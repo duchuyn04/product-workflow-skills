@@ -76,21 +76,28 @@ Kiểm tra DoD/AC, review và bằng chứng đúng revision tích hợp. Code x
 Nếu Jira đã Done nhưng chưa chứng minh DoD: hiển thị “Jira: Done; kiểm chứng: chưa đủ” cùng phần thiếu. Không tự certify, reopen hay sửa lịch sử bên ngoài quyền được cấp.
 
 ### Kiểm chứng Giao diện Web trên Browser Native trước khi Tick Done
-Đối với các tính năng hoặc stories có thành phần giao diện Web (Frontend / UI / Sơ đồ tương tác):
-- **CẤM TICK DONE KHI CHƯA XÁC THỰC GIAO DIỆN HOẶC CHƯA HỎI Ý KIẾN NGƯỜI DÙNG:** AI chủ động đề xuất và dùng công cụ `ask` để hỏi người dùng có muốn mở Engine Browser Native để test web thực tế hay không:
-  ```text
-  ask(questions=[{
-    "id": "browser_inspect_option",
-    "question": "Tính năng web đã hoàn thành code. Bạn có muốn kích hoạt Engine Browser Native để mở giao diện kiểm thử trực quan trước khi nghiệm thu Tick Done không?",
-    "options": [
-      {"label": "Mở Browser Native để kiểm thử", "description": "Tự động khởi chạy Chromium, render trang web và đối chiếu Acceptance Criteria trực quan."},
-      {"label": "Bỏ qua kiểm thử browser", "description": "Nghiệm thu dựa trên kết quả unit tests và code review hiện có."},
-      {"label": "Chạy kiểm thử ngầm (Headless Screenshot)", "description": "Chụp ảnh màn hình giao diện ngầm để đính kèm vào bằng chứng nghiệm thu."}
-    ],
-    "recommended": 0
-  }])
-  ```
-- Nếu người dùng chọn mở Browser: AI mở trình duyệt native qua `browser.open`, kiểm tra các trạng thái màn hình (Loading, Empty, Success, Error) đối chiếu với AC, chụp screenshot đính kèm vào evidence trước khi tick `[x]`.
+
+#### 1. File sơ đồ HTML/SVG: kiểm thử bắt buộc
+Đối với mọi task có thay đổi trong `docs/workflow/diagrams/*.html`:
+- Không chờ người dùng chọn và không cho phép bỏ qua. Agent phải tự động mở file bằng `browser.open`, chờ `document.fonts.ready` cùng hai animation frames, rồi kiểm tra DOM/SVG thật.
+- Evidence bắt buộc gồm kết quả đo font (`getBBox()`/`getComputedTextLength()`), overflow/padding node, connector edge attachment, label gap 6–10px, khoảng cách connector song song tối thiểu 12px và screenshot.
+- Nếu Browser Native trả `failed` hoặc không khởi chạy được (`not-run`), giữ trạng thái chưa hoàn tất và không tick `[x]`. Chỉ tick Done khi quality gate đạt trên revision tích hợp.
+- `ask` chỉ được dùng sau quality gate nếu người dùng muốn xem preview trực quan.
+
+#### 2. Giao diện Web khác
+Đối với Frontend/UI/component không phải file sơ đồ, AI vẫn dùng `ask` để xin ý kiến trước khi mở Browser Native:
+```text
+ask(questions=[{
+  "id": "browser_inspect_option",
+  "question": "Tính năng web đã hoàn thành. Bạn có muốn kích hoạt Engine Browser Native để kiểm thử trực quan trước khi nghiệm thu không?",
+  "options": [
+    {"label": "Mở Browser Native để kiểm thử", "description": "Render, đối chiếu AC, kiểm tra console và chụp screenshot."},
+    {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ áp dụng cho giao diện không phải file sơ đồ."},
+    {"label": "Chạy kiểm thử ngầm", "description": "Chụp screenshot ngầm để lưu vào evidence."}
+  ],
+  "recommended": 0
+}])
+```
 
 ## 6. Release readiness và vận hành
 

@@ -124,27 +124,33 @@ Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm th�
 
 Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm tra → kết quả → link/output → reviewer khi bắt buộc. Dùng mẫu shared khi cần lưu.
 
-### Kiểm chứng Giao diện Web với Engine Browser Native (Bắt buộc hỏi qua `ask`)
-Đối với các task có thay đổi về giao diện web (HTML/CSS, Frontend UI, component, hoặc file sơ đồ `docs/workflow/diagrams/*.html`):
-- **CẤM TỰ Ý MỞ BROWSER LÀM PHIỀN HOẶC BỎ QUA KIỂM THỬ TRỰC QUAN:** AI bắt buộc dùng công cụ `ask` để đề xuất và xin ý kiến người dùng:
-  ```text
-  ask(questions=[{
-    "id": "browser_test_option",
-    "question": "Tôi đã hoàn thành giao diện/sơ đồ web. Bạn có muốn kích hoạt Engine Browser Native để mở và kiểm thử trực quan trên trình duyệt không?",
-    "options": [
-      {"label": "Mở Browser Native để kiểm thử", "description": "Tự động khởi chạy Chromium, tải trang web/sơ đồ và kiểm tra giao diện trực quan."},
-      {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ kiểm tra mã nguồn và unit tests trong terminal."},
-      {"label": "Chạy kiểm thử ngầm (Headless Screenshot)", "description": "Chụp ảnh màn hình ngầm để kiểm tra lỗi layout mà không mở cửa sổ tương tác."}
-    ],
-    "recommended": 0
-  }])
-  ```
-- **Nếu người dùng chọn "Mở Browser Native để kiểm thử":**
-  - AI sử dụng `browser.open({ url: ... })` để mở trang web dev server hoặc file diagram HTML.
-  - Tương tác với các phần tử giao diện (`tab.click`, `tab.fill`), kiểm tra console errors (`tab.evaluate`).
-  - Chụp ảnh màn hình (`tab.screenshot()`) và trình bày bằng chứng kiểm thử trực quan cho người dùng.
-- **Nếu người dùng chọn "Chạy kiểm thử ngầm":** AI mở tab ngầm, chụp ảnh screenshot lưu vào bằng chứng kiểm chứng.
-- **Nếu người dùng chọn "Bỏ qua":** AI tiếp tục quy trình kiểm thử trong terminal.
+### Kiểm chứng Giao diện Web với Engine Browser Native
+
+#### 1. File sơ đồ HTML/SVG: quality gate tự động
+Đối với mọi task tạo hoặc sửa `docs/workflow/diagrams/*.html`:
+- AI **bắt buộc tự động** dùng `browser.open({ url: "file://..." })` trước khi bàn giao. Không gọi `ask` để quyết định có chạy kiểm thử hay không.
+- Chờ `document.fonts.ready` và hai animation frames, sau đó dùng `tab.run`/DOM thật để kiểm tra:
+  - `getBBox()`/`getComputedTextLength()` của text, font đã tải, không tràn node và padding mỗi bên tối thiểu 16px.
+  - Connector bám đúng mép node, không đi xuyên node trung gian, label cách stroke 6–10px.
+  - Connector song song cách nhau tối thiểu 12px, không trùng hoặc che nhau.
+- Chụp `tab.screenshot()` và lưu kết quả đo làm evidence. Chạy thêm `scripts/self_check.py` như kiểm tra tĩnh bổ sung.
+- Nếu assertion thất bại, sửa nguồn và chạy lại. Nếu Browser Native không khởi chạy được, ghi `not-run` cùng nguyên nhân. `failed` hoặc `not-run` đều chặn bàn giao và trạng thái Done.
+- Chỉ sau khi quality gate đạt, AI mới dùng `ask` nếu người dùng muốn preview trực quan.
+
+#### 2. Giao diện Web khác
+Đối với HTML/CSS, frontend UI hoặc component không phải file sơ đồ, AI dùng `ask` để xin ý kiến trước khi mở Browser Native:
+```text
+ask(questions=[{
+  "id": "browser_test_option",
+  "question": "Giao diện web đã hoàn thành. Bạn có muốn kích hoạt Engine Browser Native để kiểm thử trực quan không?",
+  "options": [
+    {"label": "Mở Browser Native để kiểm thử", "description": "Tải trang, tương tác, kiểm tra console và chụp screenshot."},
+    {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ áp dụng cho giao diện không phải file sơ đồ."},
+    {"label": "Chạy kiểm thử ngầm", "description": "Chụp screenshot ngầm để lưu vào evidence."}
+  ],
+  "recommended": 0
+}])
+```
 
 ## 7. Hoàn thành và cập nhật trạng thái
 

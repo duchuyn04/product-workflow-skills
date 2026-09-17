@@ -481,7 +481,8 @@ Run before producing any diagram.
 - [ ] No vertical `writing-mode` text?
 - [ ] `viewBox` expanded for the legend strip (~60px)?
 - [ ] Node origins, dimensions, gaps, padding on the 4px grid; type sizes on the role ramp?
-- [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics.)
+- [ ] Ran the mandatory Browser Native refinement gate: fonts settled, DOM/SVG geometry measured, connector rules checked, and screenshot evidence captured.
+- [ ] From the installed skill directory, did `python3 scripts/self_check.py <file>` pass? (Accessible-SVG contract, single-file safety, motion basics; supplementary to Browser Native.)
 - [ ] If animated, does the complete static/no-JS frame work, does reduced motion hide/disable playback, and is the controller copied verbatim from `assets/template-motion.html`? From a repository checkout, also run `python3 <repo-root>/scripts/verify-motion.py path/to/generated.html` plus the skin linter; from an installed skill, manually check print and static-query states on top of the self-check.
 
 **Typography:**
@@ -494,39 +495,31 @@ Run before producing any diagram.
 - [ ] No JetBrains Mono anywhere?
 
 
-## 9.1. Tinh chỉnh Font chữ & Mũi tên bằng Engine Browser Native (Browser Refinement)
+## 9.1. Tinh chỉnh Font chữ & Mũi tên bằng Engine Browser Native (Quality Gate bắt buộc)
 
-Khi tạo hoặc sửa file sơ đồ HTML/SVG trong `docs/workflow/diagrams/<tên-sơ-đồ>.html`:
-AI tận dụng Engine Browser Native của Oh My Pi (`browser.open({ url: "file://..." })`) để evaluate DOM thực tế và tự động sửa các lỗi hiển thị:
+Khi tạo hoặc sửa bất kỳ file sơ đồ HTML/SVG nào, AI **bắt buộc** chạy quality gate này trước khi bàn giao. Đây là kiểm thử tự động, không chờ người dùng chọn và không được bỏ qua:
 
-1. **Đo đạc Font chữ thực tế & Chống tràn hộp (Typography Bounding Box):**
-   - Đợi toàn bộ font web nạp xong trong runtime: `await document.fonts.ready`.
-   - Dùng `tab.evaluate()` để lấy kích thước bounding box thật của từng thẻ `<text>` (`element.getBBox()` hoặc `element.getComputedTextLength()`).
-   - Nếu nhãn tiếng Việt có dấu hoặc chuỗi văn bản dài vượt quá chiều rộng của hộp node `<rect>`, tự động tính toán lại và nới rộng `width` của hộp (đảm bảo padding tối thiểu 16px mỗi bên, bo góc `rx="6"`).
+1. **Mở và ổn định trang:**
+   - Dùng `browser.open({ url: "file://..." })` với file sơ đồ.
+   - Chờ `document.fonts.ready`, sau đó chờ thêm hai `requestAnimationFrame` để layout ổn định trước khi đo.
+   - Nếu file dùng font remote và font chưa tải được, ghi nhận lỗi; không dùng fallback để claim Pass.
 
-2. **Căn chỉnh & Nắn lại tọa độ Mũi tên (Connectors & Collision Detection):**
-   - Sau khi các node box được điều chỉnh kích thước, cập nhật lại tọa độ xuất phát `(x1, y1)` và đích đến `(x2, y2)` của các đường connector `<path>` / `<line>` để bám khít vào viền mép mới của hộp, không bị đâm xuyên vào bên trong node.
-   - Đo bounding box của nhãn mũi tên (label `<rect>` + `<text>`) để bảo đảm khoảng cách an toàn (gap) 6–10px so với đường stroke, không để nhãn đè lên mũi tên.
-   - Kiểm tra va chạm: đảm bảo hai mũi tên chạy song song cách nhau ≥ 12px, không đè lên nhau và không cắt qua các node trung gian.
+2. **Đo Font chữ thực tế & chống tràn hộp:**
+   - Dùng `tab.run`/DOM thật để lấy `getBBox()` và `getComputedTextLength()` của các node text, đặc biệt nhãn tiếng Việt có dấu.
+   - Đối chiếu text box với node `<rect>` tương ứng. Text không được tràn và phải có padding tối thiểu 16px mỗi bên.
+   - Nếu phát hiện lỗi, sửa file nguồn, mở lại trang và đo lại từ đầu.
 
-3. **Chụp ảnh màn hình xác thực ngầm (Headless Screenshot Verification):**
-   - Chạy `await tab.screenshot()` để AI tự kiểm tra trực quan bố cục toàn diện.
-   - Đóng tab (`await tab.close()`) sau khi hoàn tất hiệu chỉnh.
+3. **Kiểm tra connector và va chạm:**
+   - Xác nhận connector `<path>`/`<line>` bám đúng mép node, không đâm vào thân node và không đi xuyên node trung gian.
+   - Đo label mask và đường stroke: khoảng cách nhìn thấy phải từ 6px đến 10px.
+   - Connector song song phải cách nhau tối thiểu 12px; không có hai connector trùng stroke hoặc che nhau.
+   - Diagram mới nên gắn semantic attributes ổn định (`data-diagram-node`, `data-diagram-connector`, `data-diagram-label`) để việc đo và liên kết node/connector không phụ thuộc vào vị trí DOM.
 
-4. **Đề xuất người dùng mở xem sơ đồ trên Browser qua `ask`:**
-   - Sau khi hoàn thiện file sơ đồ, AI gọi công cụ `ask` để hỏi người dùng có muốn mở trực tiếp trên trình duyệt để kiểm tra không:
-     ```text
-     ask(questions=[{
-       "id": "view_diagram_browser",
-       "question": "Tôi đã tạo và tinh chỉnh sơ đồ tại `docs/workflow/diagrams/<tên-sơ-đồ>.html`. Bạn có muốn mở sơ đồ trên Engine Browser Native để xem trực quan không?",
-       "options": [
-         {"label": "Mở sơ đồ trên Browser Native", "description": "Tự động mở Chromium để xem trực tiếp sơ đồ sắc nét."},
-         {"label": "Xem file trong IDE", "description": "Tự mở file HTML trong trình duyệt hoặc IDE cá nhân."},
-         {"label": "Tiếp tục quy trình", "description": "Chuyển sang bước tiếp theo mà không cần xem trước."}
-       ],
-       "recommended": 0
-     }])
-     ```
+4. **Bằng chứng và điều kiện thất bại:**
+   - Chạy `await tab.screenshot()` sau khi các phép đo đạt, lưu screenshot cùng evidence của task.
+   - Đóng tab sau khi hoàn tất kiểm tra.
+   - Nếu bất kỳ assertion nào thất bại, trạng thái là `failed`; sửa nguồn và chạy lại. Nếu Browser Native không khởi chạy được, trạng thái là `not-run`. Cả hai trạng thái đều chặn bàn giao và claim Done.
+   - Chỉ sau khi quality gate đạt mới được dùng `ask` cho nhu cầu preview trực quan tùy chọn. `ask` không quyết định việc có chạy kiểm thử hay không.
 
 ---
 
