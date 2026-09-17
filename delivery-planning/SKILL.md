@@ -138,15 +138,26 @@ Chứa đầy đủ mọi thông tin cần thiết để 1 Developer hoặc 1 Su
 - Tham chiếu Schema / API: `docs/workflow/architecture/<feature>-design.md`
 - Prerequisites: [ID task phải xong trước, hoặc "Không có"]
 
-## Tiêu chí nghiệm thu (Acceptance Criteria)
-- Given [trạng thái đầu vào], When [hành động], Then [kết quả mong đợi].
+## Kịch bản kiểm thử & Bảng Test Cases chi tiết (Áp dụng tư duy Scenario vs Test Case)
+
+### Test Scenario: [Tên kịch bản kiểm thử cấp cao kế thừa từ Cổng G2 - WHAT TO TEST]
+- **Mục tiêu:** [Mô tả luồng nghiệp vụ cần kiểm chứng từ góc nhìn người dùng]
+
+### Bảng Test Cases chi tiết (HOW TO TEST):
+| Test Case ID | Loại kiểm thử | Kịch bản kiểm thử | Tiền điều kiện & Dữ liệu (Given) | Các bước thực hiện (When) | Kết quả kỳ vọng (Then) | Công cụ thực thi | Trạng thái |
+|---|---|---|---|---|---|---|---|
+| `TC-XX-01` | Unit Test | [Happy Path] Thực hiện thành công với dữ liệu chuẩn | Dữ liệu hợp lệ | Gọi hàm / API endpoint | Trả về kết quả đúng, mã HTTP 200/201 | `node:test` | `[ ]` |
+| `TC-XX-02` | Unit Test | [Negative] Từ chối dữ liệu không hợp lệ | Dữ liệu thiếu hoặc sai format | Gọi hàm / API endpoint | Ném lỗi cụ thể, mã HTTP 400 | `node:test` | `[ ]` |
+| `TC-XX-03` | Unit Test | [Boundary] Xử lý giá trị tại biên | Giá trị min hoặc max | Gọi hàm kiểm tra biên | Xử lý đúng quy tắc, không tràn số | `node:test` | `[ ]` |
+| `TC-XX-04` | Browser Native | [Visual/Render] Hiển thị giao diện / Sơ đồ chuẩn | Render bằng Chromium | Mở trang web / sơ đồ HTML | Không vỡ layout, font load đủ, gap connector >= 6px | Engine Browser Native | `[ ]` |
+| `TC-XX-05` | Browser Native | [Interactive Flow] Người dùng thao tác và xử lý lỗi | Màn hình tương tác | Bấm nút submit khi có lỗi mạng | Hiển thị thông báo lỗi, nút bấm disabled | Engine Browser Native | `[ ]` |
 
 ## Hướng dẫn kiểm chứng (Verification Steps)
-- Lệnh test: `npm test tests/path/to/test.ts`
-- Tiêu chuẩn hoàn thành: AC đạt, review bắt buộc và kiểm chứng tích hợp theo DoD.
-- Bằng chứng: [AC ID, revision/môi trường, kết quả pass/failed/not-run, link output và review]
+- Lệnh chạy Unit Test: `npm test tests/path/to/test.ts`
+- Thao tác Browser Native: Dùng Engine Browser Native kiểm tra giao diện thực tế và chụp ảnh screenshot
+- Tiêu chuẩn hoàn thành: 100% Test Cases trong bảng đạt trạng thái Pass (`[x]`), review bắt buộc đạt và vượt qua kiểm thử tích hợp theo DoD.
+- Bằng chứng nghiệm thu: [AC ID, revision/môi trường, kết quả test, screenshot link và reviewer sign-off]
 ```
-
 ## Gate G4 và bàn giao (Hard-Stop)
 
 Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.

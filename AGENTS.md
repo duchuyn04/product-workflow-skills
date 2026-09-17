@@ -110,6 +110,17 @@ Trước khi làm bất kỳ hành động nào, AI phải tự xác định yê
     ```
   - Nếu người dùng chọn mở Browser Native: AI dùng `browser.open` kết nối tới local dev server hoặc file HTML, tương tác với các nút bấm/form, kiểm tra console logs, chụp ảnh màn hình và báo cáo cho người dùng.
 
+### F. Tư duy thiết kế Test Scenario (What to test) vs Test Case (How to test)
+Hệ thống áp dụng chuẩn kiểm thử công nghiệp, tách bạch rõ ràng 2 tầng tư duy:
+1. **Test Scenario (Cổng G2 - Kịch bản cấp cao - WHAT TO TEST):**
+   - Gắn liền với từng User Story và User Journey.
+   - Mô tả mục tiêu kiểm thử nghiệp vụ từ góc nhìn người dùng: Luồng thành công (Happy Path), Xử lý từ chối (Negative), Giá trị biên (Boundary/Edge Case), Phân quyền (Security/Permissions), và Khôi phục lỗi (Failure/Recovery).
+2. **Bảng Test Cases chi tiết (Cổng G4 & Task Cards - HOW TO TEST):**
+   - Mỗi Test Scenario được phân rã thành **Bảng Test Cases độc lập** trong file `tasks/task-XX-<slug>.md`.
+   - Mỗi Test Case xác định rõ: ID (`TC-XX-01`), Loại test (**Unit Test** hay **Engine Browser Native**), Tiền điều kiện (Given), Các bước thực hiện (When), Kết quả kỳ vọng (Then), và Công cụ thực thi.
+   - **Phân định rõ trách nhiệm kiểm thử:**
+     - *Unit Test (`node:test` / runner):* Chuyên trị logic thuật toán, validation, quy tắc nghiệp vụ, tính toán, và các giá trị biên.
+     - *Engine Browser Native (Chromium):* Chuyên trị hiển thị giao diện, đo đạc DOM/SVG (`getBBox()`), chống tràn chữ, kiểm tra khoảng cách mũi tên và tương tác người dùng thực tế.
 ---
 
 ## 3. Chiến lược thực thi: Hỏi người dùng chọn Subagents qua `ask`

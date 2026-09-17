@@ -47,6 +47,16 @@ And [không tạo tác dụng phụ trái rule, nếu đây là yêu cầu]
 
 Không để AC chỉ là “API trả 200”, “giao diện đẹp” hoặc “không có lỗi”. Không thêm tính năng retry/undo/offline mặc định; chỉ đặc tả khi rule hoặc flow cần.
 
+### 2.1. Phân tách Tư duy Test Scenario (What to test) từ User Stories
+Mỗi User Story đại diện cho một giá trị người dùng. Để bảo đảm kiểm chứng toàn diện trước khi chuyển sang kỹ thuật, AI phải xây dựng **Danh mục Test Scenarios (Kịch bản kiểm thử cấp cao)** bao phủ các góc độ:
+1. **Happy Path Scenario:** Người dùng thực hiện luồng chính trong điều kiện lý tưởng.
+2. **Negative / Rejection Scenario:** Dữ liệu sai, nhập thiếu, trùng lặp hoặc vi phạm điều kiện nghiệp vụ.
+3. **Boundary / Edge Case Scenario:** Giá trị tại biên (0, min, max, độ dài chuỗi tối đa/tối thiểu).
+4. **Security / Permission Scenario:** Thao tác khi chưa đăng nhập, token hết hạn, hoặc truy cập ngoài quyền hạn.
+5. **Failure / Recovery Scenario:** Mất kết nối, timeout, thao tác lặp hoặc người dùng bấm hủy giữa chừng.
+
+Mỗi Test Scenario sẽ là đầu vào nghiệp vụ trực tiếp để Cổng G4 (`delivery-planning`) phân rã thành các **Test Cases chi tiết (How to test)** trong từng Task Card.
+
 ## 3. Thiết kế flow trước chi tiết trang trí
 
 Cho mỗi story/journey:
