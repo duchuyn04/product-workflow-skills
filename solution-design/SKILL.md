@@ -82,5 +82,6 @@ Không tạo ADR cho mọi lựa chọn vụn vặt. Không ghi rằng giải ph
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.
 
 Bàn giao cho `delivery-planning`: module map, contracts/revisions, dependency thực, shared-write conflicts, enablers/spikes cần thiết, cách tích hợp và NFR phải chứng minh. Không lập một thứ tự module cố định bỏ qua giá trị sản phẩm.
+Sau khi G3 được duyệt, bàn giao sang `delivery-planning` để phân rã task; tuyệt đối không tự ý nhảy sang `task-execution` để viết code ngay.
 
 Khi yêu cầu đổi, trình delta và affected modules/contracts/ADRs. Chỉ phần ảnh hưởng cần duyệt lại; không tự thay toàn bộ stack hoặc tự sửa callers khi người dùng chỉ hỏi phương án.

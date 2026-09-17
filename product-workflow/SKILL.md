@@ -33,6 +33,14 @@ Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu
 
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
 
+## Quy tắc bắt buộc: Chống đốt cháy giai đoạn
+
+Khi nhận yêu cầu tạo sản phẩm mới, xây dựng tính năng mới hoặc phát triển dự án từ đầu:
+- **Bắt buộc bắt đầu từ `product-discovery` (G1):** Không được nhảy cóc sang `solution-design` hay `task-execution` kể cả khi người dùng nói "Hãy code cho tôi ứng dụng X".
+- **Nghiêm cấm tự ý sinh mã nguồn:** Không chuyển sang `task-execution` hoặc tạo file code khi chưa có xác nhận phê duyệt G1 (Nghiệp vụ), G2 (Stories & UX) và G3 (Kiến trúc, Schema & API Contracts).
+- **Thực hiện tuần tự từng cổng:** Mỗi phiên chỉ tập trung hoàn thành một cổng, trình bày kết quả rõ ràng và dừng lại chờ người dùng xem xét, phản hồi trước khi tiến sang cổng kế tiếp:
+  `G1 (Nghiệp vụ)` ──► [Người dùng duyệt] ──► `G2 (Stories & UX)` ──► [Người dùng duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Người dùng duyệt] ──► `G4 (Kế hoạch task)` ──► `task-execution (Viết code)`
+
 ## Điểm quyết định theo scope
 
 - G1: nghiệp vụ và phạm vi được người có trách nhiệm xác nhận.

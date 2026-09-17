@@ -75,7 +75,7 @@ Mẫu luồng nghiệp vụ:
 
 G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và phạm vi, quy tắc của phần tính năng sắp làm đã đủ rõ ràng, và các câu hỏi còn mở không gây tắc nghẽn phần việc đó. Ghi đúng phiên bản và phạm vi duyệt.
 
-Chưa biết người duyệt thì hỏi; không tự coi người đang chat giữ mọi vai trò. Đủ G1 thì chuyển đề xuất sang `story-and-experience`, không tiếp tục phỏng vấn chỉ để thêm chi tiết chưa cần.
+Chưa biết người duyệt thì hỏi; không tự coi người đang chat giữ mọi vai trò. Đủ G1 thì trình người dùng xác nhận rồi chuyển đề xuất sang `story-and-experience` (G2); tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`).
 
 Nếu rủi ro phải thử mới biết, đề xuất thử nghiệm có câu hỏi, đầu ra và timebox để người dùng chốt. Không tự chọn giải pháp kỹ thuật trong discovery.
 

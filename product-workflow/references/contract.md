@@ -52,6 +52,14 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 | G4 Thực thi | Scope công việc đã duyệt, prerequisites và quyền thực thi đáp ứng | Người/đội có trách nhiệm theo quy định dự án |
 
 Chưa chỉ định người quyết định thì hỏi, không tự tạo approval. “OK” chỉ xác nhận đề xuất cụ thể ngay trước đó, không cấp quyền publish, claim, deploy hay duyệt mọi tài liệu tương lai.
+### Vi phạm nghiêm trọng: Đốt cháy giai đoạn (Gate-skipping)
+Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
+1. Nhảy thẳng vào viết code hoặc tạo dự án khi chưa qua các cổng G1, G2, G3.
+2. Tự chốt tech stack rồi viết code ngay mà bỏ qua việc làm rõ Business Rules và User Stories.
+3. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
+
+Mỗi cổng là một điểm dừng bắt buộc. AI phải trình bày kết quả của cổng đó, sau đó dừng lại để người dùng xem xét, phản hồi hoặc phê duyệt trước khi chuyển sang cổng kế tiếp.
+
 
 ## 5. Trạng thái, Ready và Done
 

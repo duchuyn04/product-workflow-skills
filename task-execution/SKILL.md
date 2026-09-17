@@ -18,6 +18,15 @@ Xác định người chịu trách nhiệm, người/agent thực thi và revie
 
 ## 2. Nhận task
 
+### Điều kiện tiên quyết: Kiểm tra cổng (Gate Check)
+Tuyệt đối không sinh mã nguồn hoặc tạo file code nếu phạm vi công việc chưa trải qua đầy đủ các cổng:
+- G1: Nghiệp vụ và quy tắc cốt lõi đã được người dùng phê duyệt.
+- G2: User Stories, Acceptance Criteria và luồng giao diện đã được người dùng phê duyệt.
+- G3: Database Schema và API Contracts đã được người dùng phê duyệt.
+- G4: Task cụ thể đã được phân rã với tiêu chí nghiệm thu rõ ràng.
+
+Nếu thiếu bất kỳ cổng nào ở trên, AI **bắt buộc phải từ chối viết code** và phản hồi rõ: *"Tính năng này chưa hoàn thành cổng [G1/G2/G3/G4]. Để đảm bảo chất lượng và đúng nghiệp vụ, quy trình yêu cầu chúng ta chốt [nội dung cổng] trước khi viết code."*, sau đó chuyển sang kỹ năng phù hợp.
+
 Chỉ đề nghị nhận task khi:
 - Nội dung/AC/cách kiểm chứng/contracts đủ rõ và đúng revision được duyệt.
 - Hard prerequisites đáp ứng, không có blocker ngoài hoặc dữ kiện thiếu làm vô hiệu readiness.
