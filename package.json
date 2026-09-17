@@ -32,5 +32,14 @@
     "agile",
     "scrum"
   ],
-  "license": "MIT"
+  "author": "duchuyn04",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duchuyn04/product-workflow-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/duchuyn04/product-workflow-skills/issues"
+  },
+  "homepage": "https://github.com/duchuyn04/product-workflow-skills#readme"
 }

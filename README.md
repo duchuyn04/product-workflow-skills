@@ -64,29 +64,34 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 
 ## Cài đặt
 
-### Cách 1: Cài đặt nhanh qua npx (khuyên dùng)
+### Cách 1: Cài đặt nhanh qua npx
 
-Chạy lệnh sau tại thư mục gốc của dự án:
+Chạy lệnh sau tại thư mục gốc dự án của bạn (không cần tải mã nguồn trước):
 ```bash
-npx product-workflow-skills
+npx github:duchuyn04/product-workflow-skills
 ```
+*(hoặc lệnh ngắn `npx duchuyn04/product-workflow-skills`)*
 
 Lệnh này sẽ tự động:
 - Tạo thư mục `.agents/skills/` và sao chép đầy đủ 8 kỹ năng vào dự án.
 - Tạo file `AGENTS.md` ở thư mục gốc để AI agent nhận diện quy trình.
 
-Tùy chọn khác:
+Các tùy chọn khác:
 ```bash
 # Cài vào một thư mục cụ thể
-npx product-workflow-skills ./my-project
+npx github:duchuyn04/product-workflow-skills ./my-project
 
 # Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
-npx product-workflow-skills --global
+npx github:duchuyn04/product-workflow-skills --global
 
-# Ghi đè nếu đã tồn tại
-npx product-workflow-skills --force
+# Ghi đè cập nhật nếu đã tồn tại
+npx github:duchuyn04/product-workflow-skills --force
 ```
 
+Nếu bạn đã publish package lên npmjs.com, có thể dùng tên ngắn gọn:
+```bash
+npx product-workflow-skills
+```
 ### Cách 2: Sao chép thủ công
 
 1. Sao chép các thư mục kỹ năng vào thư mục `.agents/skills/` trong dự án của bạn.

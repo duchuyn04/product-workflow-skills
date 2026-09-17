@@ -26,7 +26,8 @@ function printHelp() {
 Product Workflow Skills Installer
 
 Cách dùng:
-  npx product-workflow-skills [đường-dẫn-dự-án] [tùy-chọn]
+  npx github:duchuyn04/product-workflow-skills [đường-dẫn-dự-án] [tùy-chọn]
+  (hoặc: npx product-workflow-skills [nếu đã publish npm])
 
 Tùy chọn:
   -g, --global     Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
@@ -35,9 +36,9 @@ Tùy chọn:
   -v, --version    Xem phiên bản
 
 Ví dụ:
-  npx product-workflow-skills                 Cài vào thư mục hiện tại
-  npx product-workflow-skills ./my-project    Cài vào thư mục my-project
-  npx product-workflow-skills --global        Cài toàn cục cho Oh My Pi
+  npx github:duchuyn04/product-workflow-skills
+  npx github:duchuyn04/product-workflow-skills ./my-project
+  npx github:duchuyn04/product-workflow-skills --global
 `);
 }
 
