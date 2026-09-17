@@ -89,7 +89,7 @@ So từng AC với flow và màn hình. Rule không được stories nào bao ph
 
 G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng. Nếu phạm vi không có giao diện, ghi rõ không áp dụng kèm lý do; lúc này vẫn cần mô tả hành vi và tiêu chí nghiệm thu cho API hoặc quy trình xử lý nền.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong User Stories, AC và UI flows/states, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã hoàn thành User Stories và thiết kế luồng giao diện (Cổng G2). Bạn có duyệt nội dung này để chuyển sang thiết kế Kiến trúc kỹ thuật & API Contracts (Cổng G3) không?"*
+**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong User Stories, AC và UI flows/states, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi: *"Tôi đã hoàn thành User Stories và thiết kế luồng giao diện (Cổng G2). Bạn có duyệt nội dung này để chuyển sang thiết kế Kiến trúc kỹ thuật & API Contracts (Cổng G3) không?"* (các tùy chọn: `Duyệt và tiếp tục`, `Cần điều chỉnh`, `Giải thích thêm`).
 
 Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
 Khi tiếp tục/đổi rule, chỉ xét stories/flows liên quan và đánh dấu approval bị ảnh hưởng cần duyệt lại. Lưu links và next action theo hợp đồng, không chép toàn bộ tài liệu vào checkpoint.

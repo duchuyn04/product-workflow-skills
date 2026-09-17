@@ -83,7 +83,7 @@ G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ địn
 
 *Lưu ý cốt lõi:* Việc chỉ chọn tên công nghệ (ví dụ: React + Express + SQLite) mới chỉ là 10% của G3. G3 bắt buộc phải có Database Schema chi tiết (bảng, khóa, quan hệ), REST/GraphQL API Contracts cụ thể và ADR ghi nhận lý do.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Database Schema và API Contracts, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã hoàn thành thiết kế Schema và API Contracts (Cổng G3). Bạn có duyệt thiết kế này để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"*
+**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Database Schema và API Contracts, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi: *"Tôi đã hoàn thành thiết kế Schema và API Contracts (Cổng G3). Bạn có duyệt thiết kế này để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"* (các tùy chọn: `Duyệt và tiếp tục`, `Cần điều chỉnh`, `Giải thích thêm`).
 
 Sau khi G3 được duyệt, bàn giao sang `delivery-planning` (G4) để phân rã task. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.
 Khi yêu cầu đổi, trình delta và affected modules/contracts/ADRs. Chỉ phần ảnh hưởng cần duyệt lại; không tự thay toàn bộ stack hoặc tự sửa callers khi người dùng chỉ hỏi phương án.

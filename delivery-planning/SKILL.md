@@ -89,7 +89,19 @@ Quyền publish issue không bao gồm start/close sprint, sửa schema hay assi
 ## Gate G4 và bàn giao (Hard-Stop)
 
 Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
+**Quy tắc dừng lượt bắt buộc:** Sau khi bẻ nhỏ tính năng thành danh sách task cụ thể (1–4h) kèm thứ tự và dependency, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi để người dùng duyệt:
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi bẻ nhỏ tính năng thành danh sách task cụ thể (1–4h) kèm thứ tự và dependency, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã lập kế hoạch phân rã các task (Cổng G4). Bạn có duyệt kế hoạch này không, và bạn muốn tôi bắt đầu thực hiện task nào trước?"*
+```text
+ask(questions=[{
+  "id": "gate_g4_approval",
+  "question": "Bạn có duyệt kế hoạch phân rã task (Cổng G4) này để chuẩn bị triển khai không?",
+  "options": [
+    {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline)."},
+    {"label": "Cần chỉnh sửa danh sách task", "description": "Thêm, bớt hoặc điều chỉnh lại phạm vi các task."},
+    {"label": "Xem giải thích thứ tự phụ thuộc", "description": "Giải thích vì sao các task được sắp xếp theo thứ tự này."}
+  ],
+  "recommended": 0
+}])
+```
 
-Chỉ sau khi người dùng xác nhận kế hoạch và chỉ định task, AI mới bàn giao task đó sang `task-execution` với gói task/contracts/dependencies đầy đủ để bắt đầu triển khai mã nguồn.
+Chỉ sau khi người dùng phê duyệt kế hoạch, AI mới chuyển sang `task-execution` để bắt đầu lựa chọn mô hình thực thi (Spawn Subagents hay Inline) và phân công triển khai mã nguồn.

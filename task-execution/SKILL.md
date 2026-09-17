@@ -47,9 +47,47 @@ Nếu cơ chế an toàn có sẵn và được ủy quyền: đọc fresh → k
 Nếu thiếu Jira hoặc cơ chế claim: nói rõ chưa nhận được task; dừng phần nhận/thực thi task được quản lý chung. Có thể hoàn thiện handoff hoặc phân tích không thay đổi chung. Chỉ chuyển sang điều phối thủ công nếu người dùng đồng ý giới hạn, không coi là đã đáp ứng claim đồng thời.
 
 Timeout sau claim là kết quả chưa rõ; đối chiếu theo cơ chế có sẵn trước retry/bắt đầu. Không báo thành công chỉ vì không thấy lỗi.
+## 3. Lựa chọn chế độ thực thi trong Oh My Pi (Execution Strategy)
 
-## 3. Gói bàn giao
+Khi đã đủ điều kiện nhận việc (đạt G1–G4), Main Agent **bắt buộc gọi công cụ `ask`** để người dùng quyết định mô hình thực thi:
 
+```text
+ask(questions=[{
+  "id": "execution_mode",
+  "question": "Bạn muốn thực thi các task đã được duyệt theo hình thức nào?",
+  "options": [
+    {"label": "Spawn Subagents (Khuyên dùng trong OMP)", "description": "Tự động phân công Task Worker, Task Reviewer cho từng task và Reviewer tổng nghiệm thu cuối cùng."},
+    {"label": "Thực thi trực tiếp (Inline)", "description": "Main Agent tự viết code và kiểm thử từng task một cách tuần tự."},
+    {"label": "Từng task có xác nhận", "description": "Làm từng task và dừng lại xin ý kiến duyệt diff sau mỗi task."}
+  ],
+  "recommended": 0
+}])
+```
+
+### Quy trình Chế độ Subagents 3 tầng:
+
+#### Tầng 1: Task Worker (Subagent thực thi từng task)
+- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task cụ thể trong plan.
+- Cung cấp bối cảnh khép kín: ID task, mục tiêu, AC, file paths cụ thể, contracts/schema đúng phiên bản.
+- Yêu cầu Worker: Viết mã nguồn đúng AC, chạy unit test / smoke test, xuất bằng chứng kết quả (evidence) và diff. Không chạy test toàn dự án giữa chừng để tránh tắc nghẽn.
+
+#### Tầng 2: Task Reviewer (Subagent thẩm định từng task)
+- Ngay sau khi Task Worker nộp kết quả, Main Agent dispatch subagent reviewer (agent role `reviewer`).
+- Reviewer độc lập thẩm tra diff và evidence của task theo 2 tiêu chí:
+  1. *Spec Compliance:* Code có thỏa mãn đúng AC của task không? Có code thừa/tự ý mở rộng scope ngoài spec không?
+  2. *Code Quality:* Mã nguồn có sạch, đúng quy ước dự án, xử lý lỗi đầy đủ và không phá vỡ logic cũ không?
+- Nếu Reviewer phát hiện lỗi: Trả feedback rõ ràng để Worker sửa lại ──► Reviewer kiểm tra lại.
+- Khi Reviewer phê duyệt: Task được đánh dấu hoàn thành và chuyển sang task kế tiếp.
+
+#### Tầng 3: Reviewer Tổng (Nghiệm thu toàn diện sau khi hết tasks)
+- Sau khi TẤT CẢ các tasks trong plan đã hoàn tất, Main Agent dispatch Subagent Reviewer Tổng.
+- Nhiệm vụ của Reviewer Tổng:
+  1. Quét toàn bộ `git diff` của toàn bộ tính năng/module từ đầu đến cuối.
+  2. Chạy bộ kiểm thử tích hợp (integration tests / regression tests) toàn dự án.
+  3. Đối chiếu với Definition of Done (DoD) và tiêu chí nghiệm thu của Product Goal.
+  4. Xuất báo cáo tổng kết chất lượng và đề xuất sẵn sàng phát hành (release readiness).
+
+## 4. Gói bàn giao
 Đưa cho người/agent đủ thông tin để làm mà không cần chat gốc:
 
 | Nội dung | Bắt buộc làm rõ |
@@ -65,7 +103,7 @@ Timeout sau claim là kết quả chưa rõ; đối chiếu theo cơ chế có s
 
 Không hardcode file paths đoán mò; khám phá repo để lấy paths thật khi vào implementation. Không gửi secrets/dữ liệu hạn chế quyền cho subagents hoặc reviewer không được phép.
 
-## 4. Thực thi đúng scope
+## 5. Thực thi đúng scope
 
 1. Đọc code/quy ước/tests liên quan, trạng thái làm việc hiện tại và instructions repo; giữ nguyên thay đổi người dùng.
 2. Nêu nguyên nhân/cơ chế, giải pháp và đánh đổi trước sửa khi quy định dự án yêu cầu.
@@ -76,7 +114,7 @@ Không hardcode file paths đoán mò; khám phá repo để lấy paths thật 
 
 Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm thử phù hợp, giữ regression test khi có lỗi/biên đáng bảo vệ. Không mock thành công để né tích hợp thật trong nghiệm thu.
 
-## 5. Review và kiểm chứng
+## 6. Review và kiểm chứng
 
 - Thu evidence đúng revision/môi trường: lệnh hoặc thao tác, kết quả thật và artifact/link.
 - Review sự phù hợp spec trước, chất lượng/bảo mật/khả năng vận hành theo scope tiếp theo.
@@ -86,7 +124,7 @@ Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm th�
 
 Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm tra → kết quả → link/output → reviewer khi bắt buộc. Dùng mẫu shared khi cần lưu.
 
-## 6. Hoàn thành và cập nhật trạng thái
+## 7. Hoàn thành và cập nhật trạng thái
 
 Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.
 
@@ -94,7 +132,7 @@ Có quyền ghi Jira: dùng transition thật, ghi evidence references theo quy 
 
 Nếu Jira đã Done nhưng evidence thiếu, báo bất nhất để người có quyền xử lý; không tự chứng nhận hoặc tự sửa lịch sử. Chuyển `delivery-inspection` khi cần nhìn ảnh hưởng lên module/sprint/release.
 
-## 7. Gián đoạn, trả việc và tiếp tục
+## 8. Gián đoạn, trả việc và tiếp tục
 
 Lưu checkpoint/handoff khi được phép: output/revision, tiến độ kiểm chứng, nhánh làm việc, blockers và next action. Không tự giải phóng hay cướp owner vì một phiên im lặng.
 

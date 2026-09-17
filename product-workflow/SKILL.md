@@ -51,8 +51,16 @@ Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
 - Hoàn thành G3 (`solution-design`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `delivery-planning` (G4).
 - Hoàn thành G4 (`delivery-planning`) ──► Bàn giao từng task cụ thể cho `task-execution`.
 
-### 3. Quy tắc dừng lượt (Hard-Stop Policy)
+### 3. Quy tắc dừng lượt (Hard-Stop Policy) và công cụ `ask` trong Oh My Pi
 Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để người dùng phản hồi/duyệt. Tuyệt đối không vừa trình bày thiết kế vừa gọi công cụ tạo file mã nguồn trong cùng một turn.
+
+**Tận dụng công cụ `ask` của OMP:** Tại điểm dừng của mỗi cổng (G1, G2, G3, G4), AI ưu tiên gọi công cụ `ask` để người dùng bấm chọn duyệt trực quan:
+- Duyệt cổng: `ask` với các tùy chọn `[Duyệt và tiếp tục]` (recommended), `[Cần điều chỉnh]`, `[Hỏi thêm chi tiết]`.
+- Sau khi duyệt G4: `ask` để người dùng chọn chiến lược thực thi mã nguồn:
+  1. `Spawn Subagents`: Dispatch Task Worker ──► Task Reviewer từng task ──► Reviewer tổng (Khuyến nghị cho OMP).
+  2. `Thực thi tuần tự (Inline)`: Main Agent tự thực thi và kiểm thử từng task.
+  3. `Từng task có xác nhận`: Làm xong mỗi task thì dừng lại xin duyệt diff trước khi sang task kế tiếp.
+
 ## Điểm quyết định theo scope
 
 - G1: nghiệp vụ và phạm vi được người có trách nhiệm xác nhận.

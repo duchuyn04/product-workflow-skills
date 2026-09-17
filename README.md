@@ -63,6 +63,19 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 - Gate G3 (Kiến trúc): Công nghệ, schema dữ liệu và hợp đồng API cần cho triển khai đã được phê duyệt.
 - Gate G4 (Sẵn sàng thực thi): Tính năng đã được chia thành các task cụ thể, đầy đủ điều kiện tiên quyết và không còn vướng mắc kỹ thuật.
 
+## Tối ưu hóa cho Oh My Pi (OMP)
+
+Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính năng native:
+- **Duyệt cổng tương tác bằng công cụ `ask`**: Thay vì phải tự gõ lệnh, terminal hiển thị menu chọn trực quan (`[Duyệt và tiếp tục]`, `[Cần điều chỉnh]`, `[Giải thích thêm]`) tại mỗi cổng G1–G4.
+- **Lập kế hoạch chi tiết (Plan Mode)**: Bẻ nhỏ tính năng thành các task độc lập kèm đầy đủ file paths và tiêu chí nghiệm thu (AC) trước khi viết code.
+- **Hỏi người dùng chọn mô hình Subagents**: Sau khi duyệt Cổng G4, AI dùng `ask` để bạn chọn:
+  1. **Spawn Subagents (Mô hình 3 tầng)**:
+     - *Task Worker*: Subagent thực thi code và kiểm thử cho từng task độc lập.
+     - *Task Reviewer*: Subagent thẩm định diff ngay sau mỗi task (Spec Compliance + Code Quality).
+     - *Reviewer Tổng*: Subagent kiểm tra toàn bộ git diff, chạy test tích hợp và đối chiếu Definition of Done (DoD) trước khi hoàn tất tính năng.
+  2. **Thực thi tuần tự (Inline Execution)**: Main Agent tự làm từng task.
+  3. **Từng task có xác nhận**: Dừng lại xin duyệt diff sau mỗi task.
+
 ## Cài đặt
 
 ### Cách 1: Cài đặt chuẩn qua npx skills
