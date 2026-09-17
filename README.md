@@ -95,28 +95,49 @@ Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính nă
   - *Sửa mũi tên & font chữ trong Diagram*: Đợi font web nạp xong, đo chính xác bounding box thật của chữ qua DOM, nới rộng hộp node nếu chữ tràn (tiếng Việt có dấu) và nắn lại tọa độ mũi tên bám khít mép hộp mà không đâm xuyên node. Chụp ảnh màn hình ngầm để thẩm định bố cục.
   - *Đề xuất kiểm thử Web trực quan qua `ask`*: Sau khi hoàn thành task giao diện web hoặc tạo sơ đồ HTML, AI chủ động dùng `ask` hỏi bạn có muốn mở Browser Native để test web hay không, giúp kiểm tra giao diện trực quan và bắt lỗi console trước khi nghiệm thu.
 ## Cài đặt
+### Cách 1 (Khuyên dùng): Cài đặt qua trình quản lý chuẩn quốc tế `npx skills`
 
-### Chạy installer bằng npx
+Chạy lệnh sau trong terminal của bạn để mở giao diện tương tác chọn skills (giống hệt ảnh của bạn):
 
-Trong terminal tại dự án, chạy:
+```bash
+npx skills@latest add duchuyn04/product-workflow-skills
+```
+
+Giao diện terminal sẽ hiển thị bảng danh sách 9 skills:
+- Dùng phím mũi tên `↑` `↓` để di chuyển.
+- Phím `Space` để chọn hoặc bỏ chọn từng kỹ năng, hoặc chọn `Select All (0/9)`.
+- Phím `Enter` để xác nhận cài đặt.
+
+**Các tùy chọn cài đặt nhanh:**
+```bash
+# Cài đặt tự động toàn bộ 9 skills không cần chọn thủ công
+npx skills@latest add duchuyn04/product-workflow-skills -y --all
+
+# Cài đặt toàn cục (Global) cho tài khoản máy tính
+npx skills@latest add duchuyn04/product-workflow-skills -g
+
+# Cập nhật các skills đã cài lên phiên bản mới nhất
+npx skills update
+```
+
+---
+
+### Cách 2: Trình cài đặt kèm đồng bộ tự động `AGENTS.md`
+
+Nếu bạn muốn cài đặt và tự động tạo hoặc tích hợp khối chỉ dẫn vào file `AGENTS.md` ở thư mục gốc dự án:
 
 ```bash
 npx github:duchuyn04/product-workflow-skills
 ```
 
-Installer hiển thị hai lựa chọn:
-
+Installer hiển thị menu lựa chọn:
 ```text
 1. Project: .agents/skills/ và AGENTS.md trong dự án hiện tại
 2. Global: ~/.omp/agent/skills/ cho Oh My Pi
 ```
+Nhập `1` (hoặc Enter) để cài cho Project; nhập `2` để cài Global.
 
-Nhập `1` hoặc Enter để cài Project; nhập `2` để cài Global. Ctrl+C hủy trước khi ghi file.
-
-Project cài toàn bộ 9 skills và tạo/cập nhật khối chỉ dẫn trong `AGENTS.md`, giữ nguyên các quy tắc riêng ngoài khối đó. Global cài 9 skills cho tài khoản hiện tại trong Oh My Pi, không sửa `AGENTS.md` hay `.agents/` của dự án.
-
-Có thể chọn trực tiếp, không qua menu:
-
+Có thể chọn trực tiếp bằng cờ:
 ```bash
 # Cài vào dự án hiện tại
 npx github:duchuyn04/product-workflow-skills --project
@@ -127,9 +148,6 @@ npx github:duchuyn04/product-workflow-skills --project ./my-project
 # Cài global cho Oh My Pi
 npx github:duchuyn04/product-workflow-skills --global
 ```
-
-Trong script/CI không có terminal tương tác, phải truyền `--project`, đường dẫn dự án hoặc `--global`. Không kết hợp hai phạm vi; đường dẫn dự án không áp dụng cho Global. Chạy lại installer để cập nhật skills tại phạm vi đã chọn.
-
 ### Đóng gói và chạy bản local
 
 Từ thư mục mã nguồn:
@@ -147,18 +165,6 @@ npx --yes --package ./product-workflow-skills-1.0.0.tgz product-workflow-skills
 Có thể thêm `--project ./my-project` hoặc `--global` sau tên lệnh `product-workflow-skills`. Trong terminal tương tác, bỏ cờ để dùng menu.
 
 Sau khi chủ sở hữu publish package lên npm, có thể gọi `npx product-workflow-skills`. `npm pack` chỉ tạo gói local, không publish hoặc cập nhật GitHub.
-
-### Cài qua trình quản lý skills.sh
-
-Để chọn vị trí theo harness được skills.sh hỗ trợ:
-
-```bash
-npx skills@latest add duchuyn04/product-workflow-skills
-npx skills@latest add duchuyn04/product-workflow-skills -y --all
-npx skills@latest add duchuyn04/product-workflow-skills -g
-```
-
-Đây là trình cài riêng của skills.sh; menu Project/Global và tích hợp `AGENTS.md` ở trên thuộc installer của package này.
 
 ### Sao chép thủ công
 
