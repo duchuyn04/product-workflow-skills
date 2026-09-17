@@ -42,7 +42,7 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 
 ## 4. Câu hỏi và gates
 
-Đọc nguồn trước khi hỏi. Hỏi 2–3 câu cùng chủ đề mỗi lượt, ưu tiên câu ảnh hưởng scope/kiến trúc/an toàn; ghi lý do và phương án có tradeoff. Không hỏi lại câu đã trả lời nếu nguồn chưa mâu thuẫn hoặc thay đổi.
+Đọc nguồn trước khi hỏi. Hỏi theo từng chủ đề có trọng tâm (mỗi lượt 3–5 câu qua công cụ `ask`). Với hệ thống lớn, bắt buộc phân rã phân hệ và phỏng vấn cuốn chiếu qua nhiều vòng, không giới hạn cơ học số lượng câu hỏi cần thiết để làm rõ toàn diện nghiệp vụ.
 
 | Gate | Điều kiện | Người quyết định |
 |---|---|---|
@@ -55,11 +55,12 @@ Chưa chỉ định người quyết định thì hỏi, không tự tạo appro
 ### Vi phạm nghiêm trọng: Đốt cháy giai đoạn (Gate-skipping)
 Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
 1. Nhảy thẳng vào viết code hoặc tạo dự án khi chưa qua các cổng G1, G2, G3.
-2. Tự chốt tech stack rồi viết code ngay mà bỏ qua việc làm rõ Business Rules và User Stories.
-3. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
+2. Tự suy đoán nghiệp vụ thay vì dùng công cụ `ask` phỏng vấn người dùng ở Cổng G1.
+3. Tự quyết định tech stack trong đầu thay vì đề xuất 2–3 phương án và dùng `ask` để người dùng chọn ở Cổng G3.
+4. Chỉ in tài liệu ra chat mà không dùng công cụ `write` lưu file vật lý vào thư mục `docs/workflow/`.
+5. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
 
-Mỗi cổng là một điểm dừng bắt buộc. AI phải trình bày kết quả của cổng đó, sau đó dừng lại để người dùng xem xét, phản hồi hoặc phê duyệt trước khi chuyển sang cổng kế tiếp.
-
+Mỗi cổng là một điểm dừng bắt buộc. AI phải lưu file tài liệu vào `docs/workflow/`, trình bày tóm tắt và dùng công cụ `ask` để người dùng duyệt trước khi chuyển sang cổng kế tiếp.
 
 ## 5. Trạng thái, Ready và Done
 

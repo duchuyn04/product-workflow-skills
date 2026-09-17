@@ -12,18 +12,31 @@ hide: true
 
 Yêu cầu hiện tại, dự án/scope, tài liệu và quyết định đã có, người hiểu nghiệp vụ, mục tiêu/ràng buộc đã biết. Nếu được yêu cầu tiếp tục, đọc checkpoint và các nguồn được trỏ tới, không bắt đầu một bảng hỏi mới từ đầu.
 
-## Quy trình phỏng vấn
+## Quy trình phỏng vấn nghiệp vụ (Bắt buộc dùng `ask`)
 
-### 1. Lập bản đồ điều đã biết
+### 1. Đánh giá quy mô & Phân rã trước khi hỏi
+CẤM TỰ Ý ĐOÁN NGHIỆP VỤ rồi đưa ra bản tóm tắt có sẵn. AI phải đánh giá quy mô bài toán:
+- **Nếu là tính năng nhỏ / đơn lẻ:** Tiến hành 1 vòng phỏng vấn (3–5 câu hỏi trọng tâm qua `ask`) ──► Chốt brief.
+- **Nếu là dự án lớn / nền tảng phức tạp (Website hoàn chỉnh, SaaS, E-commerce, ERP...):**
+  - **Tuyệt đối không dồn hàng chục hay hàng trăm câu hỏi vào một lượt.**
+  - **Phân rã thành các phân hệ trước (Decomposition First):** Cùng người dùng vạch ra bức tranh toàn cảnh và phân rã thành danh mục các phân hệ độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Đặt hàng & Thanh toán, Quản lý kho, Quản trị Admin...).
+  - Chọn một phân hệ ưu tiên làm trước (MVP hoặc phân hệ nền tảng).
 
-Đọc nguồn liên quan, ưu tiên lời xác nhận của người dùng và hồ sơ hiện hành. Lập bốn nhóm: đã xác nhận, giả thuyết, câu hỏi mở, ngoài phạm vi. Ghi nguồn/revision; tài liệu nhiều trang không có nghĩa nghiệp vụ đã được duyệt.
+### 2. Phỏng vấn cuốn chiếu nhiều vòng (Multi-Round Thematic Deep-Dive)
+Với mỗi phân hệ, AI tiến hành phỏng vấn sâu qua **nhiều vòng (nhiều lượt trao đổi)**, mỗi lượt tập trung vào một chủ đề:
+1. *Vòng 1 - Luồng người dùng chính:* Happy path, triggers, các bước thao tác, dữ liệu nhập và kết quả mong muốn.
+2. *Vòng 2 - Quy tắc nghiệp vụ cốt lõi:* Công thức tính toán, trạng thái dữ liệu, điều kiện ràng buộc (invariants).
+3. *Vòng 3 - Xử lý ngoại lệ & lỗi biên:* Trùng lặp dữ liệu, thao tác đồng thời, mất kết nối, người dùng nhập sai, hết quyền hạn.
+4. *Vòng 4 - Tích hợp & phi chức năng:* Dịch vụ bên thứ ba (cổng thanh toán, vận chuyển, email), giới hạn SLA, bảo mật.
 
-Nếu hai nguồn mâu thuẫn, nêu quyết định đang xung đột và ảnh hưởng; hỏi người có trách nhiệm. Không tự chọn câu trả lời thuận tiện cho implementation.
+*Tổng số câu hỏi có thể lên tới hàng chục đến hàng trăm câu hỏi qua nhiều lượt trao đổi, đào sâu chi tiết từng góc cạnh của website.*
 
-### 2. Hỏi theo rủi ro, không theo số trang
-
-Mỗi lượt 2–3 câu cùng chủ đề, kèm lý do cần biết và phương án/tradeoff khi có. Đợi câu trả lời trước khi đặc tả phần phụ thuộc. Không hỏi lại dữ kiện đọc được; không tự tạo business rule từ best practice chung.
-
+### 3. Kỹ thuật giảm tải nhận thức qua công cụ `ask`
+Để người dùng không bị mệt mỏi khi phải trả lời nhiều câu hỏi:
+- AI đưa ra câu hỏi dạng trắc nghiệm với các phương án lựa chọn A, B, C cụ thể qua `ask`, nêu rõ tình huống và gợi ý phương án chuẩn công nghiệp.
+- Người dùng chỉ cần bấm chọn phương án phù hợp.
+- Sau mỗi vòng phỏng vấn, AI dùng `ask` hỏi: *"Bạn có muốn phỏng vấn sâu tiếp về [chủ đề tiếp theo] không, hay thông tin đã đủ để chốt Business Brief cho phân hệ này?"*
+- Chỉ khi người dùng xác nhận đã đủ thông tin, AI mới bắt đầu tổng hợp thành tài liệu Business Brief.
 Bao phủ các chiều sau theo mức liên quan:
 
 | Chiều | Cần làm rõ | Ví dụ câu hỏi |
@@ -50,9 +63,12 @@ Thử phản ví dụ cho rule: rỗng, biên, lặp, đồng thời, hết quy�
 
 Trình từng phần ngắn, không đổ một PRD dài trước khi xác nhận hiểu đúng. Sửa kết luận theo phản hồi, giữ lịch sử quyết định quan trọng. Nếu được phép lưu, cập nhật nguồn hiện hữu; chỉ tạo file mới khi nó có trách nhiệm riêng.
 
-## Đầu ra: business brief
+## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
-- Product Goal: kết quả, người hưởng lợi, thước đo và nguồn dữ liệu đo; phần chưa biết ghi rõ.
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
+`docs/workflow/specs/<tên-tính-năng>-brief.md`
+
+Nội dung file bao gồm:
 - Stakeholders/actors và ma trận quyền theo hành động/dữ liệu.
 - Glossary: thuật ngữ, định nghĩa domain, ví dụ và từ dễ nhầm.
 - As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ.
@@ -73,12 +89,13 @@ Mẫu luồng nghiệp vụ:
 
 ## Gate G1 và điều kiện dừng (Hard-Stop)
 
-G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và phạm vi, quy tắc của phần tính năng sắp làm đã đủ rõ ràng, và các câu hỏi còn mở không gây tắc nghẽn phần việc đó. Ghi đúng phiên bản và phạm vi duyệt.
+G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và phạm vi, quy tắc của phần tính năng sắp làm đã đủ rõ ràng, và các câu hỏi còn mở không gây tắc nghẽn phần việc đó.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Business Brief và Business Rules, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi: *"Tôi đã tóm tắt mục tiêu và quy tắc nghiệp vụ (Cổng G1). Bạn có đồng ý duyệt nội dung này để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"* (các tùy chọn: `Duyệt và tiếp tục`, `Cần điều chỉnh`, `Giải thích thêm`).
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/specs/<tên-tính-năng>-brief.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã phỏng vấn và ghi lại Business Brief tại `docs/workflow/specs/<tên-tính-năng>-brief.md`. Bạn có duyệt tài liệu này (Cổng G1) để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
+- Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh quy tắc]`, `[Xem giải thích chi tiết]`.
 
 Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.
-
 ## Thay đổi và tiếp tục
 
 Khi rule đổi, ghi delta so với revision đã duyệt; liệt kê stories/flows/contracts cần xem lại nếu đã có liên kết. Không xóa lịch sử hoặc kéo toàn dự án về Draft. Bàn giao cho `delivery-inspection` để đánh giá tác động liên ngành khi cần.

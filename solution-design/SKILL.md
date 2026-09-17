@@ -18,21 +18,26 @@ Ghi yêu cầu bắt buộc, mong muốn và chưa biết: loại sản phẩm, 
 
 Không bịa con số tải, SLA hoặc năng lực thành viên. Ràng buộc chưa có nguồn phải hỏi hoặc ghi giả thuyết cần kiểm chứng. Không tự mặc định Next.js, microservices, monorepo hay cloud cụ thể.
 
-## 2. So sánh stack
+## 2. So sánh và lựa chọn Tech Stack (Bắt buộc dùng `ask`)
 
-Chọn 2–3 phương án khả thi có thể đáp ứng yêu cầu bắt buộc; ưu tiên phương án đơn giản và công nghệ đội vận hành được. Nếu chỉ một phương án hợp lệ vì ràng buộc thật, giải thích thay vì tạo đối thủ giả.
+AI **TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý CHỌN TECH STACK TRONG ĐẦU**.
+- Phân tích yêu cầu và đề xuất 2–3 phương án công nghệ khả thi kèm ưu/nhược điểm cụ thể.
+- **Bắt buộc dùng công cụ `ask` của Oh My Pi** để người dùng trực tiếp bấm chọn phương án:
 
-| Tiêu chí | Phương án A | Phương án B | Nguồn/bằng chứng | Quyết định cần |
-|---|---|---|---|---|
-| Yêu cầu bắt buộc | | | | |
-| Năng lực đội và bảo trì | | | | |
-| Chi phí và vận hành | | | | |
-| Kiểm thử, bảo mật, triển khai | | | | |
-| Phụ thuộc nhà cung cấp/đường thay đổi | | | | |
+```text
+ask(questions=[{
+  "id": "tech_stack_selection",
+  "question": "Bạn muốn sử dụng phương án công nghệ (Tech Stack) nào cho tính năng/dự án này?",
+  "options": [
+    {"label": "Phương án 1 (Khuyến nghị)", "description": "Tóm tắt stack + ưu điểm (ví dụ: Next.js + PostgreSQL)."},
+    {"label": "Phương án 2 (Đơn giản / Gọn nhẹ)", "description": "Tóm tắt stack + ưu điểm (ví dụ: React Vite + Express + SQLite)."},
+    {"label": "Phương án 3 (Tùy biến khác)", "description": "Người dùng tự nhập hoặc chọn stack khác."}
+  ],
+  "recommended": 0
+}])
+```
 
-Không chấm điểm chính xác giả. Nếu dùng trọng số, người dùng/đội phải chốt tiêu chí và trọng số; giải thích độ không chắc chắn. Giá/capability bên ngoài ảnh hưởng quyết định phải kiểm tra nguồn cập nhật.
-
-Đề xuất rõ phương án, lý do và đánh đổi; người có trách nhiệm kỹ thuật/sản phẩm xác nhận quyết định liên quan. Đừng để “AI khuyến nghị” thành approval.
+Chỉ sau khi người dùng xác nhận lựa chọn Tech Stack qua `ask`, AI mới tiến hành vẽ ranh giới, thiết kế Database Schema và API Contracts.
 
 ## 3. Giải quyết rủi ro bằng spike khi cần
 
@@ -76,14 +81,26 @@ Mẫu ADR:
 - Người duyệt, revision/bằng chứng và điều kiện xem xét lại.
 
 Không tạo ADR cho mọi lựa chọn vụn vặt. Không ghi rằng giải pháp đã triển khai khi mới thiết kế.
+## Đầu ra: Lưu file tài liệu kiến trúc (Docs-First)
+
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
+`docs/workflow/architecture/<tên-tính-năng>-design.md`
+
+Nội dung file bao gồm:
+- Quyết định lựa chọn Tech Stack và lý do (ADR).
+- Ranh giới module và Data Flow.
+- Database Schema chi tiết (các bảng, khóa chính/ngoại, kiểu dữ liệu, quan hệ).
+- REST/GraphQL API Contracts cụ thể (Endpoints, Request/Response payloads, mã lỗi).
 
 ## Gate G3 và bàn giao (Hard-Stop)
 
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.
 
-*Lưu ý cốt lõi:* Việc chỉ chọn tên công nghệ (ví dụ: React + Express + SQLite) mới chỉ là 10% của G3. G3 bắt buộc phải có Database Schema chi tiết (bảng, khóa, quan hệ), REST/GraphQL API Contracts cụ thể và ADR ghi nhận lý do.
+*Lưu ý cốt lõi:* Việc chỉ chọn tên công nghệ (ví dụ: React + Express + SQLite) mới chỉ là 10% của G3. G3 bắt buộc phải có Database Schema chi tiết và API Contracts được lưu trữ vào file.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Database Schema và API Contracts, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi: *"Tôi đã hoàn thành thiết kế Schema và API Contracts (Cổng G3). Bạn có duyệt thiết kế này để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"* (các tùy chọn: `Duyệt và tiếp tục`, `Cần điều chỉnh`, `Giải thích thêm`).
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/architecture/<tên-tính-năng>-design.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã thiết kế xong Schema và API Contracts tại `docs/workflow/architecture/<tên-tính-năng>-design.md`. Bạn có duyệt tài liệu kiến trúc này (Cổng G3) để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"*
+- Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Schema/API]`, `[Xem giải thích chi tiết]`.
 
 Sau khi G3 được duyệt, bàn giao sang `delivery-planning` (G4) để phân rã task. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.
 Khi yêu cầu đổi, trình delta và affected modules/contracts/ADRs. Chỉ phần ảnh hưởng cần duyệt lại; không tự thay toàn bộ stack hoặc tự sửa callers khi người dùng chỉ hỏi phương án.

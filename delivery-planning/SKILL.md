@@ -85,16 +85,26 @@ Chưa kết nối Jira: xuất draft theo `skill://product-workflow/references/r
 Có Jira: đọc project/board/hierarchy/fields/link types/permissions thực tế; đối chiếu backlog để tránh trùng. Trình breakdown và ảnh hưởng; lấy phê duyệt publish khi chưa được ủy quyền. Tạo theo dependency để liên kết keys thật, chỉ báo thành công sau output xác nhận. Timeout sau ghi phải đối chiếu, không tạo lại mù.
 
 Quyền publish issue không bao gồm start/close sprint, sửa schema hay assign người khác. Không tự thay parent issue chỉ vì đã tạo subtasks.
+## Đầu ra: Lưu file kế hoạch thực thi (Docs-First)
+
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
+`docs/workflow/plans/<tên-tính-năng>-plan.md`
+
+Nội dung file bao gồm:
+- Danh sách các task phân rã (1–4 giờ).
+- Chi tiết từng task: ID, mục tiêu, các file paths cần sửa/tạo, Acceptance Criteria, và cách kiểm chứng.
+- Ma trận phụ thuộc (Dependency graph) và các nhóm task có thể chạy song song.
 
 ## Gate G4 và bàn giao (Hard-Stop)
 
 Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
-**Quy tắc dừng lượt bắt buộc:** Sau khi bẻ nhỏ tính năng thành danh sách task cụ thể (1–4h) kèm thứ tự và dependency, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi để người dùng duyệt:
+
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/plans/<tên-tính-năng>-plan.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 
 ```text
 ask(questions=[{
   "id": "gate_g4_approval",
-  "question": "Bạn có duyệt kế hoạch phân rã task (Cổng G4) này để chuẩn bị triển khai không?",
+  "question": "Tôi đã lập kế hoạch phân rã task tại `docs/workflow/plans/<tên-tính-năng>-plan.md`. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
   "options": [
     {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline)."},
     {"label": "Cần chỉnh sửa danh sách task", "description": "Thêm, bớt hoặc điều chỉnh lại phạm vi các task."},

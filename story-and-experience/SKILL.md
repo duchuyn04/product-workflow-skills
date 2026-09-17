@@ -85,11 +85,24 @@ Tái sử dụng design system/component hiện có. Không chọn style, font h
 
 So từng AC với flow và màn hình. Rule không được stories nào bao phủ phải được nêu; UI behavior không có nguồn thì hỏi có phải feature mới. Không tuyên bố đã test trình duyệt khi mới walkthrough tài liệu.
 
+## Đầu ra: Lưu file tài liệu User Stories & UX (Docs-First)
+
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
+`docs/workflow/specs/<tên-tính-năng>-stories.md`
+
+Nội dung file bao gồm:
+- Story Map phân rã theo hành trình người dùng.
+- Chi tiết các User Stories kèm Acceptance Criteria quan sát được (chuẩn Given-When-Then).
+- Luồng thao tác chi tiết (Flow catalogue) và các nhánh rẽ lỗi / từ chối quyền.
+- Danh mục màn hình và ma trận trạng thái UI (Loading, Empty, Error, Success).
+
 ## Gate G2 và bàn giao (Hard-Stop)
 
-G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng. Nếu phạm vi không có giao diện, ghi rõ không áp dụng kèm lý do; lúc này vẫn cần mô tả hành vi và tiêu chí nghiệm thu cho API hoặc quy trình xử lý nền.
+G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong User Stories, AC và UI flows/states, AI phải **DỪNG TIN NHẮN** hoặc gọi công cụ `ask` của Oh My Pi: *"Tôi đã hoàn thành User Stories và thiết kế luồng giao diện (Cổng G2). Bạn có duyệt nội dung này để chuyển sang thiết kế Kiến trúc kỹ thuật & API Contracts (Cổng G3) không?"* (các tùy chọn: `Duyệt và tiếp tục`, `Cần điều chỉnh`, `Giải thích thêm`).
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/specs/<tên-tính-năng>-stories.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã hoàn thành User Stories và thiết kế UI States tại `docs/workflow/specs/<tên-tính-năng>-stories.md`. Bạn có duyệt tài liệu này (Cổng G2) để chuyển sang thiết kế Kiến trúc & API Contracts (Cổng G3) không?"*
+- Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Stories/UX]`, `[Xem giải thích chi tiết]`.
 
 Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
 Khi tiếp tục/đổi rule, chỉ xét stories/flows liên quan và đánh dấu approval bị ảnh hưởng cần duyệt lại. Lưu links và next action theo hợp đồng, không chép toàn bộ tài liệu vào checkpoint.

@@ -61,6 +61,15 @@ Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kế
   2. `Thực thi tuần tự (Inline)`: Main Agent tự thực thi và kiểm thử từng task.
   3. `Từng task có xác nhận`: Làm xong mỗi task thì dừng lại xin duyệt diff trước khi sang task kế tiếp.
 
+### 4. Nguyên tắc Docs-First (Lưu trữ file tài liệu vật lý ra `docs/workflow/`)
+CẤM CHỈ IN TÀI LIỆU TRONG CHAT. Mỗi cổng hoàn thành bắt buộc phải dùng công cụ `write` lưu file Markdown thật vào thư mục `docs/workflow/` để người dùng đọc lại, lưu trữ và theo dõi phiên bản:
+- Cổng G1: `docs/workflow/specs/<tên-tính-năng>-brief.md`
+- Cổng G2: `docs/workflow/specs/<tên-tính-năng>-stories.md`
+- Cổng G3: `docs/workflow/architecture/<tên-tính-năng>-design.md`
+- Cổng G4: `docs/workflow/plans/<tên-tính-năng>-plan.md`
+
+Sau khi tạo file, thông báo đường dẫn file đã tạo để người dùng mở trong IDE xem lại, sau đó mới gọi công cụ `ask` để duyệt cổng.
+
 ## Điểm quyết định theo scope
 
 - G1: nghiệp vụ và phạm vi được người có trách nhiệm xác nhận.

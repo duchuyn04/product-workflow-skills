@@ -1,6 +1,6 @@
 # Quy tắc bắt buộc của Product Workflow (Tối ưu cho Oh My Pi)
 
-Hệ thống tuân thủ nguyên tắc kiểm soát chất lượng nghiêm ngặt (Hard-Gate System) kết hợp sức mạnh native của **Oh My Pi (OMP)**: công cụ `ask`, quy trình `plan`, và điều phối `subagents` (`task` tool).
+Hệ thống tuân thủ nguyên tắc kiểm soát chất lượng nghiêm ngặt (Hard-Gate System) kết hợp sức mạnh native của **Oh My Pi (OMP)**: công cụ `ask`, quy trình `plan`, lưu trữ tài liệu vật lý (`docs/workflow/`), và điều phối `subagents` (`task` tool).
 
 ---
 
@@ -24,16 +24,37 @@ Trước khi làm bất kỳ hành động nào, AI phải tự xác định yê
 
 ---
 
-## 2. Tận dụng sức mạnh Oh My Pi: Cổng dừng, Ask & Plan
+## 2. Ba nguyên tắc cốt lõi: Phỏng vấn, Minh bạch Stack & Docs-First
 
-### Tương tác duyệt cổng bằng công cụ `ask`
-Tại mỗi điểm dừng cổng (G1, G2, G3, G4), AI **bắt buộc sử dụng công cụ `ask` của OMP** để người dùng chọn trực quan trên terminal:
-- Lựa chọn duyệt: `[Duyệt và chuyển sang cổng tiếp theo]`, `[Cần điều chỉnh lại]`, `[Xem giải thích chi tiết]`.
+### A. Phỏng vấn nghiệp vụ thích ứng theo quy mô (Cổng G1)
+- **CẤM TỰ SUY ĐOÁN NGHIỆP VỤ:** Tuyệt đối không tự ý quyết định luồng nghiệp vụ thay cho người dùng rồi bắt họ duyệt một bản tóm tắt có sẵn.
+- **Chiến lược phỏng vấn theo quy mô dự án:**
+  - *Dự án nhỏ / Tính năng đơn lẻ:* 1 vòng phỏng vấn (3–5 câu hỏi trọng tâm qua `ask`) ──► Chốt brief.
+  - *Dự án lớn / Nền tảng phức tạp (E-commerce, SaaS, ERP, Portal...):*
+    1. **Phân rã phân hệ trước (Decomposition First):** Không dồn hàng chục hay cả trăm câu hỏi vào một lượt gây kiệt sức cho người dùng. AI trước tiên giúp người dùng định vị bức tranh tổng thể và phân rã thành các phân hệ/module độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Giỏ hàng & Thanh toán, Quản lý kho, Dashboard...).
+    2. **Phỏng vấn cuốn chiếu nhiều vòng (Multi-Round Thematic Deep-Dive):** Chọn phân hệ ưu tiên làm trước, phỏng vấn sâu qua nhiều lượt (mỗi lượt 3–5 câu hỏi cùng chủ đề qua `ask`), đào sâu lần lượt:
+       - Luồng người dùng chính (Happy path & Actors).
+       - Quy tắc nghiệp vụ cốt lõi (Business rules, invariants & calculations).
+       - Trường hợp ngoại lệ & lỗi biên (Edge cases, permissions, concurrency, errors).
+       - Tích hợp & phi chức năng (Third-party APIs, SLA, bảo mật).
+       *Tổng số câu hỏi phỏng vấn có thể lên tới hàng chục đến hàng trăm câu qua nhiều lượt trao đổi, tuyệt đối không bị giới hạn cơ học.*
+    3. **Giảm tải nhận thức qua `ask`:** Đưa ra các kịch bản thực tế kèm các phương án lựa chọn (A, B, C) để người dùng bấm chọn nhanh, tránh bắt người dùng gõ văn bản quá dài.
+    4. **Kiểm soát điểm dừng:** Sau mỗi vòng, AI dùng `ask` hỏi: *"Bạn có muốn phỏng vấn sâu tiếp về [chủ đề tiếp theo] không, hay thông tin đã đủ để chốt Business Brief cho phần này?"*
+- Sau khi người dùng xác nhận đã đủ thông tin phỏng vấn, AI mới tổng hợp và ghi ra file tài liệu.
 
-### Lập kế hoạch (Plan Mode) tại G4
-Trước khi viết bất kỳ dòng code nào, kỹ năng `delivery-planning` (G4) phải tạo một bản kế hoạch hoàn chỉnh:
-- Bẻ nhỏ tính năng thành các task độc lập (1–4 giờ).
-- Xác định rõ: mục tiêu, files cần sửa, tiêu chí nghiệm thu (AC), và cách kiểm chứng cho từng task.
+### B. Minh bạch Tech Stack (Cổng G3)
+- **CẤM TỰ Ý CHỌN TECH STACK TRONG ĐẦU:** Không được tự mặc định công nghệ (như tự chọn React, Vite, Express, SQLite...) mà không hỏi ý kiến người dùng.
+- **Đề xuất và hỏi qua `ask`:** Đưa ra 2–3 phương án công nghệ khả thi kèm ưu/nhược điểm (tradeoffs), sau đó dùng công cụ `ask` để người dùng chủ động chọn stack.
+- Sau khi người dùng chọn xong tech stack mới tiến hành thiết kế chi tiết Database Schema, API Contracts và ADR.
+
+### C. Nguyên tắc Docs-First: Bắt buộc ghi file tài liệu vật lý ra `docs/workflow/`
+- **CẤM CHỈ NÓI SUÔNG TRONG CHAT:** Mọi tài liệu thiết kế nếu chỉ in ra cửa sổ chat sẽ bị trôi mất ngữ cảnh và người dùng không có gì để lưu trữ, đọc lại.
+- **Tự động ghi file vật lý (`write` tool) tại mỗi cổng:**
+  - Cổng G1: Tạo file `docs/workflow/specs/<feature>-brief.md`
+  - Cổng G2: Tạo file `docs/workflow/specs/<feature>-stories.md`
+  - Cổng G3: Tạo file `docs/workflow/architecture/<feature>-design.md`
+  - Cổng G4: Tạo file `docs/workflow/plans/<feature>-plan.md`
+- Sau khi ghi file, thông báo đường dẫn file đã tạo để người dùng mở trong IDE đọc lại và dùng công cụ `ask` để xác nhận duyệt cổng.
 
 ---
 
@@ -48,18 +69,18 @@ Sau khi Cổng G4 (Plan) được duyệt, AI **bắt buộc dùng `ask`** để
   3. Từng task có xác nhận (Dừng lại sau mỗi task để bạn kiểm tra diff)
 ```
 
-### Quy trình mô hình Subagents 3 tầng (khi người dùng chọn Spawn Subagents):
+### Quy trình mô hình Subagents 3 tầng:
 1. **Tầng 1 - Task Worker (Subagent):**
-   - Main Agent dispatch subagent worker (qua công cụ `task`) nhận một task cụ thể từ plan.
+   - Main Agent dispatch subagent worker (qua công cụ `task`) nhận một task cụ thể từ file plan trong `docs/workflow/plans/`.
    - Worker thực thi mã nguồn đúng phạm vi, chạy unit test / smoke test, và xuất bằng chứng hoàn thành (evidence).
 2. **Tầng 2 - Task Reviewer (Subagent từng task):**
    - Ngay khi Worker hoàn thành, Main Agent dispatch subagent reviewer (agent role `reviewer`).
-   - Reviewer kiểm tra diff của task theo 2 tiêu chuẩn:
+   - Reviewer kiểm tra diff của task:
      - *Spec Compliance:* Có đáp ứng đúng AC không? Có code thừa ngoài phạm vi không?
      - *Code Quality:* Mã nguồn có sạch, đúng quy ước dự án và không làm vỡ logic cũ không?
    - Nếu phát hiện vấn đề: Yêu cầu Worker sửa lại và review lại. Khi đạt thì đánh dấu task hoàn thành.
 3. **Tầng 3 - Reviewer Tổng (Final Reviewer sau khi xong toàn bộ tasks):**
-   - Sau khi tất cả các task đã hoàn tất, Main Agent dispatch một Subagent Reviewer Tổng thể.
+   - Sau khi tất cả các task đã hoàn tất, Main Agent dispatch Subagent Reviewer Tổng thể.
    - Quét toàn bộ git diff của cả tính năng/module.
    - Chạy test tích hợp toàn diện (integration test / regression test).
    - Đối chiếu với Definition of Done (DoD) và đánh giá độ sẵn sàng phát hành.
@@ -72,12 +93,13 @@ Nếu AI xuất hiện bất kỳ suy nghĩ nào dưới đây, **PHẢI DỪNG 
 
 | Suy nghĩ bao biện của AI | Sự thật / Lệnh cấm bắt buộc |
 |---|---|
-| *"Tôi đã chốt tech stack (React + SQLite), giờ tôi code luôn backend."* | **SAI.** Chốt tech stack mới chỉ là 10% của G3. Phải có Business Rules (G1), User Stories/AC (G2), Database Schema chi tiết và API Contracts (G3) được duyệt trước khi code. |
+| *"Tôi tự suy đoán nghiệp vụ rồi tóm tắt bảo người dùng duyệt cho nhanh."* | **SAI.** Đó là tự biên tự diễn. Phải dùng `ask` phỏng vấn người dùng ít nhất 2–3 câu hỏi cốt lõi trước. |
+| *"Tôi tự chọn React + SQLite luôn, không cần hỏi tech stack."* | **SAI.** Phải đề xuất 2–3 phương án stack kèm ưu/nhược điểm và dùng `ask` để người dùng lựa chọn. |
+| *"Tôi in tài liệu ra tin nhắn chat là đủ, không cần tạo file làm gì."* | **SAI.** Bắt buộc ghi file Markdown vào `docs/workflow/` để người dùng có tài liệu lưu trữ, đọc lại trong IDE. |
+| *"Tôi đã chốt tech stack, giờ tôi code luôn backend."* | **SAI.** Chốt stack mới chỉ là 10% của G3. Phải có Business Rules (G1), Stories/AC (G2), Schema chi tiết và API Contracts (G3) lưu vào docs trước khi code. |
 | *"Tính năng này đơn giản/quen thuộc, không cần làm spec hay stories."* | **SAI.** Càng tính năng đơn giản càng dễ hiểu lầm nghiệp vụ. Đơn giản nghĩa là tài liệu ngắn gọn, không có nghĩa là được bỏ qua cổng. |
-| *"Tôi vừa trình bày thiết kế vừa tạo file mã nguồn luôn để tiết kiệm thời gian."* | **SAI.** Vừa trình bày vừa gõ code là vi phạm cổng. Phải dùng `ask` để người dùng duyệt trước. |
+| *"Tôi vừa trình bày thiết kế vừa tạo file mã nguồn luôn để tiết kiệm thời gian."* | **SAI.** Vừa trình bày vừa gõ code là vi phạm cổng. Phải lưu tài liệu vào `docs/`, dùng `ask` để người dùng duyệt trước. |
 | *"Người dùng nói 'OK', nghĩa là tôi được quyền code toàn bộ ứng dụng."* | **SAI.** "OK" chỉ là phê duyệt cho cổng vừa trình bày ngay trước đó. Cần chuyển sang cổng tiếp theo tuần tự, không nhảy cóc sang code. |
-| *"Tôi code trước rồi bổ sung tài liệu/test sau."* | **SAI.** Mọi quyết định và thiết kế phải đi trước mã nguồn. Code không có spec/stories là code phế phẩm. |
-| *"Người dùng đang giục cần gấp, tôi nhảy vào code luôn."* | **SAI.** Càng gấp càng phải làm đúng từ đầu để không mất công đập đi xây lại. Tóm tắt nhanh G1–G3 trong 1–2 đoạn rồi xin duyệt trước khi gõ code. |
 
 ---
 
