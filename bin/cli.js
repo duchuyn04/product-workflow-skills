@@ -1,0 +1,161 @@
+#!/usr/bin/env node
+
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const packageRoot = path.resolve(__dirname, '..');
+
+const SKILLS = [
+  'product-workflow',
+  'project-guide',
+  'product-discovery',
+  'story-and-experience',
+  'solution-design',
+  'delivery-planning',
+  'task-execution',
+  'delivery-inspection',
+];
+
+function printHelp() {
+  console.log(`
+Product Workflow Skills Installer
+
+Cách dùng:
+  npx product-workflow-skills [đường-dẫn-dự-án] [tùy-chọn]
+
+Tùy chọn:
+  -g, --global     Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
+  -f, --force      Ghi đè nếu thư mục kỹ năng hoặc AGENTS.md đã tồn tại
+  -h, --help       Hiển thị hướng dẫn sử dụng
+  -v, --version    Xem phiên bản
+
+Ví dụ:
+  npx product-workflow-skills                 Cài vào thư mục hiện tại
+  npx product-workflow-skills ./my-project    Cài vào thư mục my-project
+  npx product-workflow-skills --global        Cài toàn cục cho Oh My Pi
+`);
+}
+
+function printVersion() {
+  try {
+    const pkgJson = JSON.parse(
+      fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')
+    );
+    console.log(`v${pkgJson.version}`);
+  } catch {
+    console.log('v1.0.0');
+  }
+}
+
+function copyDirectorySync(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirectorySync(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+function run() {
+  const args = process.argv.slice(2);
+
+  let targetDir = null;
+  let isGlobal = false;
+  let isForce = false;
+
+  for (const arg of args) {
+    if (arg === '-h' || arg === '--help') {
+      printHelp();
+      return;
+    }
+    if (arg === '-v' || arg === '--version') {
+      printVersion();
+      return;
+    }
+    if (arg === '-g' || arg === '--global') {
+      isGlobal = true;
+      continue;
+    }
+    if (arg === '-f' || arg === '--force') {
+      isForce = true;
+      continue;
+    }
+    if (!arg.startsWith('-') && !targetDir) {
+      targetDir = arg;
+    }
+  }
+
+  console.log('Đang cài đặt Product Workflow Skills...\n');
+
+  let destSkillsDir = '';
+  let targetProjectRoot = '';
+
+  if (isGlobal) {
+    destSkillsDir = path.join(os.homedir(), '.omp', 'agent', 'skills');
+    console.log(`Chế độ: Cài đặt toàn cục`);
+    console.log(`Thư mục đích: ${destSkillsDir}\n`);
+  } else {
+    targetProjectRoot = path.resolve(process.cwd(), targetDir || '.');
+    destSkillsDir = path.join(targetProjectRoot, '.agents', 'skills');
+    console.log(`Chế độ: Cài đặt theo dự án`);
+    console.log(`Thư mục dự án: ${targetProjectRoot}`);
+    console.log(`Thư mục skills: ${destSkillsDir}\n`);
+  }
+
+  // Sao chép từng skill
+  let installedCount = 0;
+  for (const skillName of SKILLS) {
+    const srcSkillPath = path.join(packageRoot, skillName);
+    const destSkillPath = path.join(destSkillsDir, skillName);
+
+    if (!fs.existsSync(srcSkillPath)) {
+      console.warn(`[Cảnh báo] Không tìm thấy nguồn skill: ${skillName}`);
+      continue;
+    }
+
+    if (fs.existsSync(destSkillPath) && !isForce) {
+      // Ghi đè cập nhật nội dung thư mục skill
+      copyDirectorySync(srcSkillPath, destSkillPath);
+      console.log(`✓ Đã cập nhật: ${skillName}`);
+    } else {
+      copyDirectorySync(srcSkillPath, destSkillPath);
+      console.log(`✓ Đã cài đặt: ${skillName}`);
+    }
+    installedCount++;
+  }
+
+  // Với cài đặt dự án, sao chép thêm file AGENTS.md vào root dự án
+  if (!isGlobal && targetProjectRoot) {
+    const srcAgentsPath = path.join(packageRoot, 'AGENTS.md');
+    const destAgentsPath = path.join(targetProjectRoot, 'AGENTS.md');
+
+    if (fs.existsSync(srcAgentsPath)) {
+      if (fs.existsSync(destAgentsPath) && !isForce) {
+        console.log(`\n• File AGENTS.md đã tồn tại ở thư mục gốc (dùng --force nếu muốn ghi đè).`);
+      } else {
+        fs.copyFileSync(srcAgentsPath, destAgentsPath);
+        console.log(`\n✓ Đã tạo file AGENTS.md tại thư mục gốc dự án.`);
+      }
+    }
+  }
+
+  console.log(`\nHoàn tất! Đã cài ${installedCount}/${SKILLS.length} skills.`);
+  console.log('\nCách bắt đầu sử dụng:');
+  console.log('1. Mở AI coding assistant (Oh My Pi, Claude Code, Cursor) trong dự án.');
+  console.log('2. Nhập: "Tôi mới vào team, dự án đang ở đâu và nên làm gì tiếp?" hoặc gọi skill: /skill:project-guide');
+  console.log('3. Hoặc điều phối công việc với: /skill:product-workflow\n');
+}
+
+run();

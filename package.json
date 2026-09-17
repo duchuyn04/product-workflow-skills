@@ -1,0 +1,36 @@
+{
+  "name": "product-workflow-skills",
+  "version": "1.0.0",
+  "description": "Bộ kỹ năng phát triển sản phẩm (Agent Skills) cho AI Coding Harness",
+  "type": "module",
+  "bin": {
+    "product-workflow-skills": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "delivery-inspection",
+    "delivery-planning",
+    "product-discovery",
+    "product-workflow",
+    "project-guide",
+    "solution-design",
+    "story-and-experience",
+    "task-execution",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "agent-skills",
+    "ai-agents",
+    "product-workflow",
+    "oh-my-pi",
+    "claude-code",
+    "cursor",
+    "agile",
+    "scrum"
+  ],
+  "license": "MIT"
+}

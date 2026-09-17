@@ -11,3 +11,7 @@ desktop.ini
 
 # Temporary / logs
 *.log
+
+# Node
+node_modules/
+package-lock.json

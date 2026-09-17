@@ -64,33 +64,35 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 
 ## Cài đặt
 
-### Cách 1: Dùng theo từng dự án (khuyên dùng)
+### Cách 1: Cài đặt nhanh qua npx (khuyên dùng)
 
-1. Sao chép các thư mục kỹ năng vào thư mục `.agents/skills/` trong dự án:
-   ```bash
-   your-project/
-   ├── .agents/
-   │   └── skills/
-   │       ├── product-workflow/
-   │       ├── project-guide/
-   │       ├── product-discovery/
-   │       ├── story-and-experience/
-   │       ├── solution-design/
-   │       ├── delivery-planning/
-   │       ├── task-execution/
-   │       └── delivery-inspection/
-   ├── AGENTS.md
-   └── ...
-   ```
-
-2. Sao chép file `AGENTS.md` vào thư mục gốc của dự án để agent tự động nhận diện quy trình khi bắt đầu phiên làm việc.
-
-### Cách 2: Cài đặt toàn cục cho Oh My Pi
-
-Sao chép các thư mục kỹ năng vào thư mục cấu hình cá nhân:
+Chạy lệnh sau tại thư mục gốc của dự án:
 ```bash
-~/.omp/agent/skills/
+npx product-workflow-skills
 ```
+
+Lệnh này sẽ tự động:
+- Tạo thư mục `.agents/skills/` và sao chép đầy đủ 8 kỹ năng vào dự án.
+- Tạo file `AGENTS.md` ở thư mục gốc để AI agent nhận diện quy trình.
+
+Tùy chọn khác:
+```bash
+# Cài vào một thư mục cụ thể
+npx product-workflow-skills ./my-project
+
+# Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
+npx product-workflow-skills --global
+
+# Ghi đè nếu đã tồn tại
+npx product-workflow-skills --force
+```
+
+### Cách 2: Sao chép thủ công
+
+1. Sao chép các thư mục kỹ năng vào thư mục `.agents/skills/` trong dự án của bạn.
+2. Sao chép file `AGENTS.md` vào thư mục gốc của dự án.
+
+Nếu dùng toàn cục cho Oh My Pi, sao chép các thư mục kỹ năng vào `~/.omp/agent/skills/`.
 
 ## Câu lệnh mẫu theo nhu cầu
 
