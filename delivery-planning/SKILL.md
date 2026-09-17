@@ -86,6 +86,10 @@ Có Jira: đọc project/board/hierarchy/fields/link types/permissions thực t�
 
 Quyền publish issue không bao gồm start/close sprint, sửa schema hay assign người khác. Không tự thay parent issue chỉ vì đã tạo subtasks.
 
-## Gate G4 và bàn giao
+## Gate G4 và bàn giao (Hard-Stop)
 
-Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn. Bàn giao sang `task-execution` với gói task/contracts/dependencies và điều kiện còn thiếu. Chưa đủ thì nêu blocker/owner, vẫn hoàn thành các phần kế hoạch độc lập.
+Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
+
+**Quy tắc dừng lượt bắt buộc:** Sau khi bẻ nhỏ tính năng thành danh sách task cụ thể (1–4h) kèm thứ tự và dependency, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã lập kế hoạch phân rã các task (Cổng G4). Bạn có duyệt kế hoạch này không, và bạn muốn tôi bắt đầu thực hiện task nào trước?"*
+
+Chỉ sau khi người dùng xác nhận kế hoạch và chỉ định task, AI mới bàn giao task đó sang `task-execution` với gói task/contracts/dependencies đầy đủ để bắt đầu triển khai mã nguồn.

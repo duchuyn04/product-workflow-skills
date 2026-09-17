@@ -71,13 +71,13 @@ Mẫu luồng nghiệp vụ:
 | Bước | Actor | Trigger/đầu vào | Hành động | Trạng thái/đầu ra | Rule | Khi thất bại |
 |---|---|---|---|---|---|---|
 
-## Gate G1 và điều kiện dừng
+## Gate G1 và điều kiện dừng (Hard-Stop)
 
 G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và phạm vi, quy tắc của phần tính năng sắp làm đã đủ rõ ràng, và các câu hỏi còn mở không gây tắc nghẽn phần việc đó. Ghi đúng phiên bản và phạm vi duyệt.
 
-Chưa biết người duyệt thì hỏi; không tự coi người đang chat giữ mọi vai trò. Đủ G1 thì trình người dùng xác nhận rồi chuyển đề xuất sang `story-and-experience` (G2); tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`).
+**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Business Brief và Business Rules, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã tóm tắt mục tiêu và quy tắc nghiệp vụ (Cổng G1). Bạn có đồng ý duyệt nội dung này để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
 
-Nếu rủi ro phải thử mới biết, đề xuất thử nghiệm có câu hỏi, đầu ra và timebox để người dùng chốt. Không tự chọn giải pháp kỹ thuật trong discovery.
+Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.
 
 ## Thay đổi và tiếp tục
 

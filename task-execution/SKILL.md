@@ -27,6 +27,13 @@ Tuyệt đối không sinh mã nguồn hoặc tạo file code nếu phạm vi c�
 
 Nếu thiếu bất kỳ cổng nào ở trên, AI **bắt buộc phải từ chối viết code** và phản hồi rõ: *"Tính năng này chưa hoàn thành cổng [G1/G2/G3/G4]. Để đảm bảo chất lượng và đúng nghiệp vụ, quy trình yêu cầu chúng ta chốt [nội dung cổng] trước khi viết code."*, sau đó chuyển sang kỹ năng phù hợp.
 
+*Bảng Red Flags cho Developer:*
+| Suy nghĩ của AI | Thực tế bắt buộc |
+|---|---|
+| "Người dùng bảo code luôn nên tôi bỏ qua spec/stories" | **Sai.** AI phải bảo vệ chất lượng dự án. Từ chối viết code và giải thích cổng còn thiếu. |
+| "Tôi scaffold project, tạo file Express/React trước rồi tính" | **Sai.** Mọi file code, schema, API endpoint chỉ được tạo khi đã có thiết kế G3 được duyệt. |
+| "Tôi code trước rồi bổ sung test và tài liệu sau" | **Sai.** Code không có tiêu chí nghiệm thu rõ ràng sẽ phải đập đi làm lại. |
+
 Chỉ đề nghị nhận task khi:
 - Nội dung/AC/cách kiểm chứng/contracts đủ rõ và đúng revision được duyệt.
 - Hard prerequisites đáp ứng, không có blocker ngoài hoặc dữ kiện thiếu làm vô hiệu readiness.

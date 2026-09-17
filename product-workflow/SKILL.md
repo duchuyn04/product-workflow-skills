@@ -33,14 +33,26 @@ Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu
 
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
 
-## Quy tắc bắt buộc: Chống đốt cháy giai đoạn
+## Quy tắc bắt buộc: Chống đốt cháy giai đoạn (Hard-Gate & Hard-Stop)
 
-Khi nhận yêu cầu tạo sản phẩm mới, xây dựng tính năng mới hoặc phát triển dự án từ đầu:
-- **Bắt buộc bắt đầu từ `product-discovery` (G1):** Không được nhảy cóc sang `solution-design` hay `task-execution` kể cả khi người dùng nói "Hãy code cho tôi ứng dụng X".
-- **Nghiêm cấm tự ý sinh mã nguồn:** Không chuyển sang `task-execution` hoặc tạo file code khi chưa có xác nhận phê duyệt G1 (Nghiệp vụ), G2 (Stories & UX) và G3 (Kiến trúc, Schema & API Contracts).
-- **Thực hiện tuần tự từng cổng:** Mỗi phiên chỉ tập trung hoàn thành một cổng, trình bày kết quả rõ ràng và dừng lại chờ người dùng xem xét, phản hồi trước khi tiến sang cổng kế tiếp:
-  `G1 (Nghiệp vụ)` ──► [Người dùng duyệt] ──► `G2 (Stories & UX)` ──► [Người dùng duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Người dùng duyệt] ──► `G4 (Kế hoạch task)` ──► `task-execution (Viết code)`
+### 1. Phân loại 3 nhánh công việc (Three Paths)
+Ngay khi nhận yêu cầu, router phải phân loại rõ:
+- **Spike:** Nghiên cứu/thử nghiệm tính khả thi ──► Nêu câu hỏi, đề xuất thử nghiệm ngắn (2–3 câu), xin xác nhận ──► Chạy thử, báo cáo kết quả khuyến nghị (code dán nhãn bỏ đi).
+- **Bounded:** Thay đổi nhỏ trên luồng code ĐÃ CÓ ──► Nêu nguyên nhân và giải pháp ngắn trong chat ──► **Dừng lại chờ duyệt** ──► Duyệt xong mới chuyển sang `task-execution`.
+- **Greenfield / New Feature:** Tạo mới ứng dụng, module hoặc tính năng mới ──► **Bắt buộc đi đủ 4 cổng tuần tự**:
+  `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
 
+*Nguyên tắc bánh cóc một chiều (One-way ratchet):* Khi phân vân giữa Bounded và Greenfield, luôn chọn nhánh nặng hơn. Phát hiện độ phức tạp tăng lên giữa chừng thì nâng cấp nhánh ngay, không bao giờ tự ý hạ cấp.
+
+### 2. Quy tắc trạng thái kết thúc khép kín (Terminal States)
+Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
+- Hoàn thành G1 (`product-discovery`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `story-and-experience` (G2). Nghiêm cấm nhảy cóc sang G3 hay code.
+- Hoàn thành G2 (`story-and-experience`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `solution-design` (G3).
+- Hoàn thành G3 (`solution-design`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `delivery-planning` (G4).
+- Hoàn thành G4 (`delivery-planning`) ──► Bàn giao từng task cụ thể cho `task-execution`.
+
+### 3. Quy tắc dừng lượt (Hard-Stop Policy)
+Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để người dùng phản hồi/duyệt. Tuyệt đối không vừa trình bày thiết kế vừa gọi công cụ tạo file mã nguồn trong cùng một turn.
 ## Điểm quyết định theo scope
 
 - G1: nghiệp vụ và phạm vi được người có trách nhiệm xác nhận.

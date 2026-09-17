@@ -3,6 +3,7 @@
 Bộ kỹ năng (Agent Skills) hỗ trợ quy trình phát triển phần mềm từ làm rõ yêu cầu, thiết kế giải pháp đến lập trình và kiểm thử trên các AI coding harness (Oh My Pi, Claude Code, Cursor).
 
 Thay vì để AI tự suy đoán nghiệp vụ hoặc nhảy vào viết code ngay, bộ kỹ năng này tổ chức công việc theo các vai trò rõ ràng:
+
 - Làm rõ bài toán và quy tắc nghiệp vụ trước khi thiết kế.
 - Thống nhất user stories, luồng giao diện, kiến trúc dữ liệu và hợp đồng API trước khi triển khai.
 - Phân rã tính năng thành các phần việc cụ thể, có kiểm chứng và lưu lại tài liệu theo phiên bản trong `docs/workflow/`.
@@ -64,35 +65,36 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 
 ## Cài đặt
 
-### Cách 1: Cài đặt nhanh qua npx
+### Cách 1: Cài đặt chuẩn qua npx skills
 
-Chạy lệnh sau tại thư mục gốc dự án của bạn (không cần tải mã nguồn trước):
+Sử dụng công cụ quản lý kỹ năng chuẩn quốc tế (`skills.sh`), hỗ trợ tự động hơn 79+ AI Coding Agents (Claude Code, Cursor, Codex, Windsurf, Cline, v.v.):
+
+```bash
+npx skills@latest add duchuyn04/product-workflow-skills
+```
+
+Các tùy chọn:
+
+```bash
+# Cài đặt toàn bộ 8 skills mà không cần chọn thủ công
+npx skills@latest add duchuyn04/product-workflow-skills -y --all
+
+# Cài đặt toàn cục (Global) cho tài khoản máy tính
+npx skills@latest add duchuyn04/product-workflow-skills -g
+
+# Cập nhật các skills đã cài lên phiên bản mới nhất
+npx skills update
+```
+
+### Cách 2: Cài đặt kèm tự động tích hợp AGENTS.md
+
+Nếu bạn muốn công cụ tự động tạo hoặc tích hợp thông minh quy trình vào file `AGENTS.md` ở thư mục gốc dự án:
+
 ```bash
 npx github:duchuyn04/product-workflow-skills
 ```
-*(hoặc lệnh ngắn `npx duchuyn04/product-workflow-skills`)*
 
-Lệnh này sẽ tự động:
-- Tạo thư mục `.agents/skills/` và sao chép đầy đủ 8 kỹ năng vào dự án.
-- Tạo file `AGENTS.md` ở thư mục gốc để AI agent nhận diện quy trình.
-
-Các tùy chọn khác:
-```bash
-# Cài vào một thư mục cụ thể
-npx github:duchuyn04/product-workflow-skills ./my-project
-
-# Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
-npx github:duchuyn04/product-workflow-skills --global
-
-# Ghi đè cập nhật nếu đã tồn tại
-npx github:duchuyn04/product-workflow-skills --force
-```
-
-Nếu bạn đã publish package lên npmjs.com, có thể dùng tên ngắn gọn:
-```bash
-npx product-workflow-skills
-```
-### Cách 2: Sao chép thủ công
+### Cách 3: Sao chép thủ công
 
 1. Sao chép các thư mục kỹ năng vào thư mục `.agents/skills/` trong dự án của bạn.
 2. Sao chép file `AGENTS.md` vào thư mục gốc của dự án.
@@ -101,12 +103,15 @@ Nếu dùng toàn cục cho Oh My Pi, sao chép các thư mục kỹ năng vào 
 
 ## Câu lệnh mẫu theo nhu cầu
 
-| Nhu cầu | Câu lệnh mẫu |
-|---|---|
-| Định hướng dự án | "Tôi mới vào dự án, hiện tại dự án đang ở đâu và tôi nên làm gì tiếp?" |
-| Phân tích nghiệp vụ | "Làm rõ nghiệp vụ xử lý trùng lặp dữ liệu và các quy tắc liên quan." |
-| Viết User Stories | "Viết User Stories và đặc tả trạng thái giao diện cho màn hình tạo mới." |
-| Thiết kế kiến trúc và API | "Thiết kế database schema và REST API contracts cho module này." |
-| Lập kế hoạch sprint | "Chia nhỏ tính năng thành các task cụ thể để chuẩn bị triển khai." |
-| Triển khai code | "Thực hiện task API đăng nhập và chạy unit test." |
-| Kiểm tra tiến độ và nghiệm thu | "Xem ma trận tiến độ và kiểm tra tiêu chí hoàn thành của sprint này." |
+
+| Nhu cầu                        | Câu lệnh mẫu                                                             |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| Định hướng dự án               | "Tôi mới vào dự án, hiện tại dự án đang ở đâu và tôi nên làm gì tiếp?"   |
+| Phân tích nghiệp vụ            | "Làm rõ nghiệp vụ xử lý trùng lặp dữ liệu và các quy tắc liên quan."     |
+| Viết User Stories              | "Viết User Stories và đặc tả trạng thái giao diện cho màn hình tạo mới." |
+| Thiết kế kiến trúc và API      | "Thiết kế database schema và REST API contracts cho module này."         |
+| Lập kế hoạch sprint            | "Chia nhỏ tính năng thành các task cụ thể để chuẩn bị triển khai."       |
+| Triển khai code                | "Thực hiện task API đăng nhập và chạy unit test."                        |
+| Kiểm tra tiến độ và nghiệm thu | "Xem ma trận tiến độ và kiểm tra tiêu chí hoàn thành của sprint này."    |
+
+

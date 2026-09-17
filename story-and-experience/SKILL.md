@@ -85,10 +85,11 @@ Tái sử dụng design system/component hiện có. Không chọn style, font h
 
 So từng AC với flow và màn hình. Rule không được stories nào bao phủ phải được nêu; UI behavior không có nguồn thì hỏi có phải feature mới. Không tuyên bố đã test trình duyệt khi mới walkthrough tài liệu.
 
-## Gate G2 và bàn giao
+## Gate G2 và bàn giao (Hard-Stop)
 
 G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng. Nếu phạm vi không có giao diện, ghi rõ không áp dụng kèm lý do; lúc này vẫn cần mô tả hành vi và tiêu chí nghiệm thu cho API hoặc quy trình xử lý nền.
 
-Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.
+**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong User Stories, AC và UI flows/states, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã hoàn thành User Stories và thiết kế luồng giao diện (Cổng G2). Bạn có duyệt nội dung này để chuyển sang thiết kế Kiến trúc kỹ thuật & API Contracts (Cổng G3) không?"*
 
+Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
 Khi tiếp tục/đổi rule, chỉ xét stories/flows liên quan và đánh dấu approval bị ảnh hưởng cần duyệt lại. Lưu links và next action theo hợp đồng, không chép toàn bộ tài liệu vào checkpoint.

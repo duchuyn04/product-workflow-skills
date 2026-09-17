@@ -1,17 +1,51 @@
 # Quy tắc bắt buộc của Product Workflow
 
-## 1. Nguyên tắc chống đốt cháy giai đoạn (Nghiêm cấm vượt cổng)
-- **TUYỆT ĐỐI KHÔNG VIẾT CODE NGAY:** Khi người dùng yêu cầu tạo ứng dụng mới, phát triển tính năng mới hoặc bắt đầu dự án, AI **KHÔNG ĐƯỢC PHÉP** tự ý sinh mã nguồn, tạo file backend/frontend, hay cài đặt dependencies khi chưa hoàn thành và được người dùng phê duyệt lần lượt các cổng G1, G2, G3.
-- **Thứ tự thực hiện bắt buộc (tuần tự từng bước):**
-  1. `product-discovery` (Cổng G1): Khám phá bài toán, làm rõ mục tiêu, xác định actors, các trường hợp ngoại lệ và chốt quy tắc nghiệp vụ (Business Rules). Trình người dùng duyệt G1.
-  2. `story-and-experience` (Cổng G2): Viết User Stories kèm tiêu chí nghiệm thu (Given-When-Then), danh mục màn hình và luồng giao diện UI. Trình người dùng duyệt G2.
-  3. `solution-design` (Cổng G3): So sánh kiến trúc, thiết kế Database Schema, REST/GraphQL API Contracts và ghi nhận quyết định qua ADR. Trình người dùng duyệt G3.
-  4. `delivery-planning` (Cổng G4): Phân rã tính năng thành các task nhỏ (1–4h), xác định việc phụ thuộc và việc song song. Trình kế hoạch task.
-  5. `task-execution`: CHỈ BẮT ĐẦU VIẾT MÃ NGUỒN khi đã qua đủ các cổng G1, G2, G3, G4 và nhận từng task cụ thể.
-- **Mỗi lượt trao đổi chỉ xử lý một cổng:** Trình bày kết quả của cổng hiện tại, sau đó **dừng lại** để người dùng xem xét, góp ý hoặc duyệt. Tuyệt đối không gộp nhiều cổng trong một câu trả lời rồi tự ý nhảy vào viết code.
+Hệ thống tuân thủ nguyên tắc kiểm soát chất lượng nghiêm ngặt (Hard-Gate System). Mọi AI Agent hoạt động trong dự án bắt buộc phải tuân thủ hướng dẫn dưới đây.
 
-## 2. Điều phối kỹ năng
-- Với người mới vào team hoặc chưa rõ dự án đang ở đâu: đọc `skill://project-guide` để định hướng.
-- Với mọi yêu cầu phân tích, thiết kế, lập kế hoạch hoặc triển khai: đọc `skill://product-workflow` để điều phối đúng chuyên gia cho cổng tương ứng.
-- Từ ngữ "OK", "tiếp tục" hoặc "đồng ý" của người dùng chỉ có giá trị phê duyệt cho nội dung của cổng vừa trình bày, không được suy diễn thành quyền bỏ qua các cổng còn lại để đi code ngay.
-- Giữ nguyên nguồn tài liệu đã có; không tự ý thay đổi mã nguồn hoặc deploy khi yêu cầu của người dùng chỉ ở mức trao đổi hoặc thiết kế.
+---
+
+## 1. Phân loại 3 nhánh công việc (Three Paths)
+Trước khi làm bất kỳ hành động nào, AI phải tự xác định yêu cầu thuộc nhánh nào:
+
+1. **Spike (Thử nghiệm tính khả thi):**
+   - Áp dụng khi: Người dùng hỏi "liệu có thể...", "thử nghiệm xem có chạy được không", câu hỏi kỹ thuật chưa rõ giải pháp.
+   - Quy trình: Trình bày câu hỏi và cách thử (2–3 câu) ──► Dừng lại lấy xác nhận ──► Tiến hành thử nghiệm ──► Báo cáo kết quả/khuyến nghị. Mã nguồn tạo ra trong spike được dán nhãn là bản nháp/bỏ đi (throwaway).
+
+2. **Bounded (Phạm vi hẹp trên mã nguồn có sẵn):**
+   - Áp dụng khi: Sửa bug cụ thể, sửa lỗi chính tả, thêm 1 trường dữ liệu nhỏ vào luồng đã có sẵn trong codebase.
+   - Điều kiện: Luồng nghiệp vụ và code tương ứng ĐÃ TỒN TẠI trong repo. Nếu là tính năng mới hoặc chưa có luồng tương tự, KHÔNG ĐƯỢC coi là Bounded.
+   - Quy trình: Nêu nguyên nhân, tóm tắt giải pháp ngắn gọn trong chat ──► **DỪNG LẠI chờ người dùng duyệt** ──► Sau khi người dùng đồng ý mới sửa code và kiểm thử qua `task-execution`.
+
+3. **Greenfield / New Feature (Dự án mới hoặc tính năng mới):**
+   - Áp dụng khi: Tạo ứng dụng mới, xây dựng module mới, thêm tính năng mới hoặc thay đổi lớn về kiến trúc.
+   - **Bắt buộc tuân thủ 4 cổng chất lượng tuần tự:**
+     `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
+   - Khi phân vân giữa Bounded và Feature: **Luôn chọn nhánh nặng hơn (Greenfield/Feature)**. Độ phức tạp phát sinh giữa chừng sẽ nâng cấp nhánh ngay lập tức, không bao giờ được tự ý hạ cấp quy trình.
+
+---
+
+## 2. Quy tắc cổng cứng (Hard-Gate & Hard-Stop Policy)
+- **TUYỆT ĐỐI KHÔNG VIẾT CODE TRƯỚC KHI DUYỆT G1, G2, G3:** Cấm tự ý tạo file mã nguồn, sinh code backend/frontend, tạo database migration hoặc cài đặt dependencies khi các cổng trước chưa được người dùng phê duyệt rõ ràng.
+- **Dừng lại ở mỗi cổng (One Gate per Turn):** Mỗi lượt trả lời chỉ thực hiện đúng một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để xin ý kiến phản hồi hoặc phê duyệt từ người dùng.
+- **Nghiêm cấm vừa trình bày vừa viết code trong cùng một lượt:** Trình bày thiết kế và gọi công cụ tạo file trong cùng một tin nhắn bị coi là hành vi đốt cháy giai đoạn.
+
+---
+
+## 3. Bảng nhận diện suy nghĩ bao biện (Red Flags Table)
+Nếu AI xuất hiện bất kỳ suy nghĩ nào dưới đây, **PHẢI DỪNG LẠI NGAY LẬP TỨC**:
+
+| Suy nghĩ bao biện của AI | Sự thật / Lệnh cấm bắt buộc |
+|---|---|
+| *"Tôi đã chốt tech stack (React + SQLite), giờ tôi code luôn backend."* | **SAI.** Chốt tech stack mới chỉ là 10% của G3. Phải có Business Rules (G1), User Stories/AC (G2), Database Schema chi tiết và API Contracts (G3) được duyệt trước khi code. |
+| *"Tính năng này đơn giản/quen thuộc, không cần làm spec hay stories."* | **SAI.** Càng tính năng đơn giản càng dễ hiểu lầm nghiệp vụ. Đơn giản nghĩa là tài liệu ngắn gọn, không có nghĩa là được bỏ qua cổng. |
+| *"Tôi vừa trình bày thiết kế vừa tạo file mã nguồn luôn để tiết kiệm thời gian."* | **SAI.** Vừa trình bày vừa gõ code là vi phạm cổng. Phải dừng lại chờ người dùng nói "Duyệt" mới được làm bước tiếp theo. |
+| *"Người dùng nói 'OK', nghĩa là tôi được quyền code toàn bộ ứng dụng."* | **SAI.** "OK" chỉ là phê duyệt cho cổng vừa trình bày ngay trước đó. Cần chuyển sang cổng tiếp theo tuần tự, không nhảy cóc sang code. |
+| *"Tôi code trước rồi bổ sung tài liệu/test sau."* | **SAI.** Mọi quyết định và thiết kế phải đi trước mã nguồn. Code không có spec/stories là code phế phẩm. |
+| *"Người dùng đang giục cần gấp, tôi nhảy vào code luôn."* | **SAI.** Càng gấp càng phải làm đúng từ đầu để không mất công đập đi xây lại. Tóm tắt nhanh G1–G3 trong 1–2 đoạn rồi xin duyệt trước khi gõ code. |
+
+---
+
+## 4. Điều phối chuyên gia
+- Người mới vào dự án hoặc chưa rõ bối cảnh: đọc `skill://project-guide`.
+- Yêu cầu nghiệp vụ, tính năng, kiến trúc: đọc `skill://product-workflow` để định tuyến tuần tự.
+- `task-execution` có trách nhiệm kiểm tra cổng (Gate Check) và **từ chối viết code** nếu chưa có xác nhận đạt G1, G2, G3.

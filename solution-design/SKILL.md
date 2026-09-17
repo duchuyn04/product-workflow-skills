@@ -77,11 +77,13 @@ Mẫu ADR:
 
 Không tạo ADR cho mọi lựa chọn vụn vặt. Không ghi rằng giải pháp đã triển khai khi mới thiết kế.
 
-## Gate G3 và bàn giao
+## Gate G3 và bàn giao (Hard-Stop)
 
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.
 
-Bàn giao cho `delivery-planning`: module map, contracts/revisions, dependency thực, shared-write conflicts, enablers/spikes cần thiết, cách tích hợp và NFR phải chứng minh. Không lập một thứ tự module cố định bỏ qua giá trị sản phẩm.
-Sau khi G3 được duyệt, bàn giao sang `delivery-planning` để phân rã task; tuyệt đối không tự ý nhảy sang `task-execution` để viết code ngay.
+*Lưu ý cốt lõi:* Việc chỉ chọn tên công nghệ (ví dụ: React + Express + SQLite) mới chỉ là 10% của G3. G3 bắt buộc phải có Database Schema chi tiết (bảng, khóa, quan hệ), REST/GraphQL API Contracts cụ thể và ADR ghi nhận lý do.
 
+**Quy tắc dừng lượt bắt buộc:** Sau khi trình bày xong Database Schema và API Contracts, AI phải **DỪNG TIN NHẮN** và hỏi rõ: *"Tôi đã hoàn thành thiết kế Schema và API Contracts (Cổng G3). Bạn có duyệt thiết kế này để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"*
+
+Sau khi G3 được duyệt, bàn giao sang `delivery-planning` (G4) để phân rã task. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.
 Khi yêu cầu đổi, trình delta và affected modules/contracts/ADRs. Chỉ phần ảnh hưởng cần duyệt lại; không tự thay toàn bộ stack hoặc tự sửa callers khi người dùng chỉ hỏi phương án.

@@ -68,6 +68,43 @@ function copyDirectorySync(src, dest) {
     }
   }
 }
+const MARKER_START = '<!-- BEGIN: product-workflow-skills -->';
+const MARKER_END = '<!-- END: product-workflow-skills -->';
+
+function syncAgentsMd(targetProjectRoot, packageRoot) {
+  const srcAgentsPath = path.join(packageRoot, 'AGENTS.md');
+  const destAgentsPath = path.join(targetProjectRoot, 'AGENTS.md');
+
+  if (!fs.existsSync(srcAgentsPath)) return;
+
+  const rawWorkflowContent = fs.readFileSync(srcAgentsPath, 'utf8').trim();
+  const blockToInsert = `${MARKER_START}\n${rawWorkflowContent}\n${MARKER_END}`;
+
+  if (!fs.existsSync(destAgentsPath)) {
+    // Dự án chưa có AGENTS.md -> tạo mới hoàn toàn
+    fs.writeFileSync(destAgentsPath, blockToInsert + '\n', 'utf8');
+    console.log(`\n✓ Đã tạo mới file AGENTS.md tại thư mục gốc dự án.`);
+    return;
+  }
+
+  // Dự án đã có AGENTS.md sẵn
+  const existingContent = fs.readFileSync(destAgentsPath, 'utf8');
+
+  if (existingContent.includes(MARKER_START) && existingContent.includes(MARKER_END)) {
+    // Đã có block của product-workflow-skills -> cập nhật đúng block đó, giữ nguyên phần còn lại
+    const regex = new RegExp(`${MARKER_START}[\\s\\S]*?${MARKER_END}`, 'g');
+    const updatedContent = existingContent.replace(regex, blockToInsert);
+    fs.writeFileSync(destAgentsPath, updatedContent, 'utf8');
+    console.log(`\n✓ Đã cập nhật chỉ dẫn product-workflow-skills trong file AGENTS.md hiện có.`);
+  } else {
+    // AGENTS.md là của dự án người dùng viết từ trước -> Nối thêm vào cuối, giữ nguyên 100% nội dung của họ
+    const separator = existingContent.endsWith('\n') ? '\n' : '\n\n';
+    const updatedContent = existingContent + separator + blockToInsert + '\n';
+    fs.writeFileSync(destAgentsPath, updatedContent, 'utf8');
+    console.log(`\n✓ Đã tích hợp chỉ dẫn product-workflow-skills vào file AGENTS.md hiện có (bảo toàn toàn bộ quy tắc riêng trước đó của bạn).`);
+  }
+}
+
 
 function run() {
   const args = process.argv.slice(2);
@@ -137,19 +174,9 @@ function run() {
     installedCount++;
   }
 
-  // Với cài đặt dự án, sao chép thêm file AGENTS.md vào root dự án
+  // Với cài đặt dự án, tích hợp an toàn vào file AGENTS.md (không ghi đè mất quy tắc cũ của người dùng)
   if (!isGlobal && targetProjectRoot) {
-    const srcAgentsPath = path.join(packageRoot, 'AGENTS.md');
-    const destAgentsPath = path.join(targetProjectRoot, 'AGENTS.md');
-
-    if (fs.existsSync(srcAgentsPath)) {
-      if (fs.existsSync(destAgentsPath) && !isForce) {
-        console.log(`\n• File AGENTS.md đã tồn tại ở thư mục gốc (dùng --force nếu muốn ghi đè).`);
-      } else {
-        fs.copyFileSync(srcAgentsPath, destAgentsPath);
-        console.log(`\n✓ Đã tạo file AGENTS.md tại thư mục gốc dự án.`);
-      }
-    }
+    syncAgentsMd(targetProjectRoot, packageRoot);
   }
 
   console.log(`\nHoàn tất! Đã cài ${installedCount}/${SKILLS.length} skills.`);
