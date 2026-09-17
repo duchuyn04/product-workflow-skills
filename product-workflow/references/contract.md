@@ -27,14 +27,20 @@ Không bịa API, lệnh CLI, MCP tool hoặc khả năng claim. Nếu công c�
 
 | Nội dung | Nguồn chính thức |
 |---|---|
-| Backlog, owner, sprint, dependencies, trạng thái issue | Jira, khi đã có kết nối được cấp quyền |
+| Backlog, owner, sprint, dependencies, trạng thái công việc | Chế độ local: `product-backlog.md` và task cards liên kết; chế độ Jira: Jira đã được chọn làm nguồn chính |
 | Nghiệp vụ, glossary, stories/flows, ADR và contracts | Hồ sơ có phiên bản trong repo theo quy ước đã chọn |
 | Quyết định duyệt | Bản ghi người duyệt, phạm vi, revision và tham chiếu nguồn xác nhận; liên kết Jira khi được phép |
 | Kết quả kiểm chứng | Output thật của công cụ/CI/review/deployment, kèm revision và môi trường |
 | Checkpoint | Con trỏ tới các nguồn trên và câu hỏi còn mở, không phải backlog thứ hai |
-| Ma trận | Tổng hợp chỉ đọc từ nghĩa vụ đầu ra, approvals và Jira/evidence |
+| Ma trận | Agent cập nhật từ scope, AC, approvals và evidence; ở chế độ Jira, trạng thái issue lấy từ Jira |
 
-Khi chưa kết nối Jira, được tạo **bản nháp backlog chưa publish** nếu người dùng yêu cầu. Ghi rõ chưa có Jira key/owner/trạng thái Jira; không coi bản nháp là nguồn quản lý công việc song song. Sau publish có xác nhận, dùng key trả về và biến nháp thành tham chiếu, không duy trì hai bản trạng thái.
+Khi bắt đầu workflow có lưu tài liệu, dùng `docs/workflow/product-backlog.md` làm Product Backlog local nếu dự án chưa có nguồn chính khác. Nếu đã có backlog tương đương, cập nhật tại chỗ và ghi đường dẫn trong chỉ mục, không tạo bản cạnh tranh. Mẫu ma trận và cách tính điểm nằm trong mục `Product Backlog dạng ma trận` của `skill://product-workflow/references/records.md`. Chỉ đọc skill hoặc hỏi hiện trạng không cấp quyền tạo/cập nhật backlog.
+
+Backlog ghi rõ nguồn trạng thái `local` hoặc `Jira`, scope/release và thời điểm đối chiếu. Local dùng ID ổn định và trạng thái nội bộ, không giả Jira key hay claim nguyên tử. Task cards giữ chi tiết thực thi/evidence; roadmap chỉ liên kết và tổng hợp, không quản lý một bộ trạng thái độc lập.
+
+Nếu dự án đã dùng Jira, mất kết nối không được tự chuyển về local: giữ snapshot, ghi `chưa xác minh`, không ghi đè trạng thái Jira. Chuyển từ local sang Jira cần người dùng duyệt mapping và đối chiếu ID/key thật sau publish; từ đó Markdown là bản tổng hợp có thời điểm, không phải nguồn trạng thái thứ hai.
+
+Trong scope thực thi đã được ủy quyền, agent điều phối cập nhật backlog sau mỗi kết quả task, review và kiểm chứng tích hợp. Workers chỉ cập nhật task card/evidence được giao; không cùng ghi ma trận chung. Điều phối một người ghi giảm xung đột, không thay cơ chế claim an toàn cho nhiều phiên hoặc nhiều thành viên.
 
 Mặc định đề xuất `docs/workflow/project.md` làm chỉ mục và `docs/workflow/checkpoint.md` làm điểm tiếp tục nếu repo chưa có quy ước. Chỉ tạo khi người dùng yêu cầu bắt đầu/lưu workflow và chốt nơi lưu; ưu tiên tài liệu có sẵn, không sao chép thành nguồn thứ hai. Phiên chỉ trao đổi không tự sinh cả cây tài liệu.
 

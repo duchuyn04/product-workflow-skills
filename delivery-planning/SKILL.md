@@ -1,6 +1,6 @@
 ---
 name: delivery-planning
-description: "Chia nhỏ phạm vi công việc thành các luồng tính năng hoàn chỉnh, xác định dependency và việc có thể làm song song, chuẩn bị backlog và kế hoạch sprint theo năng lực đội."
+description: "Tạo Product Backlog Markdown dạng ma trận tính năng với Story Points, AC đạt/tổng và checkbox; chia task cards độc lập, xác định dependency, việc song song và kế hoạch sprint theo năng lực đội."
 hide: true
 ---
 
@@ -80,31 +80,83 @@ Mẫu sprint proposal: Goal → mục được chọn đề xuất → capacity/
 
 ## 6. Publish chỉ khi được phép
 
-Chưa kết nối Jira: xuất draft theo `skill://product-workflow/references/records.md`, không tạo keys/assignees/status giả. Ghi rõ không thể claim hoặc báo board live từ nháp.
+Ở chế độ local: tạo/cập nhật Product Backlog và task cards theo `skill://product-workflow/references/records.md`; dùng trạng thái nội bộ có nguồn, không bịa Jira key/assignee. Chỉ các mục đang chuẩn bị publish Jira mới cần nhãn nháp chưa publish. Có backlog Jira nhưng mất kết nối thì giữ chế độ Jira và ghi chưa xác minh, không tự chuyển sang local.
 
 Có Jira: đọc project/board/hierarchy/fields/link types/permissions thực tế; đối chiếu backlog để tránh trùng. Trình breakdown và ảnh hưởng; lấy phê duyệt publish khi chưa được ủy quyền. Tạo theo dependency để liên kết keys thật, chỉ báo thành công sau output xác nhận. Timeout sau ghi phải đối chiếu, không tạo lại mù.
 
 Quyền publish issue không bao gồm start/close sprint, sửa schema hay assign người khác. Không tự thay parent issue chỉ vì đã tạo subtasks.
-## Đầu ra: Lưu file kế hoạch thực thi (Docs-First)
 
-AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
-`docs/workflow/plans/<tên-tính-năng>-plan.md`
+## Product Backlog theo tính năng
 
-Nội dung file bao gồm:
-- Danh sách các task phân rã (1–4 giờ).
-- Chi tiết từng task: ID, mục tiêu, các file paths cần sửa/tạo, Acceptance Criteria, và cách kiểm chứng.
-- Ma trận phụ thuộc (Dependency graph) và các nhóm task có thể chạy song song.
+Đọc mục `Product Backlog dạng ma trận` trong `skill://product-workflow/references/records.md`; dùng đúng cột, công thức và điều kiện `[x]` ở đó. Khi lập kế hoạch được phép lưu, bắt buộc tạo/cập nhật `docs/workflow/product-backlog.md` hoặc backlog tương đương đã có:
+- Đối chiếu scope/brief/stories đã duyệt; mỗi tính năng một ID ổn định và một hàng, không biến mỗi task kỹ thuật thành một tính năng để cộng điểm.
+- Liên kết AC và task cards bằng ID/đường dẫn thật. Scope chưa được đặc tả vẫn hiện thiếu dữ kiện, không bịa AC hoặc task.
+- Ghi ưu tiên và Story Points theo quyết định của đội. Chưa có SP được duyệt thì giữ `—`, không tự gán giờ hoặc Fibonacci. Chưa chạy kiểm chứng thì không ghi AC đạt.
+- Tổng hợp riêng tính năng Done, SP hoàn tất và AC đạt; chỉ rõ phần chưa ước lượng/chưa chốt AC. Không cộng SP của tasks lần nữa vào tính năng.
+- Chỉ định người điều phối cập nhật ma trận trong phạm vi đã được ủy quyền; workers ghi task cards, không cùng sửa file tổng.
+
+## Đầu ra: Cấu trúc Task Cards phân rã theo file độc lập (Docs-First)
+
+**CẤM DỒN TẤT CẢ TASKS VÀO 1 FILE `.MD` DUY NHẤT.**
+Việc gom 30–50 tasks vào 1 file plan khổng lồ gây ra xung đột Git merge khi làm việc nhóm, làm phình to context window và khiến Subagents không thể nhận việc độc lập.
+
+AI **BẮT BUỘC TỔ CHỨC THEO CẤU TRÚC THƯ MỤC MODULAR**:
+```text
+docs/workflow/plans/<tên-phân-hệ-hoặc-sprint>/
+├── roadmap.md                                   # Bản đồ tổng quan, Kanban & Dependency
+└── tasks/
+    ├── task-01-<slug>.md                       # Task Card độc lập cho Subagent/Dev
+    ├── task-02-<slug>.md
+    └── task-03-<slug>.md
+```
+
+### 1. File `roadmap.md` (Trung tâm điều phối)
+Liên kết tới Product Backlog và ghi mục tiêu/phạm vi của phân hệ hoặc sprint. Roadmap tổng hợp từ task cards, không là nguồn trạng thái thứ hai.
+- Sơ đồ quan hệ phụ thuộc (Dependency Graph): **CẤM DÙNG MERMAID**, dùng `skill://diagram-design` (`type-dependency.md`) tạo file `docs/workflow/diagrams/<tên-phân-hệ>-dependency.html` và chèn link vào `roadmap.md`.
+- Bảng Kanban liên kết tới từng task con:
+  - `[ ] [Task 01: Thiết lập Schema Database](tasks/task-01-setup-schema.md)`
+  - `[ ] [Task 02: Xây dựng REST API](tasks/task-02-rest-api.md)`
+
+### 2. Mỗi file `tasks/task-XX-<slug>.md` là một Task Card tự chứa (Self-contained)
+Chứa đầy đủ mọi thông tin cần thiết để 1 Developer hoặc 1 Subagent Worker có thể thực thi mà không cần nạp toàn bộ lịch sử chat:
+
+```markdown
+# [TASK-01]: Tiêu đề ngắn gọn của task
+
+- **Phân hệ:** [Tên module]
+- **Tính năng / Story / AC:** [ID ổn định và liên kết tới hàng backlog, story, các AC liên quan]
+- **Trạng thái:** Todo | In Progress | Review | Verification | Done; Blocked kèm lý do
+- **Ước lượng:** [Chỉ ghi khi đội đã xác nhận; không cộng trùng vào SP tính năng]
+- **Mục tiêu:** [1–2 câu mô tả giá trị kỹ thuật mang lại]
+
+## Phạm vi thay đổi (Files)
+- Tạo mới: `src/path/to/new-file.ts`
+- Sửa đổi: `src/path/to/existing.ts`
+- Kiểm thử: `tests/path/to/test.ts`
+
+## Tiền điều kiện & Hợp đồng (Inputs)
+- Tham chiếu Schema / API: `docs/workflow/architecture/<feature>-design.md`
+- Prerequisites: [ID task phải xong trước, hoặc "Không có"]
+
+## Tiêu chí nghiệm thu (Acceptance Criteria)
+- Given [trạng thái đầu vào], When [hành động], Then [kết quả mong đợi].
+
+## Hướng dẫn kiểm chứng (Verification Steps)
+- Lệnh test: `npm test tests/path/to/test.ts`
+- Tiêu chuẩn hoàn thành: AC đạt, review bắt buộc và kiểm chứng tích hợp theo DoD.
+- Bằng chứng: [AC ID, revision/môi trường, kết quả pass/failed/not-run, link output và review]
+```
 
 ## Gate G4 và bàn giao (Hard-Stop)
 
 Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/plans/<tên-tính-năng>-plan.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+**Quy tắc dừng lượt bắt buộc:** Sau khi tạo/cập nhật Product Backlog, `roadmap.md` và các task cards, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 
 ```text
 ask(questions=[{
   "id": "gate_g4_approval",
-  "question": "Tôi đã lập kế hoạch phân rã task tại `docs/workflow/plans/<tên-tính-năng>-plan.md`. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
+  "question": "Tôi đã cập nhật Product Backlog, kế hoạch tại `docs/workflow/plans/<phân-hệ>/roadmap.md` và các task cards riêng. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
   "options": [
     {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline)."},
     {"label": "Cần chỉnh sửa danh sách task", "description": "Thêm, bớt hoặc điều chỉnh lại phạm vi các task."},

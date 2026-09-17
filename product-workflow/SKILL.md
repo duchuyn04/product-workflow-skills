@@ -1,6 +1,6 @@
 ---
 name: product-workflow
-description: "Điều phối dự án từ ý tưởng đến vận hành: phân tích nghiệp vụ, user stories, UI/UX, tech stack, kiến trúc, module, backlog Scrum, nhận việc người/AI, dependency song song và ma trận tiến độ Jira. Dùng khi bắt đầu hoặc tiếp tục dự án, lập sprint, bàn giao task hay xem toàn cảnh."
+description: "Điều phối dự án từ ý tưởng đến vận hành: nghiệp vụ, stories, UI/UX, kiến trúc, Product Backlog Markdown theo tính năng với Story Points, AC đạt/tổng và checkbox hoàn thành; lập task, thực thi và nghiệm thu cho người/AI. Dùng khi bắt đầu hoặc tiếp tục dự án, lập sprint, cập nhật backlog hay xem tiến độ local/Jira."
 ---
 
 # Product workflow
@@ -26,9 +26,10 @@ Một đầu vào cho người dùng; chỉ nạp chuyên gia cần thiết. Gia
 | Ý tưởng, mục tiêu, nghiệp vụ mơ hồ, domain/rules | `skill://product-discovery` | Business brief, rules, câu hỏi mở, G1 |
 | User stories, hành trình, màn hình, UI/UX flows | `skill://story-and-experience` | Story map, AC, flows, G2 |
 | Chọn stack, kiến trúc, data/API, ranh giới module | `skill://solution-design` | So sánh lựa chọn, contracts, ADR, G3 |
-| Thứ tự module, backlog, sprint, việc song song | `skill://delivery-planning` | Phân rã luồng việc, dependency, đề xuất sprint, điều kiện G4 |
-| Nhận task, giao/bàn giao, code, kiểm chứng task | `skill://task-execution` | Claim có xác nhận khi khả dụng, handoff, evidence |
-| Xem board/ma trận, tick Done, release, review/retro | `skill://delivery-inspection` | Góc nhìn có nguồn, đánh giá Done/release, cải tiến |
+| Thứ tự module, tạo Product Backlog, sprint, việc song song | `skill://delivery-planning` | Ma trận tính năng, Story Points, AC, task cards và điều kiện G4 |
+| Nhận task, giao/bàn giao, code, kiểm chứng task | `skill://task-execution` | Nhận việc có xác nhận, handoff, evidence và cập nhật backlog |
+| Xem board/ma trận, chấm điểm nghiệm thu, tick Done, release | `skill://delivery-inspection` | Đối chiếu evidence, AC đạt/tổng, SP hoàn tất và checkbox |
+| Vẽ sơ đồ kiến trúc, DB schema, flows, sequence thay Mermaid | `skill://diagram-design` | File sơ đồ HTML/SVG độc lập trong docs/workflow/diagrams/ |
 Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu cầu; chỉ thêm chuyên gia thứ hai khi cần giải quyết đầu vào cụ thể. Không đọc cả sáu skills và mọi tài liệu mỗi lần.
 
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
@@ -66,8 +67,9 @@ CẤM CHỈ IN TÀI LIỆU TRONG CHAT. Mỗi cổng hoàn thành bắt buộc ph
 - Cổng G1: `docs/workflow/specs/<tên-tính-năng>-brief.md`
 - Cổng G2: `docs/workflow/specs/<tên-tính-năng>-stories.md`
 - Cổng G3: `docs/workflow/architecture/<tên-tính-năng>-design.md`
-- Cổng G4: `docs/workflow/plans/<tên-tính-năng>-plan.md`
-
+- Cổng G4: `docs/workflow/plans/<tên-phân-hệ-hoặc-sprint>/roadmap.md` và từng file `tasks/task-XX-<slug>.md`.
+- Product Backlog xuyên suốt workflow: `docs/workflow/product-backlog.md`, theo mẫu và quy tắc điểm trong `skill://product-workflow/references/records.md`. Ghi tính năng khi scope G1 được duyệt, liên kết AC sau G2, tasks/SP sau G4; cập nhật điểm và checkbox từ evidence trong quá trình thực thi. Không dồn chi tiết tasks vào file này.
+- Thư mục sơ đồ: `docs/workflow/diagrams/<tên-sơ-đồ>.html` (xuất qua `skill://diagram-design`, tuyệt đối không dùng Mermaid)
 Sau khi tạo file, thông báo đường dẫn file đã tạo để người dùng mở trong IDE xem lại, sau đó mới gọi công cụ `ask` để duyệt cổng.
 
 ## Điểm quyết định theo scope
@@ -92,7 +94,7 @@ Nếu người dùng nói “OK”, gắn với đề xuất cụ thể ngay tr�
 
 ## Tích hợp và phân công
 
-- Không có Jira: discovery, UX, architecture và kế hoạch nháp vẫn làm được; claims/trạng thái/board live chưa khả dụng. Nháp phải được gắn nhãn rõ.
+- Không có Jira và chưa có nguồn chính khác: quản lý backlog local bằng Markdown và task cards theo hợp đồng chung. Không giả Jira key hoặc claim đồng thời; thực thi local cần phạm vi và người điều phối được ủy quyền.
 - Có Jira: xác minh công cụ, scope/quyền, mapping và data coverage trước. Không bịa project key, field ID hay transition.
 - Việc song song: delivery-planning xác định nhóm độc lập; task-execution kiểm tra lại trước claim. Đừng tự giao cho người chưa đồng ý.
 - Nếu cần subagents, Main giữ vai trò tích hợp và quyền quyết định của người dùng; mỗi agent nhận scope riêng cùng contracts. Subagents không được tự publish/claim nếu không được ủy quyền.

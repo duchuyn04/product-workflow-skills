@@ -1,6 +1,6 @@
 # Quy tắc bắt buộc của Product Workflow (Tối ưu cho Oh My Pi)
 
-Hệ thống tuân thủ nguyên tắc kiểm soát chất lượng nghiêm ngặt (Hard-Gate System) kết hợp sức mạnh native của **Oh My Pi (OMP)**: công cụ `ask`, quy trình `plan`, lưu trữ tài liệu vật lý (`docs/workflow/`), và điều phối `subagents` (`task` tool).
+Hệ thống tuân thủ nguyên tắc kiểm soát chất lượng nghiêm ngặt (Hard-Gate System) kết hợp sức mạnh native của **Oh My Pi (OMP)**: công cụ `ask`, quy trình `plan`, lưu trữ tài liệu vật lý theo module (`docs/workflow/`), và điều phối `subagents` (`task` tool).
 
 ---
 
@@ -24,43 +24,70 @@ Trước khi làm bất kỳ hành động nào, AI phải tự xác định yê
 
 ---
 
-## 2. Ba nguyên tắc cốt lõi: Phỏng vấn, Minh bạch Stack & Docs-First
+## 2. Các nguyên tắc cốt lõi: Quy mô, Phỏng vấn, Minh bạch Stack & Docs-First
 
-### A. Phỏng vấn nghiệp vụ thích ứng theo quy mô (Cổng G1)
-- **CẤM TỰ SUY ĐOÁN NGHIỆP VỤ:** Tuyệt đối không tự ý quyết định luồng nghiệp vụ thay cho người dùng rồi bắt họ duyệt một bản tóm tắt có sẵn.
-- **Chiến lược phỏng vấn theo quy mô dự án:**
-  - *Dự án nhỏ / Tính năng đơn lẻ:* 1 vòng phỏng vấn (3–5 câu hỏi trọng tâm qua `ask`) ──► Chốt brief.
-  - *Dự án lớn / Nền tảng phức tạp (E-commerce, SaaS, ERP, Portal...):*
-    1. **Phân rã phân hệ trước (Decomposition First):** Không dồn hàng chục hay cả trăm câu hỏi vào một lượt gây kiệt sức cho người dùng. AI trước tiên giúp người dùng định vị bức tranh tổng thể và phân rã thành các phân hệ/module độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Giỏ hàng & Thanh toán, Quản lý kho, Dashboard...).
-    2. **Phỏng vấn cuốn chiếu nhiều vòng (Multi-Round Thematic Deep-Dive):** Chọn phân hệ ưu tiên làm trước, phỏng vấn sâu qua nhiều lượt (mỗi lượt 3–5 câu hỏi cùng chủ đề qua `ask`), đào sâu lần lượt:
-       - Luồng người dùng chính (Happy path & Actors).
-       - Quy tắc nghiệp vụ cốt lõi (Business rules, invariants & calculations).
-       - Trường hợp ngoại lệ & lỗi biên (Edge cases, permissions, concurrency, errors).
-       - Tích hợp & phi chức năng (Third-party APIs, SLA, bảo mật).
-       *Tổng số câu hỏi phỏng vấn có thể lên tới hàng chục đến hàng trăm câu qua nhiều lượt trao đổi, tuyệt đối không bị giới hạn cơ học.*
-    3. **Giảm tải nhận thức qua `ask`:** Đưa ra các kịch bản thực tế kèm các phương án lựa chọn (A, B, C) để người dùng bấm chọn nhanh, tránh bắt người dùng gõ văn bản quá dài.
-    4. **Kiểm soát điểm dừng:** Sau mỗi vòng, AI dùng `ask` hỏi: *"Bạn có muốn phỏng vấn sâu tiếp về [chủ đề tiếp theo] không, hay thông tin đã đủ để chốt Business Brief cho phần này?"*
-- Sau khi người dùng xác nhận đã đủ thông tin phỏng vấn, AI mới tổng hợp và ghi ra file tài liệu.
+### A. Nhận diện quy mô & Phỏng vấn nghiệp vụ (Cổng G1)
+- **CẤM TỰ Ý ĐOÁN NGHIỆP VỤ HOẶC HỎI VỤN VẶT NGAY TỪ ĐẦU.**
+- **Bước 1 - Nhận diện quy mô & Phân rã phân hệ (Module Catalogue):**
+  Ngay khi người dùng nêu ý tưởng dự án:
+  1. Đánh giá quy mô: Micro (1–2 màn hình), Vừa (3–5 phân hệ), hay Lớn/Nền tảng (6–10+ phân hệ).
+  2. Đề xuất dự thảo danh mục các phân hệ độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Giỏ hàng & Thanh toán, Quản lý kho, Dashboard Admin...).
+  3. **Dùng `ask` để người dùng xác nhận/chỉnh sửa danh sách phân hệ** và chọn phân hệ ưu tiên làm trước (MVP).
+- **Bước 2 - Phỏng vấn cuốn chiếu nhiều vòng theo phân hệ đã chọn:**
+  Chỉ phỏng vấn sâu cho đúng phân hệ được chọn làm trước, chia theo từng chủ đề (mỗi lượt 3–5 câu qua `ask`):
+  - Luồng người dùng chính (Happy path & Actors).
+  - Quy tắc nghiệp vụ cốt lõi (Business rules, invariants & calculations).
+  - Ngoại lệ & lỗi biên (Edge cases, concurrency, permissions).
+  - Tích hợp & phi chức năng (Third-party APIs, SLA, bảo mật).
+- **Bước 3 - Quyền dừng thuộc về người dùng:** Sau mỗi vòng, AI dùng `ask` hỏi: *"Bạn có muốn phỏng vấn sâu tiếp về [chủ đề tiếp theo] không, hay thông tin đã đủ để chốt Business Brief cho phân hệ này?"*
 
 ### B. Minh bạch Tech Stack (Cổng G3)
 - **CẤM TỰ Ý CHỌN TECH STACK TRONG ĐẦU:** Không được tự mặc định công nghệ (như tự chọn React, Vite, Express, SQLite...) mà không hỏi ý kiến người dùng.
 - **Đề xuất và hỏi qua `ask`:** Đưa ra 2–3 phương án công nghệ khả thi kèm ưu/nhược điểm (tradeoffs), sau đó dùng công cụ `ask` để người dùng chủ động chọn stack.
 - Sau khi người dùng chọn xong tech stack mới tiến hành thiết kế chi tiết Database Schema, API Contracts và ADR.
 
-### C. Nguyên tắc Docs-First: Bắt buộc ghi file tài liệu vật lý ra `docs/workflow/`
-- **CẤM CHỈ NÓI SUÔNG TRONG CHAT:** Mọi tài liệu thiết kế nếu chỉ in ra cửa sổ chat sẽ bị trôi mất ngữ cảnh và người dùng không có gì để lưu trữ, đọc lại.
-- **Tự động ghi file vật lý (`write` tool) tại mỗi cổng:**
-  - Cổng G1: Tạo file `docs/workflow/specs/<feature>-brief.md`
-  - Cổng G2: Tạo file `docs/workflow/specs/<feature>-stories.md`
-  - Cổng G3: Tạo file `docs/workflow/architecture/<feature>-design.md`
-  - Cổng G4: Tạo file `docs/workflow/plans/<feature>-plan.md`
-- Sau khi ghi file, thông báo đường dẫn file đã tạo để người dùng mở trong IDE đọc lại và dùng công cụ `ask` để xác nhận duyệt cổng.
+### C. Nguyên tắc Docs-First & Cấu trúc Task chia nhỏ (Cổng G4)
+- **CẤM CHỈ NÓI SUÔNG TRONG CHAT:** Mọi tài liệu thiết kế phải được lưu thành file vật lý trong `docs/workflow/`.
+- **CẤM DỒN TẤT CẢ TASKS VÀO 1 FILE `.MD` DUY NHẤT:** Việc gom 30–50 tasks vào 1 file làm phình to context, gây xung đột Git merge khi làm việc nhóm và khiến Subagents không thể nhận việc độc lập.
+- **Bắt buộc tổ chức tài liệu và tasks theo cấu trúc phân rã (Modular Structure):**
+  ```text
+  docs/workflow/
+  ├── product-backlog.md                           # Ma trận tính năng, SP, AC và hoàn thành
+  ├── specs/
+  │   ├── <tên-phân-hệ>-brief.md                     # Tài liệu nghiệp vụ G1
+  │   └── <tên-phân-hệ>-stories.md                   # User Stories & UX G2
+  ├── architecture/
+  │   └── <tên-phân-hệ>-design.md                    # Tech Stack, Schema, API G3
+  ├── diagrams/
+  │   └── <tên-sơ-đồ>.html                           # Sơ đồ HTML/SVG (dùng diagram-design)
+  └── plans/<tên-phân-hệ-hoặc-sprint>/
+      ├── roadmap.md                                 # Bản đồ tổng quan, Kanban & Dependency
+      └── tasks/
+          ├── task-01-<slug>.md                      # Task Card độc lập cho Subagent/Dev
+          ├── task-02-<slug>.md
+          └── task-03-<slug>.md
+  ```
+- **Mỗi file `task-XX-<slug>.md` là một Task Card tự chứa (Self-contained):**
+  Chứa đầy đủ: Task ID, ID tính năng/story/AC, Phân hệ, Mục tiêu, Files cụ thể cần tạo/sửa, Tiêu chí nghiệm thu, Cách kiểm chứng, Trạng thái và liên kết evidence.
+  Khi phân công cho Subagent Worker, truyền task card cùng scope được giao; worker đọc các nguồn liên kết cần thiết, không cần toàn bộ lịch sử chat.
+- **Product Backlog:** Agent phải tạo/cập nhật ma trận Markdown trong dự án đích khi workflow được phép lưu. Dùng mẫu và công thức duy nhất ở `skill://product-workflow/references/records.md`, mục `Product Backlog dạng ma trận`; không tạo backlog mẫu trong repo chứa skills chỉ vì người dùng yêu cầu sửa skills.
+  - Mỗi hàng là một tính năng: ID, phân hệ, ưu tiên, Story Points đã duyệt, AC đạt/tổng, trạng thái, `[ ]` / `[x]` và links stories/tasks/evidence. Task cards vẫn tách riêng.
+  - G1 đã duyệt ghi phạm vi; G2 đã duyệt liên kết AC; G4 liên kết tasks và SP. Không tự gán SP chưa duyệt hoặc tính duyệt thiết kế thành AC đạt.
+  - Sau mỗi kết quả thực thi, agent điều phối cập nhật điểm và tổng quan. Chỉ tích `[x]` khi đủ AC, review bắt buộc và kiểm chứng tích hợp; khi evidence mất hiệu lực thì bỏ tích phần ảnh hưởng và tính lại điểm.
+  - Không có nguồn chính khác thì dùng local; nếu đã chọn Jira thì Markdown phản ánh Jira/evidence, không tự chuyển nguồn khi mất kết nối. Chỉ người điều phối ghi file tổng, không để workers cùng sửa.
+
+### D. Thay thế hoàn toàn Mermaid bằng kỹ năng `diagram-design`
+- **CẤM DÙNG MERMAID (mermaid code blocks):** Cú pháp Mermaid thường xuyên bị lỗi hiển thị, vỡ layout và không render đồng nhất.
+- **Sử dụng `skill://diagram-design` cho mọi nhu cầu vẽ sơ đồ:**
+  - Sơ đồ kiến trúc (Architecture), thực thể dữ liệu (ER / DB Schema), luồng gọi API (Sequence), hành trình người dùng (User Journey / Story Map), máy trạng thái (State Machine), luồng dữ liệu (Data Flow).
+  - Xuất thành các file HTML / SVG độc lập chất lượng cao lưu vào thư mục `docs/workflow/diagrams/<tên-sơ-đồ>.html`.
+  - Nhúng hoặc liên kết file sơ đồ vào các tài liệu tương ứng trong `docs/workflow/specs/` và `docs/workflow/architecture/`.
 
 ---
 
 ## 3. Chiến lược thực thi: Hỏi người dùng chọn Subagents qua `ask`
 
-Sau khi Cổng G4 (Plan) được duyệt, AI **bắt buộc dùng `ask`** để người dùng lựa chọn chế độ thực thi mã nguồn:
+Sau khi Cổng G4 (Plan & Tasks) được duyệt, AI **bắt buộc dùng `ask`** để người dùng lựa chọn chế độ thực thi mã nguồn:
 
 ```text
 ? Bạn muốn triển khai các task theo hình thức nào?
@@ -71,20 +98,20 @@ Sau khi Cổng G4 (Plan) được duyệt, AI **bắt buộc dùng `ask`** để
 
 ### Quy trình mô hình Subagents 3 tầng:
 1. **Tầng 1 - Task Worker (Subagent):**
-   - Main Agent dispatch subagent worker (qua công cụ `task`) nhận một task cụ thể từ file plan trong `docs/workflow/plans/`.
-   - Worker thực thi mã nguồn đúng phạm vi, chạy unit test / smoke test, và xuất bằng chứng hoàn thành (evidence).
+   - Main Agent dispatch subagent worker (qua công cụ `task`), truyền **đúng file `tasks/task-XX-<slug>.md`**.
+   - Worker thực thi đúng phạm vi, ghi evidence và bàn giao task ở trạng thái Review, không tự tích Done. Agent điều phối chạy kiểm chứng trên bản tích hợp; workers không cùng sửa ma trận chung.
 2. **Tầng 2 - Task Reviewer (Subagent từng task):**
    - Ngay khi Worker hoàn thành, Main Agent dispatch subagent reviewer (agent role `reviewer`).
-   - Reviewer kiểm tra diff của task:
+   - Reviewer kiểm tra diff của task đối chiếu với file `task-XX-<slug>.md`:
      - *Spec Compliance:* Có đáp ứng đúng AC không? Có code thừa ngoài phạm vi không?
      - *Code Quality:* Mã nguồn có sạch, đúng quy ước dự án và không làm vỡ logic cũ không?
-   - Nếu phát hiện vấn đề: Yêu cầu Worker sửa lại và review lại. Khi đạt thì đánh dấu task hoàn thành.
+   - Nếu phát hiện vấn đề: Yêu cầu Worker sửa lại và review lại. Agent điều phối chỉ đánh dấu task Done khi đủ DoD, rồi cập nhật roadmap và điểm AC liên quan; không tự tích tính năng.
 3. **Tầng 3 - Reviewer Tổng (Final Reviewer sau khi xong toàn bộ tasks):**
-   - Sau khi tất cả các task đã hoàn tất, Main Agent dispatch Subagent Reviewer Tổng thể.
-   - Quét toàn bộ git diff của cả tính năng/module.
-   - Chạy test tích hợp toàn diện (integration test / regression test).
+   - Sau khi workers bàn giao và review từng task đạt, nghiệm thu tích hợp; không chờ tính năng được đánh dấu Done mới kiểm chứng.
+   - Quét toàn bộ git diff của cả phân hệ/tính năng.
+   - Đối chiếu kết quả kiểm thử tích hợp/regression do agent điều phối chạy trên revision tích hợp.
    - Đối chiếu với Definition of Done (DoD) và đánh giá độ sẵn sàng phát hành.
-   - Báo cáo kết quả nghiệm thu cuối cùng cho người dùng.
+   - Agent điều phối cập nhật checkbox tính năng và tổng điểm trong Product Backlog theo kết quả nghiệm thu, rồi báo người dùng đường dẫn và phần còn thiếu.
 
 ---
 
@@ -93,7 +120,8 @@ Nếu AI xuất hiện bất kỳ suy nghĩ nào dưới đây, **PHẢI DỪNG 
 
 | Suy nghĩ bao biện của AI | Sự thật / Lệnh cấm bắt buộc |
 |---|---|
-| *"Tôi tự suy đoán nghiệp vụ rồi tóm tắt bảo người dùng duyệt cho nhanh."* | **SAI.** Đó là tự biên tự diễn. Phải dùng `ask` phỏng vấn người dùng ít nhất 2–3 câu hỏi cốt lõi trước. |
+| *"Tôi tự suy đoán nghiệp vụ hoặc hỏi vụn vặt ngay mà không phân rã phân hệ."* | **SAI.** Phải đánh giá quy mô, đề xuất danh mục phân hệ và dùng `ask` chốt phân hệ làm trước. |
+| *"Tôi gom hết 40 tasks vào 1 file plan.md duy nhất cho tiện."* | **SAI.** Gây xung đột Git và vỡ context. Phải chia thành file task độc lập trong thư mục `tasks/`. |
 | *"Tôi tự chọn React + SQLite luôn, không cần hỏi tech stack."* | **SAI.** Phải đề xuất 2–3 phương án stack kèm ưu/nhược điểm và dùng `ask` để người dùng lựa chọn. |
 | *"Tôi in tài liệu ra tin nhắn chat là đủ, không cần tạo file làm gì."* | **SAI.** Bắt buộc ghi file Markdown vào `docs/workflow/` để người dùng có tài liệu lưu trữ, đọc lại trong IDE. |
 | *"Tôi đã chốt tech stack, giờ tôi code luôn backend."* | **SAI.** Chốt stack mới chỉ là 10% của G3. Phải có Business Rules (G1), Stories/AC (G2), Schema chi tiết và API Contracts (G3) lưu vào docs trước khi code. |

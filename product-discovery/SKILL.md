@@ -20,8 +20,20 @@ CẤM TỰ Ý ĐOÁN NGHIỆP VỤ rồi đưa ra bản tóm tắt có sẵn. AI
 - **Nếu là dự án lớn / nền tảng phức tạp (Website hoàn chỉnh, SaaS, E-commerce, ERP...):**
   - **Tuyệt đối không dồn hàng chục hay hàng trăm câu hỏi vào một lượt.**
   - **Phân rã thành các phân hệ trước (Decomposition First):** Cùng người dùng vạch ra bức tranh toàn cảnh và phân rã thành danh mục các phân hệ độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Đặt hàng & Thanh toán, Quản lý kho, Quản trị Admin...).
-  - Chọn một phân hệ ưu tiên làm trước (MVP hoặc phân hệ nền tảng).
-
+  - **Bắt buộc dùng `ask` để duyệt Danh mục phân hệ & chọn phân hệ làm trước (MVP):**
+    ```text
+    ask(questions=[{
+      "id": "module_catalogue_approval",
+      "question": "Dự án có quy mô [Vừa/Lớn], tôi đề xuất phân rã thành các phân hệ sau. Bạn có đồng ý với danh mục này và muốn bắt đầu với phân hệ nào?",
+      "options": [
+        {"label": "Duyệt danh mục và bắt đầu với Phân hệ 1 (MVP)", "description": "Tập trung phỏng vấn nghiệp vụ cho phân hệ cốt lõi trước."},
+        {"label": "Cần điều chỉnh danh mục phân hệ", "description": "Thêm, bớt hoặc gộp các phân hệ trước khi phỏng vấn."},
+        {"label": "Chọn phân hệ khác để bắt đầu", "description": "Ưu tiên một phân hệ khác làm trước."}
+      ],
+      "recommended": 0
+    }])
+    ```
+  - Chỉ sau khi người dùng chốt danh mục và chọn phân hệ, AI mới bắt đầu phỏng vấn cho đúng phân hệ đó.
 ### 2. Phỏng vấn cuốn chiếu nhiều vòng (Multi-Round Thematic Deep-Dive)
 Với mỗi phân hệ, AI tiến hành phỏng vấn sâu qua **nhiều vòng (nhiều lượt trao đổi)**, mỗi lượt tập trung vào một chủ đề:
 1. *Vòng 1 - Luồng người dùng chính:* Happy path, triggers, các bước thao tác, dữ liệu nhập và kết quả mong muốn.
@@ -71,7 +83,7 @@ AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường d
 Nội dung file bao gồm:
 - Stakeholders/actors và ma trận quyền theo hành động/dữ liệu.
 - Glossary: thuật ngữ, định nghĩa domain, ví dụ và từ dễ nhầm.
-- As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ.
+- As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ. Sơ đồ quy trình nghiệp vụ: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-process.md` hoặc `type-flowchart.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-process.html` và chèn liên kết vào tài liệu.
 - Business rules có ID, phạm vi áp dụng, nguồn xác nhận, ví dụ và phản ví dụ.
 - Dữ liệu/lifecycle và yêu cầu phi chức năng có điều kiện kiểm chứng.
 - In-scope/out-of-scope và giả thuyết cần kiểm chứng.
@@ -96,6 +108,9 @@ G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và ph
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh quy tắc]`, `[Xem giải thích chi tiết]`.
 
 Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.
+
+Khi G1 được người dùng duyệt và workflow được phép lưu, tạo/cập nhật hàng tính năng trong `docs/workflow/product-backlog.md` (hoặc backlog hiện hữu) theo mẫu `skill://product-workflow/references/records.md`. Ghi ID ổn định, module, scope và liên kết brief; ưu tiên chưa chốt ghi chưa xác định, SP `—`, AC `Chưa xác định`, hoàn thành `[ ]`. Đây là danh mục phạm vi, không phải task triển khai hay quyền publish Jira. Không tự thêm tính năng từ ví dụ phân hệ.
+
 ## Thay đổi và tiếp tục
 
 Khi rule đổi, ghi delta so với revision đã duyệt; liệt kê stories/flows/contracts cần xem lại nếu đã có liên kết. Không xóa lịch sử hoặc kéo toàn dự án về Draft. Bàn giao cho `delivery-inspection` để đánh giá tác động liên ngành khi cần.

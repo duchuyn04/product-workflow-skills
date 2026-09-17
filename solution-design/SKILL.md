@@ -88,10 +88,10 @@ AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường d
 
 Nội dung file bao gồm:
 - Quyết định lựa chọn Tech Stack và lý do (ADR).
-- Ranh giới module và Data Flow.
-- Database Schema chi tiết (các bảng, khóa chính/ngoại, kiểu dữ liệu, quan hệ).
-- REST/GraphQL API Contracts cụ thể (Endpoints, Request/Response payloads, mã lỗi).
-
+- Sơ đồ Kiến trúc hệ thống (System Architecture Diagram): **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-architecture.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-architecture.html` và chèn link vào tài liệu.
+- Sơ đồ Database Schema / ER: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-db-schema.md` hoặc `type-er.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-db-schema.html`.
+- Chi tiết Database Schema dạng bảng/DDL (khóa chính, khóa ngoại, kiểu dữ liệu, index).
+- REST/GraphQL API Contracts cụ thể kèm Sequence Diagram (dùng `type-sequence.md` qua `diagram-design` nếu có luồng auth/thanh toán phức tạp).
 ## Gate G3 và bàn giao (Hard-Stop)
 
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.

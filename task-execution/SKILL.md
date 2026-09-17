@@ -44,7 +44,7 @@ Trước claim phải biết công cụ và cơ chế nhận việc được dù
 
 Nếu cơ chế an toàn có sẵn và được ủy quyền: đọc fresh → kiểm tra → gửi claim → chờ xác nhận quyền sở hữu → ghi actor/thời điểm → bắt đầu. Conflict thì không ghi đè owner, đề xuất task khác đủ điều kiện.
 
-Nếu thiếu Jira hoặc cơ chế claim: nói rõ chưa nhận được task; dừng phần nhận/thực thi task được quản lý chung. Có thể hoàn thiện handoff hoặc phân tích không thay đổi chung. Chỉ chuyển sang điều phối thủ công nếu người dùng đồng ý giới hạn, không coi là đã đáp ứng claim đồng thời.
+Ở chế độ Jira, nếu thiếu quyền/kết nối hoặc cơ chế claim an toàn: nói rõ chưa nhận được task, dừng phần nhận/thực thi công việc quản lý chung. Ở chế độ local đã được chọn, có thể thực thi task do người dùng giao rõ cho người điều phối, với phạm vi và read/write areas đã thống nhất; không cần Jira. Việc ghi owner vào Markdown không phải claim nguyên tử; nhiều phiên/thành viên cùng tranh task vẫn phải có cơ chế an toàn hoặc người dùng xác nhận điều phối thủ công.
 
 Timeout sau claim là kết quả chưa rõ; đối chiếu theo cơ chế có sẵn trước retry/bắt đầu. Không báo thành công chỉ vì không thấy lỗi.
 ## 3. Lựa chọn chế độ thực thi trong Oh My Pi (Execution Strategy)
@@ -67,23 +67,23 @@ ask(questions=[{
 ### Quy trình Chế độ Subagents 3 tầng:
 
 #### Tầng 1: Task Worker (Subagent thực thi từng task)
-- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task cụ thể trong plan.
-- Cung cấp bối cảnh khép kín: ID task, mục tiêu, AC, file paths cụ thể, contracts/schema đúng phiên bản.
-- Yêu cầu Worker: Viết mã nguồn đúng AC, chạy unit test / smoke test, xuất bằng chứng kết quả (evidence) và diff. Không chạy test toàn dự án giữa chừng để tránh tắc nghẽn.
+- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task cụ thể.
+- Truyền file task card `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` cùng scope được giao. Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
+- Worker thực thi đúng phạm vi, ghi evidence theo AC vào task card và bàn giao ở trạng thái Review. Không tự tích Done hoặc sửa `product-backlog.md`/`roadmap.md`. Khi chạy nhiều workers đồng thời, để agent điều phối chạy kiểm chứng sau khi tích hợp, tránh checks giữa các chỉnh sửa đang dở.
 
 #### Tầng 2: Task Reviewer (Subagent thẩm định từng task)
 - Ngay sau khi Task Worker nộp kết quả, Main Agent dispatch subagent reviewer (agent role `reviewer`).
-- Reviewer độc lập thẩm tra diff và evidence của task theo 2 tiêu chí:
-  1. *Spec Compliance:* Code có thỏa mãn đúng AC của task không? Có code thừa/tự ý mở rộng scope ngoài spec không?
+- Reviewer đọc file task card `task-XX-<slug>.md` và kiểm tra diff của task:
+  1. *Spec Compliance:* Code có thỏa mãn đúng AC của task card không? Có code thừa/tự ý mở rộng scope ngoài task không?
   2. *Code Quality:* Mã nguồn có sạch, đúng quy ước dự án, xử lý lỗi đầy đủ và không phá vỡ logic cũ không?
 - Nếu Reviewer phát hiện lỗi: Trả feedback rõ ràng để Worker sửa lại ──► Reviewer kiểm tra lại.
-- Khi Reviewer phê duyệt: Task được đánh dấu hoàn thành và chuyển sang task kế tiếp.
+- Reviewer trả kết luận và phần cần sửa. Agent điều phối chỉ đánh dấu task Done khi đủ DoD và kiểm chứng cần thiết, rồi cập nhật roadmap và hàng backlog theo mục 7. Review từng task không tự chứng minh tính năng đã Done.
 
 #### Tầng 3: Reviewer Tổng (Nghiệm thu toàn diện sau khi hết tasks)
-- Sau khi TẤT CẢ các tasks trong plan đã hoàn tất, Main Agent dispatch Subagent Reviewer Tổng.
+- Sau khi các workers bàn giao và review từng task đạt, thực hiện nghiệm thu tích hợp của tính năng. Không chờ tất cả ô tính năng được tích Done mới chạy kiểm chứng này.
 - Nhiệm vụ của Reviewer Tổng:
   1. Quét toàn bộ `git diff` của toàn bộ tính năng/module từ đầu đến cuối.
-  2. Chạy bộ kiểm thử tích hợp (integration tests / regression tests) toàn dự án.
+  2. Đối chiếu bằng chứng kiểm thử tích hợp/regression do agent điều phối chạy trên revision tích hợp.
   3. Đối chiếu với Definition of Done (DoD) và tiêu chí nghiệm thu của Product Goal.
   4. Xuất báo cáo tổng kết chất lượng và đề xuất sẵn sàng phát hành (release readiness).
 
@@ -131,6 +131,17 @@ Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm 
 Có quyền ghi Jira: dùng transition thật, ghi evidence references theo quy ước, xác nhận kết quả. Không có quyền/kết nối: bàn giao đánh giá và nói Jira chưa cập nhật. PR merge không tự là story Done; children Done không tự đóng parent; Done không đồng nghĩa đã Released.
 
 Nếu Jira đã Done nhưng evidence thiếu, báo bất nhất để người có quyền xử lý; không tự chứng nhận hoặc tự sửa lịch sử. Chuyển `delivery-inspection` khi cần nhìn ảnh hưởng lên module/sprint/release.
+
+### Cập nhật Product Backlog sau mỗi kết quả
+
+Trong scope thực thi được ủy quyền, agent điều phối phải cập nhật `docs/workflow/product-backlog.md` (hoặc backlog hiện hữu), không chỉ báo xong trong chat:
+1. Đọc hàng tính năng theo ID trong task card, stories/AC và evidence mới nhất; dùng quy tắc của `skill://product-workflow/references/records.md`.
+2. Ghi kết quả task/review/kiểm chứng, kể cả failed/not-run. Tính lại AC đạt/tổng của tính năng, không cộng điểm theo số tasks hoặc lời báo của worker.
+3. Khi đủ DoD và kiểm chứng tích hợp, tích `[x]` và cộng toàn bộ SP đã duyệt của tính năng. Còn thiếu review hoặc AC thì giữ `[ ]`, trạng thái tương ứng và 0 SP hoàn tất cho hàng đó.
+4. Tính lại tổng quan, cập nhật nguồn/thời điểm và link evidence. Nếu lỗi mới hoặc thay đổi làm bằng chứng mất hiệu lực, bỏ tích phần ảnh hưởng, tính lại điểm và giữ lịch sử.
+5. Chế độ Jira chỉ phản ánh transition được xác nhận; mất quyền/kết nối thì ghi chưa đồng bộ, không tự chuyển sang local. Không cần gọi Jira ở chế độ local.
+
+Chỉ agent điều phối ghi ma trận chung; workers/reviewers gửi kết quả qua task cards và handoff. Nếu file bị người khác thay đổi, đọc bản mới và đối chiếu trước khi ghi. Cuối lượt báo đường dẫn backlog, ID tính năng vừa cập nhật, điểm và nghĩa vụ còn thiếu.
 
 ## 8. Gián đoạn, trả việc và tiếp tục
 

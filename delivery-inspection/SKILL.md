@@ -1,6 +1,6 @@
 ---
 name: delivery-inspection
-description: "Tổng hợp board và ma trận tiến độ có nguồn, kiểm tra Done/release, đánh giá tác động thay đổi, hỗ trợ Sprint Review và Retrospective."
+description: "Đối chiếu Product Backlog Markdown và ma trận tiến độ local/Jira; kiểm chứng AC, Story Points hoàn tất, checkbox Done và điều kiện release theo bằng chứng."
 hide: true
 ---
 
@@ -10,9 +10,9 @@ hide: true
 
 ## 1. Xác định câu hỏi và độ phủ nguồn
 
-Người dùng muốn xem tiến độ, tick task, đánh giá release hay xử lý thay đổi? Xác định scope/release và thời điểm dữ liệu. Đọc module catalogue, nghĩa vụ đầu ra, approvals/revisions, Jira và evidence liên quan theo quyền thực tế.
+Người dùng muốn xem tiến độ, tick task/tính năng, đánh giá release hay xử lý thay đổi? Đọc `product-backlog.md` theo đường dẫn trong chỉ mục (mặc định `docs/workflow/product-backlog.md`), xác định scope/release, nguồn trạng thái local/Jira và thời điểm dữ liệu. Đọc module catalogue, AC, approvals/revisions, task cards và evidence liên quan.
 
-Nếu chưa kết nối Jira, không báo board live hoặc owner/status hiện tại. Có thể tổng hợp tiến độ tài liệu đã đọc và bản nháp được gắn nhãn; các phần phụ thuộc Jira ghi `chưa xác minh`. Không dừng mọi phân tích độc lập vì thiếu một nguồn.
+Ở chế độ local, dùng hồ sơ Markdown và evidence mới nhất để tổng hợp, không yêu cầu Jira. Ở chế độ Jira, thiếu kết nối/quyền thì ghi `chưa xác minh`, không tự chuyển sang local hoặc báo board live. Không dừng phân tích độc lập chỉ vì thiếu một nguồn.
 
 Phân biệt: không có công việc, không đọc được công việc, dữ liệu chưa lấy đủ trang và snapshot cũ. Thiếu quyền không được biến thành “không có blocker”. Không tuyên bố toàn dự án xanh nếu coverage chưa đủ.
 
@@ -21,6 +21,14 @@ Phân biệt: không có công việc, không đọc được công việc, dữ
 Đọc board/workflow/mapping thật nếu có. Đề xuất góc nhìn: sprint hiện tại, có thể nhận, của tôi, blocked, chờ review và theo module. Hiển thị key, mục tiêu, owner, trạng thái, blocker và evidence cần; không chỉ màu.
 
 Xem board là thao tác đọc. Tạo filter/view mới, sửa issue hoặc assignee cần quyền riêng; không tự chỉnh workflow Jira. Task đang hiển thị Ready vẫn cần đọc fresh và kiểm tra trước claim trong `task-execution`.
+
+### Product Backlog và điểm theo tính năng
+
+Đọc mục `Product Backlog dạng ma trận` trong `skill://product-workflow/references/records.md` để dùng cùng công thức với planning/execution. Đối chiếu từng hàng với scope, stories/AC, task cards, evidence và review; báo riêng `Tính năng Done`, `SP hoàn tất`, `AC đạt`, kèm số tính năng thiếu ước lượng hoặc chưa chốt AC.
+
+Không tính AC đạt theo số tasks đã xong hoặc số tests pass; không tích tính năng chỉ vì tất cả tasks Done. `N/N` AC nhưng chưa đủ review/kiểm chứng tích hợp vẫn `[ ]`, chưa cộng SP hoàn tất. Canceled, unknown, evidence mất hiệu lực và scope rỗng xử lý theo mẫu shared, không làm đẹp số liệu.
+
+Yêu cầu xem tiến độ chỉ cho phép đọc và báo bất nhất. Khi người dùng yêu cầu cập nhật/tích hoàn thành, hoặc đây là bước nghiệm thu trong scope thực thi đã ủy quyền, agent điều phối ghi các hàng có đủ nguồn, tổng điểm và thời điểm đối chiếu; giữ rõ giới hạn của phần chưa xác minh. Không tự publish Jira.
 
 ## 3. Xác định nghĩa vụ của từng ô ma trận
 
@@ -63,7 +71,7 @@ Không lấy phần trăm số tasks làm “% sản phẩm hoàn thành” ho�
 
 Kiểm tra DoD/AC, review và bằng chứng đúng revision tích hợp. Code xong, một test pass hoặc PR merge riêng lẻ chưa đủ nếu còn nghĩa vụ khác.
 
-Nếu đạt và có quyền/công cụ Jira, chuyển qua `task-execution` để cập nhật bằng transition thật và xác nhận kết quả. Nếu thiếu quyền/kết nối thì nói rõ Jira chưa đổi. Không giữ checkbox có quyền riêng trong ma trận.
+Ở chế độ local, nếu đủ DoD và được ủy quyền cập nhật, ghi `[x]` vào hàng tính năng, liên kết evidence và tính lại tổng theo mẫu shared; thiếu điều kiện thì giữ `[ ]` và ghi phần còn thiếu. Task card và roadmap phải phản ánh đúng kết quả, không có checkbox tự cấp quyền nghiệm thu. Ở chế độ Jira, chuyển qua `task-execution` để dùng transition thật; chỉ phản ánh Done sau khi có xác nhận và đủ evidence. Thiếu quyền/kết nối thì ghi Jira chưa đổi.
 
 Nếu Jira đã Done nhưng chưa chứng minh DoD: hiển thị “Jira: Done; kiểm chứng: chưa đủ” cùng phần thiếu. Không tự certify, reopen hay sửa lịch sử bên ngoài quyền được cấp.
 

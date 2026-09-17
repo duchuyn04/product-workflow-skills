@@ -10,7 +10,7 @@ Thay vì để AI tự suy đoán nghiệp vụ hoặc nhảy vào viết code n
 
 ## Cấu trúc các kỹ năng
 
-Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hướng dự án và sáu kỹ năng chuyên môn:
+Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hướng dự án và bảy kỹ năng chuyên môn:
 
 ```text
                   [ Người dùng (PO, Tech Lead, Dev) ]
@@ -45,9 +45,10 @@ Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hư
 - `product-discovery` (Phân tích nghiệp vụ): Làm rõ bài toán, phỏng vấn domain, xác định actors, các trường hợp ngoại lệ và chốt quy tắc nghiệp vụ cốt lõi (Cổng G1).
 - `story-and-experience` (Thiết kế trải nghiệm người dùng): Chuyển nghiệp vụ thành user stories kèm tiêu chí nghiệm thu (Given-When-Then), danh mục màn hình và các trạng thái giao diện (Cổng G2).
 - `solution-design` (Kiến trúc kỹ thuật): Đánh giá phương án công nghệ theo ràng buộc thực tế, thiết kế schema dữ liệu, hợp đồng API và ghi nhận quyết định kiến trúc qua ADR (Cổng G3).
-- `delivery-planning` (Lập kế hoạch thực hiện): Phân rã tính năng thành các task nhỏ (1–4 giờ), xác định việc phụ thuộc, nhóm các task có thể làm song song và chuẩn bị sprint backlog (Cổng G4).
-- `task-execution` (Thực thi code): Nhận task có kiểm soát, viết code đúng phạm vi, chạy test và thu thập bằng chứng hoàn thành theo tiêu chí nghiệm thu.
-- `delivery-inspection` (Kiểm tra và nghiệm thu): Theo dõi ma trận tiến độ, kiểm tra tiêu chuẩn hoàn thành (Definition of Done), đánh giá rủi ro và điều kiện phát hành.
+- `delivery-planning` (Lập kế hoạch thực hiện): Tạo Product Backlog dạng ma trận, ghi Story Points được duyệt, liên kết AC và task cards, xác định dependency và việc có thể làm song song (Cổng G4).
+- `task-execution` (Thực thi code): Nhận task có kiểm soát, viết code đúng phạm vi, kiểm chứng và cập nhật điểm nghiệm thu cùng bằng chứng vào backlog.
+- `delivery-inspection` (Kiểm tra và nghiệm thu): Đối chiếu AC, review và kiểm chứng tích hợp trước khi tích hoàn thành; báo tổng điểm và điều kiện phát hành.
+- `diagram-design` (Thiết kế sơ đồ trực quan thay Mermaid): Tạo sơ đồ kiến trúc, DB schema, flow, sequence dưới dạng file HTML/SVG độc lập, hiển thị sắc nét trong `docs/workflow/diagrams/`.
 
 ## Các cổng kiểm soát chất lượng
 
@@ -63,6 +64,20 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 - Gate G3 (Kiến trúc): Công nghệ, schema dữ liệu và hợp đồng API cần cho triển khai đã được phê duyệt.
 - Gate G4 (Sẵn sàng thực thi): Tính năng đã được chia thành các task cụ thể, đầy đủ điều kiện tiên quyết và không còn vướng mắc kỹ thuật.
 
+## Product Backlog dạng ma trận
+
+Trong dự án sử dụng skills, agent lưu ma trận tại `docs/workflow/product-backlog.md`, hoặc cập nhật backlog tương đương đã có. Mỗi hàng là một tính năng; chi tiết triển khai vẫn nằm trong các file `plans/<phân-hệ-hoặc-sprint>/tasks/task-XX-<slug>.md`.
+
+Các cột gồm ID, phân hệ, tính năng, ưu tiên, Story Points, AC đạt/tổng, trạng thái, `[ ]` / `[x]` và liên kết stories/tasks/bằng chứng.
+
+- Story Points là ước lượng do đội duyệt; chưa ước lượng thì ghi `—`.
+- AC đạt/tổng là số tiêu chí nghiệm thu đã được kiểm chứng, không phải số tests hay tasks.
+- Agent điều phối cập nhật sau mỗi kết quả task, review và kiểm chứng. Chỉ tích `[x]` khi đủ AC, review bắt buộc và kiểm chứng tích hợp; khi evidence mất hiệu lực thì bỏ tích phần ảnh hưởng và tính lại điểm.
+- Tổng quan tách riêng tính năng Done, SP hoàn tất và AC đạt. Không cộng SP theo phần trăm AC hoặc dùng các tỷ lệ này làm phần trăm sản phẩm hoàn thành.
+- Không có Jira thì dùng backlog local. Nếu đã chọn Jira làm nguồn chính, Markdown phản ánh trạng thái Jira và bằng chứng; mất kết nối không tự đổi nguồn. Workers cập nhật task cards, người điều phối cập nhật ma trận chung.
+
+Đây là hướng dẫn để agent tạo backlog trong dự án đích. Cài đặt hoặc chỉnh sửa bộ skills không tự tạo backlog mẫu trong repo này.
+
 ## Tối ưu hóa cho Oh My Pi (OMP)
 
 Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính năng native:
@@ -70,49 +85,81 @@ Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính nă
 - **Lập kế hoạch chi tiết (Plan Mode)**: Bẻ nhỏ tính năng thành các task độc lập kèm đầy đủ file paths và tiêu chí nghiệm thu (AC) trước khi viết code.
 - **Hỏi người dùng chọn mô hình Subagents**: Sau khi duyệt Cổng G4, AI dùng `ask` để bạn chọn:
   1. **Spawn Subagents (Mô hình 3 tầng)**:
-     - *Task Worker*: Subagent thực thi code và kiểm thử cho từng task độc lập.
-     - *Task Reviewer*: Subagent thẩm định diff ngay sau mỗi task (Spec Compliance + Code Quality).
-     - *Reviewer Tổng*: Subagent kiểm tra toàn bộ git diff, chạy test tích hợp và đối chiếu Definition of Done (DoD) trước khi hoàn tất tính năng.
+     - *Task Worker*: Thực thi trong phạm vi task, ghi evidence và bàn giao để review.
+     - *Task Reviewer*: Thẩm định diff theo AC và quy ước dự án.
+     - *Agent điều phối và Reviewer tổng*: Chạy/đối chiếu kiểm chứng tích hợp, cập nhật task cards, backlog và checkbox theo Definition of Done.
   2. **Thực thi tuần tự (Inline Execution)**: Main Agent tự làm từng task.
   3. **Từng task có xác nhận**: Dừng lại xin duyệt diff sau mỗi task.
 
 ## Cài đặt
 
-### Cách 1: Cài đặt chuẩn qua npx skills
+### Chạy installer bằng npx
 
-Sử dụng công cụ quản lý kỹ năng chuẩn quốc tế (`skills.sh`), hỗ trợ tự động hơn 79+ AI Coding Agents (Claude Code, Cursor, Codex, Windsurf, Cline, v.v.):
-
-```bash
-npx skills@latest add duchuyn04/product-workflow-skills
-```
-
-Các tùy chọn:
-
-```bash
-# Cài đặt toàn bộ 8 skills mà không cần chọn thủ công
-npx skills@latest add duchuyn04/product-workflow-skills -y --all
-
-# Cài đặt toàn cục (Global) cho tài khoản máy tính
-npx skills@latest add duchuyn04/product-workflow-skills -g
-
-# Cập nhật các skills đã cài lên phiên bản mới nhất
-npx skills update
-```
-
-### Cách 2: Cài đặt kèm tự động tích hợp AGENTS.md
-
-Nếu bạn muốn công cụ tự động tạo hoặc tích hợp thông minh quy trình vào file `AGENTS.md` ở thư mục gốc dự án:
+Trong terminal tại dự án, chạy:
 
 ```bash
 npx github:duchuyn04/product-workflow-skills
 ```
 
-### Cách 3: Sao chép thủ công
+Installer hiển thị hai lựa chọn:
 
-1. Sao chép các thư mục kỹ năng vào thư mục `.agents/skills/` trong dự án của bạn.
-2. Sao chép file `AGENTS.md` vào thư mục gốc của dự án.
+```text
+1. Project: .agents/skills/ và AGENTS.md trong dự án hiện tại
+2. Global: ~/.omp/agent/skills/ cho Oh My Pi
+```
 
-Nếu dùng toàn cục cho Oh My Pi, sao chép các thư mục kỹ năng vào `~/.omp/agent/skills/`.
+Nhập `1` hoặc Enter để cài Project; nhập `2` để cài Global. Ctrl+C hủy trước khi ghi file.
+
+Project cài toàn bộ 9 skills và tạo/cập nhật khối chỉ dẫn trong `AGENTS.md`, giữ nguyên các quy tắc riêng ngoài khối đó. Global cài 9 skills cho tài khoản hiện tại trong Oh My Pi, không sửa `AGENTS.md` hay `.agents/` của dự án.
+
+Có thể chọn trực tiếp, không qua menu:
+
+```bash
+# Cài vào dự án hiện tại
+npx github:duchuyn04/product-workflow-skills --project
+
+# Cài vào một dự án khác
+npx github:duchuyn04/product-workflow-skills --project ./my-project
+
+# Cài global cho Oh My Pi
+npx github:duchuyn04/product-workflow-skills --global
+```
+
+Trong script/CI không có terminal tương tác, phải truyền `--project`, đường dẫn dự án hoặc `--global`. Không kết hợp hai phạm vi; đường dẫn dự án không áp dụng cho Global. Chạy lại installer để cập nhật skills tại phạm vi đã chọn.
+
+### Đóng gói và chạy bản local
+
+Từ thư mục mã nguồn:
+
+```bash
+npm pack
+```
+
+Lệnh tạo `product-workflow-skills-<version>.tgz`. Dùng đường dẫn đến gói để chạy bản local mà không cần publish npm:
+
+```bash
+npx --yes --package ./product-workflow-skills-1.0.0.tgz product-workflow-skills
+```
+
+Có thể thêm `--project ./my-project` hoặc `--global` sau tên lệnh `product-workflow-skills`. Trong terminal tương tác, bỏ cờ để dùng menu.
+
+Sau khi chủ sở hữu publish package lên npm, có thể gọi `npx product-workflow-skills`. `npm pack` chỉ tạo gói local, không publish hoặc cập nhật GitHub.
+
+### Cài qua trình quản lý skills.sh
+
+Để chọn vị trí theo harness được skills.sh hỗ trợ:
+
+```bash
+npx skills@latest add duchuyn04/product-workflow-skills
+npx skills@latest add duchuyn04/product-workflow-skills -y --all
+npx skills@latest add duchuyn04/product-workflow-skills -g
+```
+
+Đây là trình cài riêng của skills.sh; menu Project/Global và tích hợp `AGENTS.md` ở trên thuộc installer của package này.
+
+### Sao chép thủ công
+
+Sao chép các thư mục kỹ năng vào `.agents/skills/` trong dự án và tích hợp chỉ dẫn từ `AGENTS.md`. Với Oh My Pi global, sao chép skills vào `~/.omp/agent/skills/`.
 
 ## Câu lệnh mẫu theo nhu cầu
 

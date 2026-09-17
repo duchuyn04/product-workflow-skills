@@ -91,11 +91,11 @@ AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường d
 `docs/workflow/specs/<tên-tính-năng>-stories.md`
 
 Nội dung file bao gồm:
-- Story Map phân rã theo hành trình người dùng.
+- Story Map trực quan: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-story-map.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-story-map.html` và chèn liên kết vào tài liệu.
+- User Journey Diagram: dùng `skill://diagram-design` (`type-journey.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-journey.html` nếu mô tả trải nghiệm đa giai đoạn.
 - Chi tiết các User Stories kèm Acceptance Criteria quan sát được (chuẩn Given-When-Then).
-- Luồng thao tác chi tiết (Flow catalogue) và các nhánh rẽ lỗi / từ chối quyền.
+- Luồng thao tác chi tiết (Flow catalogue, dùng `type-flowchart.md` hoặc `type-state.md` cho các máy trạng thái phức tạp).
 - Danh mục màn hình và ma trận trạng thái UI (Loading, Empty, Error, Success).
-
 ## Gate G2 và bàn giao (Hard-Stop)
 
 G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng.
@@ -105,4 +105,7 @@ G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm 
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Stories/UX]`, `[Xem giải thích chi tiết]`.
 
 Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
+
+Khi G2 đã được người dùng duyệt, cập nhật hàng tính năng liên quan trong `docs/workflow/product-backlog.md` theo `skill://product-workflow/references/records.md`: giữ ID tính năng, liên kết story và các AC có ID ổn định, xác định tổng AC áp dụng. AC mới chưa kiểm chứng không có điểm đạt; duyệt stories không được tích hoàn thành. Nếu thay AC đã có, đánh giá lại evidence phần ảnh hưởng và ghi quyết định thay mẫu số, không tự giữ điểm cũ.
+
 Khi tiếp tục/đổi rule, chỉ xét stories/flows liên quan và đánh dấu approval bị ảnh hưởng cần duyệt lại. Lưu links và next action theo hợp đồng, không chép toàn bộ tài liệu vào checkpoint.

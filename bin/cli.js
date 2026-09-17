@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { createInterface } from 'node:readline';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,7 @@ const SKILLS = [
   'delivery-planning',
   'task-execution',
   'delivery-inspection',
+  'diagram-design',
 ];
 
 function printHelp() {
@@ -26,18 +28,23 @@ function printHelp() {
 Product Workflow Skills Installer
 
 Cách dùng:
-  npx github:duchuyn04/product-workflow-skills [đường-dẫn-dự-án] [tùy-chọn]
-  (hoặc: npx product-workflow-skills [nếu đã publish npm])
+  npx github:duchuyn04/product-workflow-skills [tùy-chọn] [đường-dẫn-dự-án]
+  npx product-workflow-skills [tùy-chọn] [đường-dẫn-dự-án] (sau khi publish npm)
+
+Không có tùy chọn: chọn Project hoặc Global trong terminal tương tác.
+Trong script/CI: chỉ định --project, đường dẫn dự án hoặc --global.
 
 Tùy chọn:
-  -g, --global     Cài đặt toàn cục cho Oh My Pi (~/.omp/agent/skills/)
-  -f, --force      Ghi đè nếu thư mục kỹ năng hoặc AGENTS.md đã tồn tại
+  -p, --project    Cài cho dự án (mặc định thư mục hiện tại: .agents/skills/)
+  -g, --global     Cài toàn cục cho Oh My Pi (~/.omp/agent/skills/)
+  -f, --force      Cài lại skills; vẫn giữ quy tắc riêng trong AGENTS.md
   -h, --help       Hiển thị hướng dẫn sử dụng
   -v, --version    Xem phiên bản
 
 Ví dụ:
   npx github:duchuyn04/product-workflow-skills
-  npx github:duchuyn04/product-workflow-skills ./my-project
+  npx github:duchuyn04/product-workflow-skills --project
+  npx github:duchuyn04/product-workflow-skills --project ./my-project
   npx github:duchuyn04/product-workflow-skills --global
 `);
 }
@@ -105,12 +112,31 @@ function syncAgentsMd(targetProjectRoot, packageRoot) {
   }
 }
 
+async function chooseInstallMode() {
+  const prompt = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log('Chọn phạm vi cài đặt:');
+    console.log('  1. Project: .agents/skills/ và AGENTS.md trong dự án hiện tại');
+    console.log('  2. Global: ~/.omp/agent/skills/ cho Oh My Pi');
+    process.stdout.write('Lựa chọn [1/2] (Enter = Project, Ctrl+C = hủy): ');
+    for await (const answer of prompt) {
+      const choice = answer.trim();
+      if (choice === '' || choice === '1') return 'project';
+      if (choice === '2') return 'global';
+      process.stdout.write('Nhập 1 cho Project hoặc 2 cho Global: ');
+    }
+    return null;
+  } finally {
+    prompt.close();
+  }
+}
 
-function run() {
+
+async function run() {
   const args = process.argv.slice(2);
 
   let targetDir = null;
-  let isGlobal = false;
+  let installMode = null;
   let isForce = false;
 
   for (const arg of args) {
@@ -122,8 +148,12 @@ function run() {
       printVersion();
       return;
     }
-    if (arg === '-g' || arg === '--global') {
-      isGlobal = true;
+    if (arg === '-g' || arg === '--global' || arg === '-p' || arg === '--project') {
+      const requestedMode = arg === '-g' || arg === '--global' ? 'global' : 'project';
+      if (installMode && installMode !== requestedMode) {
+        throw new Error('Chỉ chọn một phạm vi: --project hoặc --global.');
+      }
+      installMode = requestedMode;
       continue;
     }
     if (arg === '-f' || arg === '--force') {
@@ -134,6 +164,25 @@ function run() {
       targetDir = arg;
     }
   }
+
+  if (targetDir && installMode === 'global') {
+    throw new Error('Đường dẫn dự án không áp dụng cho --global.');
+  }
+  if (!installMode) {
+    if (targetDir) {
+      installMode = 'project';
+    } else if (process.stdin.isTTY && process.stdout.isTTY) {
+      installMode = await chooseInstallMode();
+      if (!installMode) {
+        console.log('\nĐã hủy cài đặt; chưa ghi file.');
+        process.exitCode = 130;
+        return;
+      }
+    } else {
+      throw new Error('Không có terminal tương tác. Dùng --project [đường-dẫn] hoặc --global.');
+    }
+  }
+  const isGlobal = installMode === 'global';
 
   console.log('Đang cài đặt Product Workflow Skills...\n');
 
@@ -186,4 +235,7 @@ function run() {
   console.log('3. Hoặc điều phối công việc với: /skill:product-workflow\n');
 }
 
-run();
+run().catch((error) => {
+  console.error(`Lỗi: ${error.message}`);
+  process.exitCode = 1;
+});

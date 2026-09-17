@@ -15,6 +15,7 @@ desktop.ini
 # Node
 node_modules/
 package-lock.json
+*.tgz
 
 # Third-party reference
 superpowers/
