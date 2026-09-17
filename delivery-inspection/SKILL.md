@@ -75,6 +75,23 @@ Kiểm tra DoD/AC, review và bằng chứng đúng revision tích hợp. Code x
 
 Nếu Jira đã Done nhưng chưa chứng minh DoD: hiển thị “Jira: Done; kiểm chứng: chưa đủ” cùng phần thiếu. Không tự certify, reopen hay sửa lịch sử bên ngoài quyền được cấp.
 
+### Kiểm chứng Giao diện Web trên Browser Native trước khi Tick Done
+Đối với các tính năng hoặc stories có thành phần giao diện Web (Frontend / UI / Sơ đồ tương tác):
+- **CẤM TICK DONE KHI CHƯA XÁC THỰC GIAO DIỆN HOẶC CHƯA HỎI Ý KIẾN NGƯỜI DÙNG:** AI chủ động đề xuất và dùng công cụ `ask` để hỏi người dùng có muốn mở Engine Browser Native để test web thực tế hay không:
+  ```text
+  ask(questions=[{
+    "id": "browser_inspect_option",
+    "question": "Tính năng web đã hoàn thành code. Bạn có muốn kích hoạt Engine Browser Native để mở giao diện kiểm thử trực quan trước khi nghiệm thu Tick Done không?",
+    "options": [
+      {"label": "Mở Browser Native để kiểm thử", "description": "Tự động khởi chạy Chromium, render trang web và đối chiếu Acceptance Criteria trực quan."},
+      {"label": "Bỏ qua kiểm thử browser", "description": "Nghiệm thu dựa trên kết quả unit tests và code review hiện có."},
+      {"label": "Chạy kiểm thử ngầm (Headless Screenshot)", "description": "Chụp ảnh màn hình giao diện ngầm để đính kèm vào bằng chứng nghiệm thu."}
+    ],
+    "recommended": 0
+  }])
+  ```
+- Nếu người dùng chọn mở Browser: AI mở trình duyệt native qua `browser.open`, kiểm tra các trạng thái màn hình (Loading, Empty, Success, Error) đối chiếu với AC, chụp screenshot đính kèm vào evidence trước khi tick `[x]`.
+
 ## 6. Release readiness và vận hành
 
 Done và Released tách biệt. Đánh giá theo scope:

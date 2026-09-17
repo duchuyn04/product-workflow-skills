@@ -91,6 +91,9 @@ Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính nă
   2. **Thực thi tuần tự (Inline Execution)**: Main Agent tự làm từng task.
   3. **Từng task có xác nhận**: Dừng lại xin duyệt diff sau mỗi task.
 
+- **Tích hợp Engine Browser Native (Chromium)**:
+  - *Sửa mũi tên & font chữ trong Diagram*: Đợi font web nạp xong, đo chính xác bounding box thật của chữ qua DOM, nới rộng hộp node nếu chữ tràn (tiếng Việt có dấu) và nắn lại tọa độ mũi tên bám khít mép hộp mà không đâm xuyên node. Chụp ảnh màn hình ngầm để thẩm định bố cục.
+  - *Đề xuất kiểm thử Web trực quan qua `ask`*: Sau khi hoàn thành task giao diện web hoặc tạo sơ đồ HTML, AI chủ động dùng `ask` hỏi bạn có muốn mở Browser Native để test web hay không, giúp kiểm tra giao diện trực quan và bắt lỗi console trước khi nghiệm thu.
 ## Cài đặt
 
 ### Chạy installer bằng npx

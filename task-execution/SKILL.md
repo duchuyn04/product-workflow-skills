@@ -124,6 +124,28 @@ Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm th�
 
 Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm tra → kết quả → link/output → reviewer khi bắt buộc. Dùng mẫu shared khi cần lưu.
 
+### Kiểm chứng Giao diện Web với Engine Browser Native (Bắt buộc hỏi qua `ask`)
+Đối với các task có thay đổi về giao diện web (HTML/CSS, Frontend UI, component, hoặc file sơ đồ `docs/workflow/diagrams/*.html`):
+- **CẤM TỰ Ý MỞ BROWSER LÀM PHIỀN HOẶC BỎ QUA KIỂM THỬ TRỰC QUAN:** AI bắt buộc dùng công cụ `ask` để đề xuất và xin ý kiến người dùng:
+  ```text
+  ask(questions=[{
+    "id": "browser_test_option",
+    "question": "Tôi đã hoàn thành giao diện/sơ đồ web. Bạn có muốn kích hoạt Engine Browser Native để mở và kiểm thử trực quan trên trình duyệt không?",
+    "options": [
+      {"label": "Mở Browser Native để kiểm thử", "description": "Tự động khởi chạy Chromium, tải trang web/sơ đồ và kiểm tra giao diện trực quan."},
+      {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ kiểm tra mã nguồn và unit tests trong terminal."},
+      {"label": "Chạy kiểm thử ngầm (Headless Screenshot)", "description": "Chụp ảnh màn hình ngầm để kiểm tra lỗi layout mà không mở cửa sổ tương tác."}
+    ],
+    "recommended": 0
+  }])
+  ```
+- **Nếu người dùng chọn "Mở Browser Native để kiểm thử":**
+  - AI sử dụng `browser.open({ url: ... })` để mở trang web dev server hoặc file diagram HTML.
+  - Tương tác với các phần tử giao diện (`tab.click`, `tab.fill`), kiểm tra console errors (`tab.evaluate`).
+  - Chụp ảnh màn hình (`tab.screenshot()`) và trình bày bằng chứng kiểm thử trực quan cho người dùng.
+- **Nếu người dùng chọn "Chạy kiểm thử ngầm":** AI mở tab ngầm, chụp ảnh screenshot lưu vào bằng chứng kiểm chứng.
+- **Nếu người dùng chọn "Bỏ qua":** AI tiếp tục quy trình kiểm thử trong terminal.
+
 ## 7. Hoàn thành và cập nhật trạng thái
 
 Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.

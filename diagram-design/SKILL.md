@@ -493,6 +493,41 @@ Run before producing any diagram.
 - [ ] Annotation callouts (if any) in *italic* Instrument Serif? (see [primitive-annotation.md](references/primitive-annotation.md))
 - [ ] No JetBrains Mono anywhere?
 
+
+## 9.1. Tinh chỉnh Font chữ & Mũi tên bằng Engine Browser Native (Browser Refinement)
+
+Khi tạo hoặc sửa file sơ đồ HTML/SVG trong `docs/workflow/diagrams/<tên-sơ-đồ>.html`:
+AI tận dụng Engine Browser Native của Oh My Pi (`browser.open({ url: "file://..." })`) để evaluate DOM thực tế và tự động sửa các lỗi hiển thị:
+
+1. **Đo đạc Font chữ thực tế & Chống tràn hộp (Typography Bounding Box):**
+   - Đợi toàn bộ font web nạp xong trong runtime: `await document.fonts.ready`.
+   - Dùng `tab.evaluate()` để lấy kích thước bounding box thật của từng thẻ `<text>` (`element.getBBox()` hoặc `element.getComputedTextLength()`).
+   - Nếu nhãn tiếng Việt có dấu hoặc chuỗi văn bản dài vượt quá chiều rộng của hộp node `<rect>`, tự động tính toán lại và nới rộng `width` của hộp (đảm bảo padding tối thiểu 16px mỗi bên, bo góc `rx="6"`).
+
+2. **Căn chỉnh & Nắn lại tọa độ Mũi tên (Connectors & Collision Detection):**
+   - Sau khi các node box được điều chỉnh kích thước, cập nhật lại tọa độ xuất phát `(x1, y1)` và đích đến `(x2, y2)` của các đường connector `<path>` / `<line>` để bám khít vào viền mép mới của hộp, không bị đâm xuyên vào bên trong node.
+   - Đo bounding box của nhãn mũi tên (label `<rect>` + `<text>`) để bảo đảm khoảng cách an toàn (gap) 6–10px so với đường stroke, không để nhãn đè lên mũi tên.
+   - Kiểm tra va chạm: đảm bảo hai mũi tên chạy song song cách nhau ≥ 12px, không đè lên nhau và không cắt qua các node trung gian.
+
+3. **Chụp ảnh màn hình xác thực ngầm (Headless Screenshot Verification):**
+   - Chạy `await tab.screenshot()` để AI tự kiểm tra trực quan bố cục toàn diện.
+   - Đóng tab (`await tab.close()`) sau khi hoàn tất hiệu chỉnh.
+
+4. **Đề xuất người dùng mở xem sơ đồ trên Browser qua `ask`:**
+   - Sau khi hoàn thiện file sơ đồ, AI gọi công cụ `ask` để hỏi người dùng có muốn mở trực tiếp trên trình duyệt để kiểm tra không:
+     ```text
+     ask(questions=[{
+       "id": "view_diagram_browser",
+       "question": "Tôi đã tạo và tinh chỉnh sơ đồ tại `docs/workflow/diagrams/<tên-sơ-đồ>.html`. Bạn có muốn mở sơ đồ trên Engine Browser Native để xem trực quan không?",
+       "options": [
+         {"label": "Mở sơ đồ trên Browser Native", "description": "Tự động mở Chromium để xem trực tiếp sơ đồ sắc nét."},
+         {"label": "Xem file trong IDE", "description": "Tự mở file HTML trong trình duyệt hoặc IDE cá nhân."},
+         {"label": "Tiếp tục quy trình", "description": "Chuyển sang bước tiếp theo mà không cần xem trước."}
+       ],
+       "recommended": 0
+     }])
+     ```
+
 ---
 
 ## 10. Templates & Variants

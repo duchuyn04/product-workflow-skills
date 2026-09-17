@@ -83,6 +83,29 @@ Trước khi làm bất kỳ hành động nào, AI phải tự xác định yê
   - Xuất thành các file HTML / SVG độc lập chất lượng cao lưu vào thư mục `docs/workflow/diagrams/<tên-sơ-đồ>.html`.
   - Nhúng hoặc liên kết file sơ đồ vào các tài liệu tương ứng trong `docs/workflow/specs/` và `docs/workflow/architecture/`.
 
+### E. Tích hợp Engine Browser Native: Tinh chỉnh Sơ đồ & Đề xuất Test Web
+- **1. Sửa mũi tên & Font chữ trong Diagram bằng Engine Browser Native:**
+  - Khi tạo sơ đồ HTML/SVG qua `skill://diagram-design`, AI kích hoạt Engine Browser Native (Chromium) để evaluate DOM thực tế:
+    - **Font chữ & Bounding Box:** Đợi web font nạp xong (`document.fonts.ready`), dùng `getBBox()` và `getComputedTextLength()` đo chính xác độ dài chữ thực tế (đặc biệt là tiếng Việt có dấu). Tự động nới rộng hộp node nếu chữ tràn ra ngoài (overflow), đảm bảo padding tối thiểu 16px.
+    - **Tọa độ mũi tên & Chống đè:** Tự động nắn lại tọa độ kết nối `(x1, y1)` và `(x2, y2)` của connector để bám khít vào mép hộp node sau khi đổi kích thước, không đâm xuyên vào thân hộp. Đảm bảo nhãn mũi tên cách đường stroke tối thiểu 6–10px, không đè lên mũi tên và các đường song song cách nhau ≥ 12px.
+    - **Visual Confirmation:** Chụp ảnh màn hình ngầm (`tab.screenshot()`) để AI tự kiểm tra trực quan layout trước khi bàn giao file sơ đồ.
+- **2. Đề xuất kiểm thử Web trên Browser Native qua `ask`:**
+  - Đối với mọi task liên quan đến giao diện Web (Frontend UI, component, hoặc sau khi tạo sơ đồ HTML):
+  - **CẤM TỰ Ý MỞ BROWSER LÀM PHIỀN HOẶC BỎ QUA KIỂM THỬ GIAO DIỆN:** AI bắt buộc phải gọi công cụ `ask` để hỏi người dùng có muốn mở Engine Browser Native để test web không:
+    ```text
+    ask(questions=[{
+      "id": "browser_test_option",
+      "question": "Tôi đã hoàn thành giao diện/sơ đồ web. Bạn có muốn kích hoạt Engine Browser Native để mở và kiểm thử trực quan trên trình duyệt không?",
+      "options": [
+        {"label": "Mở Browser Native để kiểm thử", "description": "Tự động khởi chạy Chromium, tải trang web/sơ đồ và kiểm tra giao diện trực quan."},
+        {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ kiểm tra mã nguồn và unit tests trong terminal."},
+        {"label": "Chạy kiểm thử ngầm (Headless Screenshot)", "description": "Chụp ảnh màn hình ngầm để kiểm tra lỗi layout mà không mở cửa sổ tương tác."}
+      ],
+      "recommended": 0
+    }])
+    ```
+  - Nếu người dùng chọn mở Browser Native: AI dùng `browser.open` kết nối tới local dev server hoặc file HTML, tương tác với các nút bấm/form, kiểm tra console logs, chụp ảnh màn hình và báo cáo cho người dùng.
+
 ---
 
 ## 3. Chiến lược thực thi: Hỏi người dùng chọn Subagents qua `ask`
