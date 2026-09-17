@@ -33,22 +33,18 @@ Trước khi làm bất kỳ hành động nào, AI phải tự xác định yê
   1. Đánh giá quy mô: Micro (1–2 màn hình), Vừa (3–5 phân hệ), hay Lớn/Nền tảng (6–10+ phân hệ).
   2. Đề xuất dự thảo danh mục các phân hệ độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Giỏ hàng & Thanh toán, Quản lý kho, Dashboard Admin...).
   3. **Dùng `ask` để người dùng xác nhận/chỉnh sửa danh sách phân hệ** và chọn phân hệ ưu tiên làm trước (MVP).
-- **Bước 2 - Phỏng vấn chuyên sâu theo Wayfinding Map, Case Study & Cây quyết định (Học hỏi từ Matt Pocock):**
-  Chỉ phỏng vấn cho đúng phân hệ được chọn làm trước, kết hợp sức mạnh của `wayfinder`, `grilling` và `domain-modeling`:
-  - **Bản đồ Khai phá (Wayfinding Map) & Quản lý Sương mù (Fog of War):**
-    Chia lộ trình phỏng vấn phân hệ thành 4 vùng nhận thức:
-    1. *Destination:* Đích đến là bản Business Brief hoàn chỉnh cho phân hệ đang phỏng vấn.
-    2. *Decisions So Far:* Ghi nhận lại các quyết định đã chốt sau mỗi case study để làm tiền đề cho vòng sau.
-    3. *The Frontier (Mặt trận câu hỏi):* Chỉ hỏi 3–5 câu hỏi/case study mà các điều kiện tiên quyết của nó đã được chốt ở *Decisions So Far*.
-    4. *Not Yet Specified (Vùng sương mù):* Những bài toán phức tạp (đối soát, tranh chấp sâu...) chưa đủ sắc bén sẽ tạm giữ trong sương mù, chỉ "tốt nghiệp" thành câu hỏi khi Frontier tiến tới.
-    5. *Out of Scope:* Chủ động gạt bỏ những tính năng ngoài phạm vi để bảo vệ dự án khỏi phình to scope (scope creep).
-  - **Tự tra cứu sự thật (Finding facts is AI's job, never the user's):** AI tự động tìm kiếm codebase, tài liệu API đối tác (Stripe, VNPay, OAuth...) và thư viện có sẵn. Tuyệt đối không hỏi người dùng những gì AI tự tra cứu được; chỉ hỏi người dùng những **Quyết định nghiệp vụ (Decisions & Tradeoffs)**.
-  - **CẤM HỎI CHUNG CHUNG TRỪU TƯỢNG:** Không hỏi những câu vô nghĩa như *"Bạn muốn module này hoạt động thế nào?"* hay *"Quy tắc của bạn là gì?"*.
-  - **Bắt buộc dùng Case Study cụ thể (Concrete Scenarios / Stress-testing):** Đưa ra tình huống thực tế với số liệu, trạng thái, tác nhân và xung đột nghiệp vụ cụ thể để người dùng quyết định hành vi hệ thống (ví dụ: hủy đơn khi đã thanh toán và hết hàng một phần thì hoàn tiền hay giữ voucher?).
-  - **Làm sắc bén ngôn ngữ Domain (Sharpen Fuzzy Language):** Bắt bẻ ngay các từ ngữ mơ hồ (ví dụ: dùng từ "tài khoản" phải làm rõ là Khách mua hàng, Người bán hay Quản trị viên; "hủy" là hủy trước thanh toán hay hủy có hoàn tiền).
-  - **Gợi ý phương án tối ưu kèm phân tích đánh đổi:** Mỗi câu hỏi qua `ask` luôn kèm phương án chuẩn công nghiệp được đánh dấu Recommended để người dùng duyệt nhanh mà không mất công gõ dài.
-- **Bước 3 - Hoàn thành dứt điểm từng phân hệ trước khi chuyển sang Cổng G2:**
-  Chỉ khi toàn bộ các nhánh quyết định và case study của phân hệ hiện tại đã được giải quyết rõ ràng (Frontier rỗng, sương mù tan hết), AI mới tổng hợp thành file `docs/workflow/specs/<tên-phân-hệ>-brief.md`, dùng `ask` để xin duyệt Cổng G1, sau đó mới chuyển phân hệ đó sang G2 (Stories & UX).
+- **Bước 2 - Phỏng vấn chuyên sâu theo Vòng lặp Case Study tối đa 50 câu hỏi/module:**
+  Chỉ phỏng vấn cho đúng phân hệ được chọn làm trước, kết hợp `wayfinder`, `grilling` và `domain-modeling`:
+  - **CẤM PHỎNG VẤN HỜI HỢT HOẶC DỪNG SỚM:** Phải đào sâu toàn diện các góc khuất, quy tắc nghiệp vụ, lỗi biên, tranh chấp dữ liệu và tích hợp của phân hệ.
+  - **Tối đa 50 câu hỏi case study cho 1 phân hệ:** AI chia thành các đợt hỏi (mỗi đợt 3–5 câu trắc nghiệm qua `ask`). Mỗi câu là một tình huống cụ thể (stress-testing scenario) có số liệu, actors, xung đột logic và phương án khuyến nghị.
+  - **Hiển thị bộ đếm tiến độ minh bạch:** Luôn ghi rõ `[Tiến độ: Đã hỏi X/50 câu cho phân hệ <Tên>]`.
+  - **Quyền quyết định thuộc về người dùng qua `ask`:** Sau mỗi đợt, AI bắt buộc gọi `ask` đưa ra 2 lựa chọn:
+    1. *Tiếp tục đào sâu Case Study tiếp theo* (tiếp tục đào sâu các kịch bản ngoại lệ, lỗi biên cho đến tối đa 50 câu).
+    2. *Đồng ý chấp nhận & Chốt Business Brief* (dừng phỏng vấn ngay lập tức để chốt tài liệu).
+  - **Làm sắc bén ngôn ngữ Domain (Sharpen Fuzzy Language):** Bắt bẻ ngay các từ ngữ mơ hồ ("tài khoản" ──► Khách vãng lai vs Thành viên đăng ký; "hủy" ──► Hủy trước thanh toán vs Hủy có hoàn tiền).
+  - **Tự tra cứu sự thật:** AI tự động tìm kiếm codebase, tài liệu API đối tác (Stripe, VNPay, OAuth...); chỉ hỏi người dùng những **Quyết định nghiệp vụ (Decisions & Tradeoffs)**.
+- **Bước 3 - Điểm dừng & Hoàn thành dứt điểm từng phân hệ trước khi sang G2:**
+  Khi người dùng chọn *"Đồng ý chấp nhận"* (hoặc khi chạm trần 50 câu hỏi), AI mới tổng hợp thành file `docs/workflow/specs/<tên-phân-hệ>-brief.md`, dùng `ask` để xin duyệt Cổng G1, sau đó mới chuyển phân hệ đó sang G2 (Stories & UX). Tuyệt đối không nhảy sang G2 khi phân hệ chưa đạt G1.
 ### B. Minh bạch Tech Stack (Cổng G3)
 - **CẤM TỰ Ý CHỌN TECH STACK TRONG ĐẦU:** Không được tự mặc định công nghệ (như tự chọn React, Vite, Express, SQLite...) mà không hỏi ý kiến người dùng.
 - **Đề xuất và hỏi qua `ask`:** Đưa ra 2–3 phương án công nghệ khả thi kèm ưu/nhược điểm (tradeoffs), sau đó dùng công cụ `ask` để người dùng chủ động chọn stack.

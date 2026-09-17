@@ -63,26 +63,41 @@ Khi người dùng dùng các từ ngữ mơ hồ hoặc nhập nhằng ngữ ng
 - *"Bạn nói 'hủy đơn' — là Hủy khi chưa thanh toán (Abandon), Hủy sau khi đã trừ tiền cần hoàn trả (Cancel & Refund), hay Hủy khi hàng đang trên đường giao (Return)?"*
 - *"Bạn nói 'duyệt' — là hệ thống tự duyệt theo rule hay cần Admin thao tác thủ công?"*
 
-#### E. Giảm tải nhận thức qua câu hỏi trắc nghiệm `ask` kèm Phương án Khuyến nghị
-Mỗi lượt trao đổi chỉ gồm **3–5 câu hỏi trắc nghiệm qua `ask`**, mỗi câu đều có phương án khuyến nghị (Recommended) chuẩn công nghiệp:
+#### E. Vòng lặp Case Study chuyên sâu tối đa 50 câu hỏi cho 1 phân hệ
+- **Tuyệt đối không phỏng vấn hời hợt hay dừng sớm:** Nghiệp vụ chỉ thực sự rõ ràng khi các kịch bản va chạm thực tế (Case Studies) được đào sâu đa chiều.
+- **Quy mô phỏng vấn:** AI được phép hỏi sâu tới **tối đa 50 câu hỏi case study cho 1 phân hệ**, chia thành từng đợt cuốn chiếu:
+  - *Đợt 1 (Câu 1–5):* Luồng người dùng chính & Hành động cốt lõi (Happy Path & Actors).
+  - *Đợt 2 (Câu 6–10):* Điều kiện ràng buộc dữ liệu & Công thức tính toán (Invariants & Rules).
+  - *Đợt 3 (Câu 11–15):* Xung đột đồng thời, Tranh chấp tài nguyên & Lỗi hệ thống (Race conditions & Concurrency).
+  - *Đợt 4 (Câu 16–20):* Tích hợp bên thứ ba, Webhooks, Timeout & Đối soát dữ liệu (Integrations & Reconciliations).
+  - *Đợt 5 (Câu 21–25):* Phân quyền chi tiết, Xung đột vai trò & Chống rò rỉ dữ liệu (RBAC & Permissions).
+  - *Đợt 6 (Câu 26–30):* Xử lý vòng đời dữ liệu: Hủy, Trả hàng, Xóa mềm vs Xóa cứng, Lưu vết kiểm toán (Audit Log & Lifecycle).
+  - *Đợt 7–10 (Câu 31–50):* Các trường hợp góc khuất (Edge Cases), Khuyến mãi phức tạp, Biến thể nghiệp vụ nâng cao phát sinh từ các câu trả lời trước.
+- **Bộ đếm tiến độ minh bạch:** Đầu mỗi đợt, AI luôn hiển thị rõ: `[Tiến độ: Đã hỏi X/50 câu cho phân hệ <Tên>]`.
+
+#### F. Trạm kiểm soát quyết định qua công cụ `ask` sau mỗi đợt
+Sau mỗi đợt 3–5 câu hỏi case study, AI **bắt buộc dùng công cụ `ask`** để trao toàn quyền quyết định tiếp tục hay dừng lại cho người dùng:
 ```text
 ask(questions=[{
-  "id": "scenario_partial_cancellation",
-  "question": "[Case Study - Hủy đơn một phần]: Khách đặt 2 món (500k) áp mã giảm 50k (đơn tối thiểu 400k). Shop hết 1 món (200k) muốn hủy. Khi giá trị đơn giảm còn 300k, hệ thống xử lý voucher thế nào?",
+  "id": "case_study_checkpoint",
+  "question": "[Tiến độ: Đã hỏi X/50 câu cho phân hệ <Tên Phân Hệ>]. Bạn muốn tiếp tục đào sâu các Case Study tiếp theo hay đã đủ thông tin để chốt Business Brief?",
   "options": [
-    {"label": "Giữ voucher tính theo tỷ lệ giá trị món còn lại", "description": "Khách vẫn được giảm tỷ lệ tương ứng, trải nghiệm khách hàng tốt nhất (Khuyên dùng)."},
-    {"label": "Thu hồi toàn bộ voucher vì đơn < 400k", "description": "Bảo vệ chặt chẽ ngân sách marketing của shop nhưng có thể gây khiếu nại."},
-    {"label": "Không cho hủy một phần, hủy toàn bộ đơn", "description": "Đơn giản hóa nghiệp vụ kế toán nhưng giảm tỷ lệ chuyển đổi."}
+    {"label": "Tiếp tục đào sâu Case Study tiếp theo", "description": "Đi tiếp vào các kịch bản ngoại lệ, lỗi biên và tích hợp sâu tiếp theo (tối đa 50 câu)."},
+    {"label": "Đồng ý chấp nhận & Chốt Business Brief", "description": "Dừng phỏng vấn ngay lập tức, tổng hợp toàn bộ quyết định đã chốt thành tài liệu Brief Cổng G1."}
   ],
   "recommended": 0
 }])
 ```
 
-#### F. Hoàn thành dứt điểm từng phân hệ trước khi chuyển sang Cổng G2
-- AI phỏng vấn sâu qua từng chủ đề của phân hệ cho đến khi **toàn bộ sương mù tan biến và mặt trận câu hỏi trống (Frontier rỗng)**.
-- Sau mỗi vòng, AI dùng `ask` hỏi: *"Bạn có muốn đào sâu thêm case study nào khác của phân hệ [Tên Phân Hệ] không, hay đã đủ để chốt Business Brief?"*.
-- Khi người dùng xác nhận đã đủ thông tin, AI xuất file `docs/workflow/specs/<tên-phân-hệ>-brief.md`, dừng tin nhắn và gọi `ask` để xin duyệt Cổng G1.
-- **Tuyệt đối không nhảy sang Cổng G2 (Stories & UX) khi phân hệ hiện tại chưa đạt G1 với đầy đủ case study cụ thể.**
+#### G. Điểm dừng & Điều kiện chuyển sang Cổng G2
+- **Điều kiện dừng phỏng vấn:**
+  1. Người dùng bấm chọn **"Đồng ý chấp nhận & Chốt Business Brief"**.
+  2. Hoặc đạt giới hạn trần **50 câu hỏi** cho phân hệ đó.
+- Khi một trong hai điều kiện trên thỏa mãn:
+  - AI dừng hỏi ngay lập tức.
+  - Tổng hợp toàn bộ quyết định thành file `docs/workflow/specs/<tên-phân-hệ>-brief.md`.
+  - Dừng tin nhắn và gọi `ask` để xin duyệt Cổng G1.
+- **Chỉ khi Cổng G1 được duyệt, AI mới cho phép chuyển phân hệ đó sang Cổng G2 (Stories & UX).**
 ## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
 AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
