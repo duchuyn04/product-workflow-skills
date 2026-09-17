@@ -1,6 +1,6 @@
 ---
 name: product-workflow
-description: "Điều phối dự án từ ý tưởng đến vận hành: nghiệp vụ, stories, UI/UX, kiến trúc, Product Backlog Markdown theo tính năng với Story Points, AC đạt/tổng và checkbox hoàn thành; lập task, thực thi và nghiệm thu cho người/AI. Dùng khi bắt đầu hoặc tiếp tục dự án, lập sprint, cập nhật backlog hay xem tiến độ local/Jira."
+description: "Đọc trước khi sửa bug, điều chỉnh hành vi hiện có, thêm tính năng vào repo cũ hoặc tạo ứng dụng mới: phân loại Spike/Bounded/Feature và xin duyệt trước khi sửa source. Điều phối nghiệp vụ, stories/UX, kiến trúc, tasks, thực thi và nghiệm thu; quản lý backlog và tiến độ local/Jira."
 ---
 
 # Product workflow
@@ -15,6 +15,18 @@ Một đầu vào cho người dùng; chỉ nạp chuyên gia cần thiết. Gia
 4. Nếu nhiều dự án/scope phù hợp mà không suy ra được từ nguồn, hỏi người dùng chọn. Nếu chưa có nơi lưu, đọc `skill://product-workflow/references/records.md`, đề xuất vị trí và chốt khi cần tạo hồ sơ.
 5. Kiểm tra revision/approval và dữ liệu Jira cần cho hành động hiện tại. Chỉ cần Jira khi tác vụ thực sự phụ thuộc Jira; không chặn discovery vì chưa có token.
 6. Nói ngắn: đang làm scope nào, có gì đã biết, còn thiếu quyết định nào và bước tiếp theo. Bắt đầu công việc đủ điều kiện ngay; không hỏi lại toàn bộ thiết kế đã được duyệt.
+
+### Trước thao tác ghi mã nguồn
+
+Đọc nội dung skill; thấy đường dẫn qua Glob chưa phải đã đọc. Trước khi duyệt, chỉ đọc/phân tích source và soạn tài liệu thiết kế theo cổng; chưa sửa source, tests, cấu hình, dependencies hoặc migrations, kể cả qua shell hay giao subagent.
+
+Nêu nhánh, phạm vi, bước hiện tại và bằng chứng duyệt trong hội thoại. Yêu cầu ban đầu không phải duyệt phương án chưa trình bày. Nếu đã có duyệt rõ cho đúng phạm vi thì tiếp tục, không hỏi lại; scope đổi phải xin duyệt phần thay đổi.
+
+- Bounded: sau khi đọc source, nêu thay đổi và cách kiểm thử, gọi `ask` rồi chờ trả lời. Nếu không có `ask`, hỏi bằng chat và dừng. Bỏ G1–G4 không có nghĩa bỏ duyệt.
+- Feature trên repo có sẵn: G1–G4 chỉ tập trung phần bổ sung và ảnh hưởng lên hành vi cũ; tái sử dụng stack/conventions hiện hữu. Có source không đồng nghĩa đã duyệt tính năng mới.
+- Spike: chỉ thử nghiệm throwaway trong phạm vi đã duyệt.
+
+Ví dụ: đổi các mức tốc độ giọng đọc thành 0.5x, 1x, 1.2x, 1.5x là Bounded nếu đã có chức năng chọn tốc độ. Đọc nơi khai báo và áp dụng tốc độ, đề xuất sửa và kiểm thử, chờ duyệt rồi mới edit. Nếu chưa có chức năng đó, xét Feature.
 
 ## Chọn chuyên gia
 

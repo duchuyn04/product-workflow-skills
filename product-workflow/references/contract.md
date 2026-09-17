@@ -60,7 +60,7 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 Chưa chỉ định người quyết định thì hỏi, không tự tạo approval. “OK” chỉ xác nhận đề xuất cụ thể ngay trước đó, không cấp quyền publish, claim, deploy hay duyệt mọi tài liệu tương lai.
 ### Vi phạm nghiêm trọng: Đốt cháy giai đoạn (Gate-skipping)
 Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
-1. Nhảy thẳng vào viết code hoặc tạo dự án khi chưa qua các cổng G1, G2, G3.
+1. Với Feature (kể cả repo có source), viết code khi chưa duyệt G1–G4; với Bounded/Spike, thực thi khi chưa duyệt phương án sửa/thử nghiệm. Đọc skill hoặc nhận yêu cầu ban đầu không thay cho duyệt.
 2. Tự suy đoán nghiệp vụ thay vì dùng công cụ `ask` phỏng vấn người dùng ở Cổng G1.
 3. Tự quyết định tech stack trong đầu thay vì đề xuất 2–3 phương án và dùng `ask` để người dùng chọn ở Cổng G3.
 4. Chỉ in tài liệu ra chat mà không dùng công cụ `write` lưu file vật lý vào thư mục `docs/workflow/`.

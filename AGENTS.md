@@ -1,22 +1,26 @@
 # Quy tắc cốt lõi Product Workflow (Hard-Gate System)
 
-Hệ thống kiểm soát chất lượng nghiêm ngặt dành cho AI Agent. Mọi Agent bắt buộc tuân thủ:
+Áp dụng cho Agent thực hiện công việc triển khai sản phẩm trong dự án này.
+
+**Phạm vi:** Phân loại nhánh và duyệt cổng khi yêu cầu có triển khai hoặc thay đổi hành vi sản phẩm. Hỏi đáp, giải thích, review chỉ đọc và chỉnh tài liệu thuần túy không cần G1–G4; vẫn đọc skill liên quan. Tài liệu đặc tả một tính năng mới vẫn thuộc quy trình Feature. Yêu cầu hỗn hợp: chỉ áp dụng cổng cho phần triển khai.
+
+Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, đọc nội dung `skill://product-workflow` (fallback `.agents/skills/product-workflow/SKILL.md`); Glob không thay cho đọc skill. Thiếu skill hoặc chưa có duyệt đúng nhánh thì dừng trước thao tác ghi, kể cả shell/subagent.
 
 ---
 
 ## 1. Lệnh cấm tuyệt đối (Hard-Stops)
-- **CẤM VIẾT CODE TRƯỚC KHI DUYỆT G1, G2, G3:** Không tự ý tạo file mã nguồn, backend/frontend, database migration khi nghiệp vụ và thiết kế chưa được người dùng duyệt rõ ràng.
-- **DỪNG LẠI Ở MỖI CỔNG (One Gate per Turn):** Trình bày xong một cổng thì bắt buộc dừng tin nhắn, dùng `ask` để xin duyệt trước khi chuyển sang bước tiếp theo.
+- **DUYỆT TRƯỚC KHI CODE:** Nhánh Feature phải được người dùng duyệt rõ ràng G1, G2, G3 và hoàn thành G4 trước khi tạo/sửa mã nguồn hoặc database migration. Spike và Bounded theo cơ chế duyệt riêng ở mục 2, không bắt buộc qua G1–G3.
+- **DỪNG LẠI Ở MỖI CỔNG (One Gate per Turn):** Trình bày xong một cổng thì xin duyệt và chờ người dùng phản hồi trước khi chuyển bước. Dùng `ask` nếu có; nếu không, hỏi trong chat rồi dừng. “OK” chỉ duyệt cổng vừa trình bày.
 - **DOCS-FIRST:** Mọi tài liệu thiết kế phải lưu thành file vật lý trong `docs/workflow/` (specs, architecture, plans, diagrams), cấm chỉ in ra chat.
 - **BẢO VỆ CODE CŨ (BROWNFIELD):** Không tự ý refactor lan man, không xóa code cũ ngoài phạm vi task, luôn bảo đảm regression tests.
-- **SƠ ĐỒ & GIAO DIỆN:** Cấm dùng Mermaid code blocks (dùng `skill://diagram-design`). Mọi diagram HTML/SVG bắt buộc tự động kiểm thử qua Engine Browser Native trước khi bàn giao.
+- **SƠ ĐỒ & GIAO DIỆN:** Đọc `diagram-design` để vẽ sơ đồ, không dùng Mermaid code blocks. Kiểm thử mọi diagram HTML/SVG qua Engine Browser Native hoặc công cụ browser tương đương trước khi bàn giao. Nếu không có browser, báo rõ phần chưa kiểm chứng và khả năng còn thiếu; không đánh dấu nghiệm thu hoàn tất.
 
 ---
 
 ## 2. Phân loại 3 nhánh công việc (Three Paths)
-Trước khi hành động, AI phải tự xác định yêu cầu thuộc nhánh nào:
-1. **Spike (Thử nghiệm tính khả thi):** Trình bày câu hỏi và cách thử (2–3 câu) ──► Dừng xin duyệt qua `ask` ──► Thử nghiệm (mã nguồn dán nhãn throwaway).
-2. **Bounded (Code cũ / Sửa lỗi nhỏ):** Nêu nguyên nhân gốc rễ và giải pháp ngắn trong chat ──► Dừng xin duyệt qua `ask` ──► Sửa đúng file và kiểm thử qua `task-execution`.
+Với yêu cầu thuộc phạm vi triển khai ở trên, xác định nhánh trước khi sửa:
+1. **Spike (Thử nghiệm tính khả thi):** Trình bày câu hỏi và cách thử (2–3 câu) ──► Xin duyệt và chờ phản hồi ──► Thử nghiệm (mã nguồn dán nhãn throwaway).
+2. **Bounded (Code cũ / Sửa lỗi nhỏ):** Nêu nguyên nhân gốc rễ và giải pháp ngắn trong chat ──► Xin duyệt và chờ phản hồi ──► Sửa đúng phạm vi và kiểm thử qua `task-execution`.
 3. **Greenfield / New Feature:** Bắt buộc tuân thủ 4 cổng chất lượng tuần tự:
    `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
    *Khi phân vân giữa Bounded và Feature: Luôn chọn nhánh nặng hơn (Feature).*
@@ -24,7 +28,7 @@ Trước khi hành động, AI phải tự xác định yêu cầu thuộc nhán
 ---
 
 ## 3. Bảng nhận diện suy nghĩ bao biện (Red Flags)
-DỪNG LẠI NGAY LẬP TỨC nếu có suy nghĩ sau:
+Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy nghĩ sau:
 | Suy nghĩ bao biện của AI | Sự thật / Lệnh cấm bắt buộc |
 |---|---|
 | *"Tôi tự đoán nghiệp vụ hoặc hỏi vụn vặt ngay."* | **SAI.** Đọc `product-discovery`, phân rã phân hệ và phỏng vấn case study chuyên sâu. |
@@ -36,7 +40,14 @@ DỪNG LẠI NGAY LẬP TỨC nếu có suy nghĩ sau:
 ---
 
 ## 4. Bản đồ điều phối chuyên gia (Pointers over Payloads)
-AI chủ động đọc kỹ năng tương ứng qua công cụ `read` trước khi thực hiện từng cổng:
+Đọc skill phù hợp với tác vụ trước khi thực hiện; chỉ nạp nội dung chi tiết của skill cần dùng, không nạp toàn bộ bộ skills.
+
+**Cách đọc theo môi trường:**
+- Nếu hỗ trợ `skill://`, dùng công cụ đọc file để mở URI trong bảng.
+- Nếu không hỗ trợ, tra danh sách skills hoặc cấu hình cài đặt của công cụ để tìm và đọc `SKILL.md` tương ứng. Trong repo này, đường dẫn là `<tên-skill>/SKILL.md`, tính từ thư mục gốc repo; không giả định đường dẫn này đúng ở dự án khác.
+- Nếu không tìm thấy skill bắt buộc, báo rõ tên skill và vị trí đã kiểm tra; chỉ dừng phần phụ thuộc vào skill đó, không tự bịa nội dung thay thế.
+- Bảng dưới là chỉ mục điều hướng. Quy trình chi tiết nằm trong từng skill; các quy tắc duyệt chung nằm ở mục 1–2.
+
 | Giai đoạn / Mục tiêu | Đọc kỹ năng | Đầu ra chuẩn |
 |---|---|---|
 | Mới vào team, định hướng dự án có sẵn | `skill://project-guide` | Báo cáo hiện trạng codebase & conventions |

@@ -95,7 +95,7 @@ Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính nă
   - *Quality gate tự động cho Diagram*: Mỗi lần tạo hoặc sửa sơ đồ HTML/SVG, AI tự mở file trong Chromium, chờ font ổn định, đo bounding box DOM/SVG, kiểm tra overflow, tọa độ và va chạm mũi tên, rồi chụp screenshot làm evidence. `failed` hoặc `not-run` chặn bàn giao và claim Done.
   - *Preview tùy chọn*: Sau khi quality gate đạt, AI mới dùng `ask` nếu bạn muốn mở xem sơ đồ trực quan. Với Frontend/UI không phải diagram, AI vẫn hỏi trước khi mở Browser Native.
 ## Cài đặt
-### Cách 1 (Khuyên dùng): Cài đặt qua trình quản lý chuẩn quốc tế `npx skills`
+### Cách 1: Chọn skills qua `npx skills`
 
 Chạy lệnh sau trong terminal của bạn để mở giao diện tương tác chọn skills (giống hệt ảnh của bạn):
 
@@ -107,6 +107,18 @@ Giao diện terminal sẽ hiển thị bảng danh sách 9 skills:
 - Dùng phím mũi tên `↑` `↓` để di chuyển.
 - Phím `Space` để chọn hoặc bỏ chọn từng kỹ năng, hoặc chọn `Select All (0/9)`.
 - Phím `Enter` để xác nhận cài đặt.
+
+**Kích hoạt quy trình trước khi sửa source:** Cài skills không bảo đảm agent tự đọc chúng. Để dùng toàn bộ workflow ở cấp dự án, chạy thêm installer dưới đây; lệnh cài/cập nhật cả 9 skills vào `.agents/skills/` và tích hợp một khối chỉ dẫn ngắn vào `AGENTS.md`:
+
+```bash
+npx github:duchuyn04/product-workflow-skills --project
+```
+
+Installer giữ nội dung ngoài marker `BEGIN/END: product-workflow-skills`; cài lại chỉ thay khối của bộ skills. Không đặt rules riêng bên trong khối này. Marker hỏng/trùng khiến bước tích hợp báo lỗi và giữ nguyên `AGENTS.md`.
+
+Mở phiên agent mới sau cài đặt để nạp rules. Với OMP, có thể gọi `/skill:product-workflow` rõ ràng. Xác nhận harness đã nạp `AGENTS.md`; các harness dùng file rules khác cần tích hợp khối tương ứng vào file được hỗ trợ.
+
+Bounded vẫn phải trình phương án và chờ duyệt; tính năng mới trên repo có sẵn vẫn đi G1–G4. Rules là chỉ dẫn cho LLM, không phải khóa công cụ. Cài global chỉ cài skills, không kích hoạt rules cho từng dự án.
 
 **Các tùy chọn cài đặt nhanh:**
 ```bash

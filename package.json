@@ -6,6 +6,9 @@
   "bin": {
     "product-workflow-skills": "./bin/cli.js"
   },
+  "scripts": {
+    "test": "node --test tests/**/*.test.js"
+  },
   "files": [
     "bin",
     "delivery-inspection",

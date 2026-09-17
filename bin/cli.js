@@ -78,14 +78,16 @@ function copyDirectorySync(src, dest) {
 const MARKER_START = '<!-- BEGIN: product-workflow-skills -->';
 const MARKER_END = '<!-- END: product-workflow-skills -->';
 
-function syncAgentsMd(targetProjectRoot, packageRoot) {
-  const srcAgentsPath = path.join(packageRoot, 'AGENTS.md');
+function syncAgentsMd(targetProjectRoot) {
   const destAgentsPath = path.join(targetProjectRoot, 'AGENTS.md');
-
-  if (!fs.existsSync(srcAgentsPath)) return;
-
-  const rawWorkflowContent = fs.readFileSync(srcAgentsPath, 'utf8').trim();
-  const blockToInsert = `${MARKER_START}\n${rawWorkflowContent}\n${MARKER_END}`;
+  const blockToInsert = `${MARKER_START}
+## Product Workflow
+- Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc \`.agents/skills/product-workflow/SKILL.md\`. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
+- Trước duyệt chỉ đọc và phân tích source; soạn tài liệu theo cổng. Chờ người dùng duyệt đúng nhánh trước mọi thao tác ghi mã nguồn, kể cả qua shell hoặc subagent.
+- Bounded: trình bày phạm vi, giải pháp, cách kiểm thử; gọi ask và chờ duyệt. Feature trên repo có sẵn vẫn cần duyệt G1–G4; Spike cần duyệt thử nghiệm.
+- Duyệt chỉ có hiệu lực với đề xuất và phạm vi vừa chốt; đã đọc skill hoặc yêu cầu ban đầu không phải bằng chứng duyệt.
+- Không đọc được skill: báo thiếu cấu hình và dừng sửa source. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
+${MARKER_END}`;
 
   if (!fs.existsSync(destAgentsPath)) {
     // Dự án chưa có AGENTS.md -> tạo mới hoàn toàn
@@ -96,6 +98,12 @@ function syncAgentsMd(targetProjectRoot, packageRoot) {
 
   // Dự án đã có AGENTS.md sẵn
   const existingContent = fs.readFileSync(destAgentsPath, 'utf8');
+  const starts = existingContent.split(MARKER_START).length - 1;
+  const ends = existingContent.split(MARKER_END).length - 1;
+  if (starts !== ends || starts > 1 ||
+      (starts === 1 && existingContent.indexOf(MARKER_END) < existingContent.indexOf(MARKER_START))) {
+    throw new Error('AGENTS.md có marker Product Workflow không hợp lệ; giữ nguyên file, cần sửa marker trước khi cài lại.');
+  }
 
   if (existingContent.includes(MARKER_START) && existingContent.includes(MARKER_END)) {
     // Đã có block của product-workflow-skills -> cập nhật đúng block đó, giữ nguyên phần còn lại
@@ -225,7 +233,7 @@ async function run() {
 
   // Với cài đặt dự án, tích hợp an toàn vào file AGENTS.md (không ghi đè mất quy tắc cũ của người dùng)
   if (!isGlobal && targetProjectRoot) {
-    syncAgentsMd(targetProjectRoot, packageRoot);
+    syncAgentsMd(targetProjectRoot);
   }
 
   console.log(`\nHoàn tất! Đã cài ${installedCount}/${SKILLS.length} skills.`);

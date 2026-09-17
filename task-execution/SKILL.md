@@ -19,26 +19,21 @@ Xác định người chịu trách nhiệm, người/agent thực thi và revie
 ## 2. Nhận task
 
 ### Điều kiện tiên quyết: Kiểm tra cổng (Gate Check)
-Tuyệt đối không sinh mã nguồn hoặc tạo file code nếu phạm vi công việc chưa trải qua đầy đủ các cổng:
-- G1: Nghiệp vụ và quy tắc cốt lõi đã được người dùng phê duyệt.
-- G2: User Stories, Acceptance Criteria và luồng giao diện đã được người dùng phê duyệt.
-- G3: Database Schema và API Contracts đã được người dùng phê duyệt.
-- G4: Task cụ thể đã được phân rã với tiêu chí nghiệm thu rõ ràng.
+Kiểm tra nhánh và bằng chứng người dùng duyệt đúng phạm vi trước mọi thao tác ghi source, tests, cấu hình, dependencies hoặc migrations (bao gồm shell và subagents):
 
-Nếu thiếu bất kỳ cổng nào ở trên, AI **bắt buộc phải từ chối viết code** và phản hồi rõ: *"Tính năng này chưa hoàn thành cổng [G1/G2/G3/G4]. Để đảm bảo chất lượng và đúng nghiệp vụ, quy trình yêu cầu chúng ta chốt [nội dung cổng] trước khi viết code."*, sau đó chuyển sang kỹ năng phù hợp.
-
-*Bảng Red Flags cho Developer:*
-| Suy nghĩ của AI | Thực tế bắt buộc |
+| Nhánh | Điều kiện được thực thi |
 |---|---|
-| "Người dùng bảo code luôn nên tôi bỏ qua spec/stories" | **Sai.** AI phải bảo vệ chất lượng dự án. Từ chối viết code và giải thích cổng còn thiếu. |
-| "Tôi scaffold project, tạo file Express/React trước rồi tính" | **Sai.** Mọi file code, schema, API endpoint chỉ được tạo khi đã có thiết kế G3 được duyệt. |
-| "Tôi code trước rồi bổ sung test và tài liệu sau" | **Sai.** Code không có tiêu chí nghiệm thu rõ ràng sẽ phải đập đi làm lại. |
+| Spike | Đã duyệt câu hỏi, cách thử và phạm vi throwaway; không sửa sản phẩm ngoài phạm vi thử nghiệm. |
+| Bounded | Đã trình bày phạm vi, nguyên nhân/nhu cầu, giải pháp và cách kiểm thử; đã gọi `ask` và nhận duyệt. Không yêu cầu G1–G4. |
+| Feature, kể cả repo có sẵn | Đã duyệt tuần tự G1 nghiệp vụ, G2 stories/UX, G3 kiến trúc/contracts, G4 tasks cho tính năng đó. |
+
+Đã đọc skill, tìm được file cần sửa hoặc yêu cầu ban đầu chưa phải bằng chứng duyệt. Thiếu duyệt: chỉ đọc/phân tích và soạn tài liệu theo cổng; nêu phần thiếu, hỏi và dừng trước edit. Không có `ask` thì hỏi bằng chat. Đã duyệt đúng scope thì không hỏi lại; scope đổi cần duyệt phần thay đổi.
 
 Chỉ đề nghị nhận task khi:
 - Nội dung/AC/cách kiểm chứng/contracts đủ rõ và đúng revision được duyệt.
 - Hard prerequisites đáp ứng, không có blocker ngoài hoặc dữ kiện thiếu làm vô hiệu readiness.
 - Task chưa có owner, thuộc scope thực thi được chọn và capacity/WIP cho phép.
-- Người/agent có kỹ năng và quyền cần; G4 đáp ứng.
+- Người/agent có kỹ năng và quyền cần; điều kiện duyệt của nhánh ở trên đáp ứng.
 
 Trước claim phải biết công cụ và cơ chế nhận việc được dùng. Cơ chế phải đã được chứng minh rằng hai client cùng claim chỉ một client được bắt đầu. Đọc assignee → ghi assignee → đọc lại không phải bảo đảm nguyên tử. Khóa file máy cá nhân không khóa được cả đội. Không bịa endpoint claim.
 
@@ -49,7 +44,7 @@ Nếu cơ chế an toàn có sẵn và được ủy quyền: đọc fresh → k
 Timeout sau claim là kết quả chưa rõ; đối chiếu theo cơ chế có sẵn trước retry/bắt đầu. Không báo thành công chỉ vì không thấy lỗi.
 ## 3. Lựa chọn chế độ thực thi trong Oh My Pi (Execution Strategy)
 
-Khi đã đủ điều kiện nhận việc (đạt G1–G4), Main Agent **bắt buộc gọi công cụ `ask`** để người dùng quyết định mô hình thực thi:
+Feature đã đạt G1–G4: Main Agent gọi `ask` để chọn mô hình thực thi. Bounded/Spike đã được duyệt thực thi trực tiếp trong phạm vi chốt, không bắt thêm vòng chọn chế độ:
 
 ```text
 ask(questions=[{
