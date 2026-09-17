@@ -42,7 +42,7 @@ Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hư
 
 ### Các kỹ năng theo vai trò chuyên môn
 
-- `product-discovery` (Phân tích nghiệp vụ): Làm rõ bài toán, phỏng vấn domain, xác định actors, các trường hợp ngoại lệ và chốt quy tắc nghiệp vụ cốt lõi (Cổng G1).
+- `product-discovery` (Phân tích nghiệp vụ): Phỏng vấn nghiệp vụ chuyên sâu theo từng module bằng kỹ thuật Case Study & Cây quyết định (học hỏi từ Matt Pocock), loại bỏ câu hỏi chung chung, làm sắc bén thuật ngữ domain và chốt Business Brief rõ ràng trước khi sang Cổng G2.
 - `story-and-experience` (Thiết kế trải nghiệm người dùng): Chuyển nghiệp vụ thành user stories kèm tiêu chí nghiệm thu (Given-When-Then), danh mục màn hình và các trạng thái giao diện (Cổng G2).
 - `solution-design` (Kiến trúc kỹ thuật): Đánh giá phương án công nghệ theo ràng buộc thực tế, thiết kế schema dữ liệu, hợp đồng API và ghi nhận quyết định kiến trúc qua ADR (Cổng G3).
 - `delivery-planning` (Lập kế hoạch thực hiện): Tạo Product Backlog dạng ma trận, ghi Story Points được duyệt, liên kết AC và task cards, xác định dependency và việc có thể làm song song (Cổng G4).

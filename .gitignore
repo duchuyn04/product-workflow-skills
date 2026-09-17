@@ -16,6 +16,8 @@ desktop.ini
 node_modules/
 package-lock.json
 *.tgz
+.agents/
+skills-lock.json
 
 # Third-party reference
 superpowers/

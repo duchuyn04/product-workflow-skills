@@ -34,47 +34,55 @@ CẤM TỰ Ý ĐOÁN NGHIỆP VỤ rồi đưa ra bản tóm tắt có sẵn. AI
     }])
     ```
   - Chỉ sau khi người dùng chốt danh mục và chọn phân hệ, AI mới bắt đầu phỏng vấn cho đúng phân hệ đó.
-### 2. Phỏng vấn cuốn chiếu nhiều vòng (Multi-Round Thematic Deep-Dive)
-Với mỗi phân hệ, AI tiến hành phỏng vấn sâu qua **nhiều vòng (nhiều lượt trao đổi)**, mỗi lượt tập trung vào một chủ đề:
-1. *Vòng 1 - Luồng người dùng chính:* Happy path, triggers, các bước thao tác, dữ liệu nhập và kết quả mong muốn.
-2. *Vòng 2 - Quy tắc nghiệp vụ cốt lõi:* Công thức tính toán, trạng thái dữ liệu, điều kiện ràng buộc (invariants).
-3. *Vòng 3 - Xử lý ngoại lệ & lỗi biên:* Trùng lặp dữ liệu, thao tác đồng thời, mất kết nối, người dùng nhập sai, hết quyền hạn.
-4. *Vòng 4 - Tích hợp & phi chức năng:* Dịch vụ bên thứ ba (cổng thanh toán, vận chuyển, email), giới hạn SLA, bảo mật.
+### 2. Kỹ thuật phỏng vấn đào sâu theo Wayfinding Map & Case Study (Học hỏi từ Matt Pocock)
 
-*Tổng số câu hỏi có thể lên tới hàng chục đến hàng trăm câu hỏi qua nhiều lượt trao đổi, đào sâu chi tiết từng góc cạnh của website.*
+Với phân hệ đang được chọn, AI tiến hành phỏng vấn sâu qua từng vòng chủ đề, kết hợp sức mạnh từ 3 kỹ thuật của Matt Pocock: `wayfinder` (Bản đồ khai phá), `grilling` (Phỏng vấn đào sâu) và `domain-modeling` (Làm sắc bén thuật ngữ):
 
-### 3. Kỹ thuật giảm tải nhận thức qua công cụ `ask`
-Để người dùng không bị mệt mỏi khi phải trả lời nhiều câu hỏi:
-- AI đưa ra câu hỏi dạng trắc nghiệm với các phương án lựa chọn A, B, C cụ thể qua `ask`, nêu rõ tình huống và gợi ý phương án chuẩn công nghiệp.
-- Người dùng chỉ cần bấm chọn phương án phù hợp.
-- Sau mỗi vòng phỏng vấn, AI dùng `ask` hỏi: *"Bạn có muốn phỏng vấn sâu tiếp về [chủ đề tiếp theo] không, hay thông tin đã đủ để chốt Business Brief cho phân hệ này?"*
-- Chỉ khi người dùng xác nhận đã đủ thông tin, AI mới bắt đầu tổng hợp thành tài liệu Business Brief.
-Bao phủ các chiều sau theo mức liên quan:
+#### A. Bản đồ Khai phá Nghiệp vụ (Wayfinding Map) & Quản lý Sương mù (Fog of War)
+Thay vì để dự án rơi vào cảnh mù mịt hoặc hỏi tràn lan, AI chia lộ trình phỏng vấn phân hệ thành 4 vùng nhận thức:
+1. **Đích đến (Destination):** Xác định rõ mục tiêu cuối cùng của Cổng G1: Hoàn thành bản Business Brief chuẩn xác cho phân hệ đang phỏng vấn, sẵn sàng chuyển giao cho G2 (User Stories & UX).
+2. **Quyết định đã chốt (Decisions So Far):** Ghi nhận có hệ thống các quyết định nghiệp vụ đã chốt qua từng vòng case study. Đây là nền tảng vững chắc để mở khóa các câu hỏi tiếp theo.
+3. **Mặt trận câu hỏi (The Frontier):** Chỉ hỏi 3–5 câu hỏi/case study mà các tiền đề của nó đã được giải quyết ở *Decisions So Far*. Tuyệt đối không hỏi trước những câu hỏi mà điều kiện tiên quyết chưa được chốt.
+4. **Vùng sương mù (Not Yet Specified / Fog of War):** Những bài toán phức tạp (đối soát hoa hồng, tranh chấp khiếu nại, đồng bộ hệ thống cũ...) chưa đủ sắc bén sẽ tạm giữ trong sương mù. Khi Frontier tiến tới, sương mù tan dần và chúng mới "tốt nghiệp" thành câu hỏi cụ thể.
+5. **Ngoài phạm vi (Out of Scope):** Chủ động nhận diện và gạt bỏ những tính năng người dùng đã từ chối để bảo vệ dự án khỏi phình to phạm vi (scope creep).
 
-| Chiều | Cần làm rõ | Ví dụ câu hỏi |
-|---|---|---|
-| Giá trị | Vấn đề, cách xử lý hiện tại, mục tiêu, cách đo và baseline | Kết quả nào chứng minh quy trình mới tốt hơn? |
-| Tác nhân | Người dùng chính/phụ, vận hành, người duyệt, hệ thống ngoài | Ai thực hiện, ai được xem và ai có quyền thay đổi? |
-| Quy trình | Trigger, tiền điều kiện, bước xử lý, handoff, kết quả | Khi bước này thất bại thì ai tiếp tục công việc? |
-| Domain | Thuật ngữ, thực thể, quan hệ, trạng thái, invariants/cách tính | Hai trạng thái này khác nhau ở quyền hoặc hành vi nào? |
-| Dữ liệu | Nguồn, sở hữu, chất lượng, sửa/xóa, lưu trữ và audit | Khi dữ liệu nguồn bị sửa hoặc xóa thì kết quả cũ xử lý ra sao? |
-| Ngoại lệ | Dữ liệu thiếu/sai/trùng, hủy, quá hạn, retry, đồng thời | Hai người sửa cùng lúc hoặc gửi cùng yêu cầu hai lần thì sao? |
-| Tích hợp | Đầu vào/ra, SLA thực tế, lỗi bên ngoài và cách phục hồi | Nếu nhà cung cấp không trả lời thì người dùng thấy gì? |
-| Phi chức năng | Bảo mật, privacy, accessibility, tải/độ trễ, ngân sách, vận hành | Mức tải/độ trễ nào là yêu cầu thật và đo trong điều kiện nào? |
-| Phạm vi | Bắt buộc, sau này, không làm, rủi ro chưa biết | Điều gì có thể bỏ mà vẫn đạt mục tiêu của lần phát hành này? |
+#### B. Tự tra cứu sự thật (Finding facts is AI's job, never the user's)
+- AI tự động khai thác codebase, schema cơ sở dữ liệu hiện có, tài liệu API công khai của bên thứ ba (Stripe, VNPay, OAuth, Firebase...) hoặc thư viện kỹ thuật.
+- **TUYỆT ĐỐI KHÔNG HỎI NGƯỜI DÙNG** những thông tin kỹ thuật mà AI có thể tự tra cứu được. Chỉ hỏi người dùng những **Quyết định nghiệp vụ (Decisions & Tradeoffs)** qua các Case Study thực tế.
 
-Không tự đặt số SLA, retention, deadline, ngân sách hoặc yêu cầu pháp lý. Yêu cầu pháp lý cần nguồn/đơn vị có thẩm quyền; AI không đóng vai xác nhận tuân thủ.
+#### C. CẤM HỎI CHUNG CHUNG TRỪU TƯỢNG — Bắt buộc dùng Case Study cụ thể (Concrete Scenarios)
+- **Sai lầm bị cấm:** Hỏi những câu vu vơ, chung chung như: *"Hệ thống xử lý thanh toán thế nào?"*, *"Quy tắc của bạn là gì?"*, *"Có những lỗi nào có thể xảy ra?"*.
+- **Bắt buộc đưa Case Study thực tế (Stress-testing Scenarios):**
+  Tạo ra các kịch bản va chạm thực tế có bối cảnh, số liệu, actors và xung đột nghiệp vụ rõ ràng:
+  - *Ví dụ Case Study Đặt hàng & Khuyến mãi:* *"Khách hàng A đặt đơn 500.000đ, áp mã giảm giá 50.000đ (điều kiện đơn từ 400.000đ). Đơn gồm 2 món. Sau đó người bán hết món 1 (200.000đ) và muốn hủy món 1. Giá trị đơn giảm còn 300.000đ (< 400.000đ). Hệ thống sẽ: A. Hủy toàn bộ voucher 50k (khách trả 300k)? B. Giữ voucher theo tỷ lệ (khách trả 270k)? C. Không cho phép hủy 1 phần, bắt buộc hủy cả đơn?"*
+  - *Ví dụ Case Study Tranh chấp kho:* *"Mặt hàng chỉ còn 1 cái cuối cùng. Khách 1 đang ở bước thanh toán chưa nhập OTP, khách 2 cũng bấm mua. Hệ thống sẽ khóa tạm 15 phút (Reservation lock) cho khách 1 hay ai thanh toán trước thì được (First-paid-first-served)?"*
 
-### 3. Mô hình hóa bằng ví dụ cụ thể
+#### D. Làm sắc bén ngôn ngữ Domain (Sharpen Fuzzy Language)
+Khi người dùng dùng các từ ngữ mơ hồ hoặc nhập nhằng ngữ nghĩa, AI phải bắt bẻ và đề xuất thuật ngữ chuẩn xác ngay lập tức:
+- *"Bạn nói 'người dùng'/'khách' — hệ thống phân biệt Khách vãng lai (Guest) hay bắt buộc đăng ký tài khoản (Member)?"*
+- *"Bạn nói 'hủy đơn' — là Hủy khi chưa thanh toán (Abandon), Hủy sau khi đã trừ tiền cần hoàn trả (Cancel & Refund), hay Hủy khi hàng đang trên đường giao (Return)?"*
+- *"Bạn nói 'duyệt' — là hệ thống tự duyệt theo rule hay cần Admin thao tác thủ công?"*
 
-Với mỗi quy trình cốt lõi, đi qua một happy path và các ngoại lệ có khả năng đổi thiết kế. Dùng dữ liệu giả không nhạy cảm để minh họa, đánh dấu là ví dụ. Chỉ ra actor, dữ liệu, trạng thái trước/sau, quyền và đầu ra từng bước.
+#### E. Giảm tải nhận thức qua câu hỏi trắc nghiệm `ask` kèm Phương án Khuyến nghị
+Mỗi lượt trao đổi chỉ gồm **3–5 câu hỏi trắc nghiệm qua `ask`**, mỗi câu đều có phương án khuyến nghị (Recommended) chuẩn công nghiệp:
+```text
+ask(questions=[{
+  "id": "scenario_partial_cancellation",
+  "question": "[Case Study - Hủy đơn một phần]: Khách đặt 2 món (500k) áp mã giảm 50k (đơn tối thiểu 400k). Shop hết 1 món (200k) muốn hủy. Khi giá trị đơn giảm còn 300k, hệ thống xử lý voucher thế nào?",
+  "options": [
+    {"label": "Giữ voucher tính theo tỷ lệ giá trị món còn lại", "description": "Khách vẫn được giảm tỷ lệ tương ứng, trải nghiệm khách hàng tốt nhất (Khuyên dùng)."},
+    {"label": "Thu hồi toàn bộ voucher vì đơn < 400k", "description": "Bảo vệ chặt chẽ ngân sách marketing của shop nhưng có thể gây khiếu nại."},
+    {"label": "Không cho hủy một phần, hủy toàn bộ đơn", "description": "Đơn giản hóa nghiệp vụ kế toán nhưng giảm tỷ lệ chuyển đổi."}
+  ],
+  "recommended": 0
+}])
+```
 
-Thử phản ví dụ cho rule: rỗng, biên, lặp, đồng thời, hết quyền hoặc thay đổi trạng thái. Không biến mọi phản ví dụ thành feature; hỏi nó nằm trong scope hay chỉ là rủi ro cần ghi.
-
-### 4. Tổng hợp để người dùng sửa được
-
-Trình từng phần ngắn, không đổ một PRD dài trước khi xác nhận hiểu đúng. Sửa kết luận theo phản hồi, giữ lịch sử quyết định quan trọng. Nếu được phép lưu, cập nhật nguồn hiện hữu; chỉ tạo file mới khi nó có trách nhiệm riêng.
-
+#### F. Hoàn thành dứt điểm từng phân hệ trước khi chuyển sang Cổng G2
+- AI phỏng vấn sâu qua từng chủ đề của phân hệ cho đến khi **toàn bộ sương mù tan biến và mặt trận câu hỏi trống (Frontier rỗng)**.
+- Sau mỗi vòng, AI dùng `ask` hỏi: *"Bạn có muốn đào sâu thêm case study nào khác của phân hệ [Tên Phân Hệ] không, hay đã đủ để chốt Business Brief?"*.
+- Khi người dùng xác nhận đã đủ thông tin, AI xuất file `docs/workflow/specs/<tên-phân-hệ>-brief.md`, dừng tin nhắn và gọi `ask` để xin duyệt Cổng G1.
+- **Tuyệt đối không nhảy sang Cổng G2 (Stories & UX) khi phân hệ hiện tại chưa đạt G1 với đầy đủ case study cụ thể.**
 ## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
 AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
