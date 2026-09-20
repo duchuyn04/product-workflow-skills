@@ -22,8 +22,8 @@ Một đầu vào cho người dùng; chỉ nạp chuyên gia cần thiết. Gia
 
 Nêu nhánh, phạm vi, bước hiện tại và bằng chứng duyệt trong hội thoại. Yêu cầu ban đầu không phải duyệt phương án chưa trình bày. Nếu đã có duyệt rõ cho đúng phạm vi thì tiếp tục, không hỏi lại; scope đổi phải xin duyệt phần thay đổi.
 
-- Bounded: sau khi đọc source, phải trình bày **Đề xuất sửa lỗi (Bounded)** trong phần chat thông thường, theo đúng thứ tự: (1) nhánh và phạm vi; (2) nguyên nhân gốc rễ cùng bằng chứng file/symbol; (3) các thay đổi dự kiến theo file/symbol; (4) phần ngoài phạm vi và rủi ro; (5) cách tái hiện và kiểm chứng sau sửa. Nếu nguyên nhân mới là giả thuyết, tiếp tục chẩn đoán và chưa xin duyệt. Chỉ sau khi đề xuất đã hiển thị đầy đủ mới gọi `ask` rồi chờ trả lời. Nội dung trong câu hỏi hoặc mô tả lựa chọn của `ask` không thay thế đề xuất trong chat. Nếu không có `ask`, hỏi bằng chat và dừng. Bỏ G1–G4 không có nghĩa bỏ duyệt.
-- Feature trên repo có sẵn: G1–G4 chỉ tập trung phần bổ sung và ảnh hưởng lên hành vi cũ; tái sử dụng stack/conventions hiện hữu. Có source không đồng nghĩa đã duyệt tính năng mới.
+- Bounded: Áp dụng cho sửa lỗi (bug fix) và các cải tiến nhỏ (minor enhancement/tweak) có bán kính ảnh hưởng cục bộ (trong 1–2 file/module sẵn có, không tạo bảng DB mới, không đổi kiến trúc cốt lõi). Sau khi đọc source, phải trình bày **Đề xuất sửa lỗi (Bounded)** trong phần chat thông thường, theo đúng thứ tự: (1) nhánh và phạm vi; (2) nguyên nhân gốc rễ (hoặc mục đích cải tiến) cùng bằng chứng file/symbol; (3) các thay đổi dự kiến theo file/symbol; (4) phần ngoài phạm vi và rủi ro; (5) cách tái hiện và kiểm chứng sau sửa. Chỉ sau khi đề xuất đã hiển thị đầy đủ mới gọi `ask` rồi chờ trả lời. Nội dung trong câu hỏi hoặc mô tả lựa chọn của `ask` không thay thế đề xuất trong chat. Nếu không có `ask`, hỏi bằng chat và dừng. Bỏ G1–G4 không có nghĩa bỏ duyệt.
+- Feature trên repo có sẵn: Chỉ áp dụng cho tính năng/phân hệ lớn, thay đổi luồng nghiệp vụ cốt lõi, tạo bảng/entity DB mới hoặc thiết kế lại API contract công khai. G1–G4 chỉ tập trung phần bổ sung và ảnh hưởng lên hành vi cũ; tái sử dụng stack/conventions hiện hữu.
 - Spike: chỉ thử nghiệm throwaway trong phạm vi đã duyệt.
 
 Ví dụ: đổi các mức tốc độ giọng đọc thành 0.5x, 1x, 1.2x, 1.5x là Bounded nếu đã có chức năng chọn tốc độ. Đọc nơi khai báo và áp dụng tốc độ, đề xuất sửa và kiểm thử, chờ duyệt rồi mới edit. Nếu chưa có chức năng đó, xét Feature.
@@ -46,19 +46,26 @@ Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu
 
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
 
+### Chuyên gia nội bộ theo trigger
+
+- Bug/regression/performance chưa có root cause chắc chắn: đọc `skill://diagnosing-bugs` trước khi lập Đề xuất sửa lỗi Bounded. Nếu URI chưa khám phá, đọc `.agents/skills/diagnosing-bugs/SKILL.md`. Root cause và evidence đã rõ thì bỏ qua specialist. Thiếu cả URI và fallback: nêu đúng nguồn thiếu và dừng phần chẩn đoán, không bịa root cause.
+- Thay đổi module/interface/seam/adapter/dependency direction/testability: đọc `skill://codebase-design`; fallback `.agents/skills/codebase-design/SKILL.md`. Khi đã xác nhận thay đổi cục bộ không ảnh hưởng kiến trúc, bắt buộc bỏ qua specialist; `not-needed` chỉ dùng khi trigger hợp lệ nhưng lens không tìm thấy Design Delta hữu ích. Parent G3/Bounded approval vẫn là gate duy nhất. Thiếu cả URI và fallback: nêu đúng skill/path đã kiểm tra và dừng phần thiết kế phụ thuộc.
+- Sau implementation của Feature hoặc Risky Bounded: `task-execution` gọi `skill://code-review`; fallback `.agents/skills/code-review/SKILL.md`. Docs-only và Bounded rủi ro thấp theo policy hiện hữu không bị ép review hai trục. Thiếu specialist thì không được bỏ checkpoint: báo nguồn thiếu và dừng phần phụ thuộc.
+
+Router chỉ giữ trigger, fallback và cách tiêu thụ Diagnosis Packet/Design Delta/Review reports; implementation thuộc specialist tương ứng. Không thêm specialist thành entry point mà người dùng phải nhớ.
+
 Thay đổi giao diện web gồm mọi thay đổi làm khác bề mặt người dùng nhìn thấy hoặc tương tác: page/component, style, form, navigation và các trạng thái loading/error/empty. Sau khi thực thi loại thay đổi này, trước khi báo hoàn thành phải chuyển qua checkpoint Browser Native trong `task-execution`: gọi `ask` để người dùng chọn cách kiểm thử, trừ khi họ đã chọn rõ cho đúng scope. Diagram HTML/SVG theo quality gate tự động riêng, không dùng câu hỏi này.
 
 ## Quy tắc bắt buộc: Chống đốt cháy giai đoạn (Hard-Gate & Hard-Stop)
 
-### 1. Phân loại 3 nhánh công việc (Three Paths)
-Ngay khi nhận yêu cầu, router phải phân loại rõ:
+### 1. Phân loại 3 nhánh công việc theo Bán kính ảnh hưởng (Blast Radius)
+Ngay khi nhận yêu cầu, router phân loại theo ranh giới ảnh hưởng và mức độ bất định:
 - **Spike:** Nghiên cứu/thử nghiệm tính khả thi ──► Nêu câu hỏi, đề xuất thử nghiệm ngắn (2–3 câu), xin xác nhận ──► Chạy thử, báo cáo kết quả khuyến nghị (code dán nhãn bỏ đi).
-- **Bounded:** Thay đổi nhỏ trên luồng code ĐÃ CÓ ──► Nêu nguyên nhân và giải pháp ngắn trong chat ──► **Dừng lại chờ duyệt** ──► Duyệt xong mới chuyển sang `task-execution`.
-- **Greenfield / New Feature:** Tạo mới ứng dụng, module hoặc tính năng mới ──► **Bắt buộc đi đủ 4 cổng tuần tự**:
+- **Bounded:** Sửa lỗi (bug fix) hoặc cải tiến nhỏ (minor enhancement/tweak) cục bộ trên luồng code ĐÃ CÓ (không tạo bảng DB mới, không đổi kiến trúc) ──► Nêu ngắn gọn phạm vi và giải pháp trong chat ──► **Dừng lại gọi `ask` chờ duyệt** ──► Duyệt xong mới chuyển sang `task-execution`.
+- **Greenfield / New Feature:** Tạo mới ứng dụng/phân hệ/module, thay đổi luồng nghiệp vụ cốt lõi, tạo bảng DB mới hoặc API contract diện rộng ──► **Bắt buộc đi đủ 4 cổng tuần tự**:
   `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
 
-*Nguyên tắc bánh cóc một chiều (One-way ratchet):* Khi phân vân giữa Bounded và Greenfield, luôn chọn nhánh nặng hơn. Phát hiện độ phức tạp tăng lên giữa chừng thì nâng cấp nhánh ngay, không bao giờ tự ý hạ cấp.
-
+*Nguyên tắc linh hoạt:* Mặc định xử lý Bounded cho các thay đổi nhỏ, cục bộ đã rõ giải pháp. Nếu trong quá trình phân tích thấy yêu cầu phát sinh thêm bảng DB mới, đổi kiến trúc hoặc nghiệp vụ mơ hồ, dừng lại và chủ động đề xuất nâng cấp lên Feature.
 ### 2. Quy tắc trạng thái kết thúc khép kín (Terminal States)
 Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
 - Hoàn thành G1 (`product-discovery`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `story-and-experience` (G2). Nghiêm cấm nhảy cóc sang G3 hay code.

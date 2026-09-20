@@ -119,6 +119,16 @@ Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm th�
 
 Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm tra → kết quả → link/output → reviewer khi bắt buộc. Dùng mẫu shared khi cần lưu.
 
+### Review hai trục bắt buộc trước Done
+
+Feature và **Risky Bounded** phải đọc `skill://code-review`; nếu URI chưa khám phá, đọc `.agents/skills/code-review/SKILL.md`. Risky Bounded là thay đổi ảnh hưởng contract/interface, security/quyền, dữ liệu hoặc migration, hay nhiều module. Docs-only và Bounded cục bộ rủi ro thấp tiếp tục policy review hiện hữu.
+
+Với Feature, ghi baseline revision khi nhận task sau G4. Với Bounded, trước first write ghi baseline revision và pre-existing dirty paths. Sau triển khai, giới hạn review vào owned changed areas. Tạo Review Input Packet C-SI-05 gồm `baseline_revision`, `owned_changed_areas`, task card, stories/AC, architecture contract, standards sources và required checks. Thiếu baseline hoặc spec bắt buộc là `blocked`, không phải pass.
+
+Có subagents: chạy Standards và Spec song song với context tách biệt. Không có subagents: chạy hai pass tuần tự, vẫn giữ hai báo cáo riêng; không bỏ axis hoặc gộp/rerank findings. Finding ảnh hưởng phải được sửa và review lại, hoặc có accepted exception kèm nguồn. Chỉ chuyển sang Verification/Done khi cả hai verdict đạt và không còn finding chưa xử lý.
+
+Code review không thay Browser Native: task có thay đổi UI/diagram vẫn phải hoàn thành checkpoint tương ứng bên dưới.
+
 ### Kiểm chứng Giao diện Web với Engine Browser Native
 
 #### 1. File sơ đồ HTML/SVG: quality gate tự động

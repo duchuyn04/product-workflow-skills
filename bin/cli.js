@@ -9,7 +9,9 @@ import { createInterface } from 'node:readline';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const packageRoot = path.resolve(__dirname, '..');
+const packageRoot = process.env.PRODUCT_WORKFLOW_PACKAGE_ROOT
+  ? path.resolve(process.env.PRODUCT_WORKFLOW_PACKAGE_ROOT)
+  : path.resolve(__dirname, '..');
 
 const SKILLS = [
   'product-workflow',
@@ -21,6 +23,9 @@ const SKILLS = [
   'task-execution',
   'delivery-inspection',
   'diagram-design',
+  'diagnosing-bugs',
+  'codebase-design',
+  'code-review',
 ];
 
 function printHelp() {
@@ -84,7 +89,7 @@ function syncAgentsMd(targetProjectRoot) {
 ## Product Workflow
 - Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc \`.agents/skills/product-workflow/SKILL.md\`. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
 - Trước duyệt chỉ đọc và phân tích source; soạn tài liệu theo cổng. Chờ người dùng duyệt đúng nhánh trước mọi thao tác ghi mã nguồn, kể cả qua shell hoặc subagent.
-- Bounded: trong chat, trình bày Đề xuất sửa lỗi gồm phạm vi, nguyên nhân có bằng chứng, thay đổi theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó mới gọi ask và chờ duyệt. Thẻ ask chỉ ghi nhận quyết định, không thay thế kế hoạch hiển thị trước đó. Feature trên repo có sẵn vẫn cần duyệt G1–G4; Spike cần duyệt thử nghiệm.
+- Bounded: trong chat, trình bày Đề xuất sửa lỗi (hoặc cải tiến nhỏ cục bộ) gồm phạm vi, nguyên nhân/mục đích, thay đổi theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó mới gọi ask và chờ duyệt. Thẻ ask chỉ ghi nhận quyết định, không thay thế kế hoạch hiển thị trước đó. Chỉ yêu cầu duyệt G1–G4 với Feature (module mới, luồng nghiệp vụ cốt lõi, DB mới); Spike cần duyệt thử nghiệm.
 - Thay đổi giao diện web người dùng nhìn thấy/tương tác: sau khi thực thi và trước khi báo hoàn thành, gọi ask để người dùng chọn cách kiểm thử bằng OMP Browser Native. Chỉ không hỏi khi người dùng đã chọn rõ cho đúng scope; nếu bỏ qua thì ghi not-run, không claim đã kiểm chứng trực quan. Diagram HTML/SVG dùng quality gate tự động riêng.
 - Duyệt chỉ có hiệu lực với đề xuất và phạm vi vừa chốt; đã đọc skill hoặc yêu cầu ban đầu không phải bằng chứng duyệt.
 - Không đọc được skill: báo thiếu cấu hình và dừng sửa source. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
@@ -193,6 +198,15 @@ async function run() {
   }
   const isGlobal = installMode === 'global';
 
+  // Preflight: mọi thư mục nguồn đã đăng ký bắt buộc phải tồn tại trước khi ghi bất kỳ file/thư mục đích nào
+  const missingSkills = SKILLS.filter((skillName) => {
+    const srcPath = path.join(packageRoot, skillName);
+    return !fs.existsSync(srcPath) || !fs.statSync(srcPath).isDirectory();
+  });
+  if (missingSkills.length > 0) {
+    throw new Error(`Không tìm thấy thư mục nguồn skill: ${missingSkills.join(', ')}`);
+  }
+
   console.log('Đang cài đặt Product Workflow Skills...\n');
 
   let destSkillsDir = '';
@@ -215,11 +229,6 @@ async function run() {
   for (const skillName of SKILLS) {
     const srcSkillPath = path.join(packageRoot, skillName);
     const destSkillPath = path.join(destSkillsDir, skillName);
-
-    if (!fs.existsSync(srcSkillPath)) {
-      console.warn(`[Cảnh báo] Không tìm thấy nguồn skill: ${skillName}`);
-      continue;
-    }
 
     if (fs.existsSync(destSkillPath) && !isForce) {
       // Ghi đè cập nhật nội dung thư mục skill

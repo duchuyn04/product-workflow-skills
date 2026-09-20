@@ -18,14 +18,17 @@ Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, �
 
 ---
 
-## 2. Phân loại 3 nhánh công việc (Three Paths)
-Với yêu cầu thuộc phạm vi triển khai ở trên, xác định nhánh trước khi sửa:
+## 2. Phân loại 3 nhánh công việc theo Bán kính ảnh hưởng (Blast Radius)
+Với yêu cầu thuộc phạm vi triển khai ở trên, phân loại dựa trên bán kính ảnh hưởng và mức độ bất định:
 1. **Spike (Thử nghiệm tính khả thi):** Trình bày câu hỏi và cách thử (2–3 câu) ──► Xin duyệt và chờ phản hồi ──► Thử nghiệm (mã nguồn dán nhãn throwaway).
-2. **Bounded (Code cũ / Sửa lỗi nhỏ):** Trong chat thông thường, trình bày **Đề xuất sửa lỗi (Bounded)** gồm phạm vi, nguyên nhân gốc rễ có bằng chứng, thay đổi dự kiến theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm chứng ──► Sau đó mới gọi `ask` xin duyệt và chờ phản hồi ──► Sửa đúng phạm vi và kiểm thử qua `task-execution`. Thẻ `ask` chỉ ghi nhận quyết định, không phải nơi duy nhất chứa kế hoạch.
-3. **Greenfield / New Feature:** Bắt buộc tuân thủ 4 cổng chất lượng tuần tự:
-   `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
-   *Khi phân vân giữa Bounded và Feature: Luôn chọn nhánh nặng hơn (Feature).*
-
+2. **Bounded (Sửa lỗi hoặc Cải tiến nhỏ cục bộ):**
+   - Áp dụng khi: Sửa lỗi (bug fix), cải tiến nhỏ (minor enhancement/tweak), thêm field/prop/flag, chỉnh style/validation/copy trong phạm vi 1–2 file/module sẵn có; không đổi kiến trúc cốt lõi, không tạo bảng/thực thể DB mới, không đổi public contracts diện rộng.
+   - Quy trình: Trong chat thông thường, trình bày **Đề xuất sửa lỗi (Bounded)** (hoặc đề xuất cải tiến) gồm phạm vi, nguyên nhân/mục đích, thay đổi dự kiến theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm chứng ──► Sau đó mới gọi `ask` xin duyệt và chờ phản hồi ──► Sửa đúng phạm vi và kiểm thử qua `task-execution`. Thẻ `ask` chỉ ghi nhận quyết định, không phải nơi duy nhất chứa kế hoạch.
+3. **Greenfield / New Feature (Tính năng hoặc Phân hệ lớn):**
+   - Áp dụng khi: Tạo mới ứng dụng/phân hệ/module từ đầu; thay đổi luồng nghiệp vụ cốt lõi; tạo bảng/entity DB mới; thiết kế lại API contract công khai cho nhiều bên; hoặc mức độ bất định cao cần phỏng vấn nghiệp vụ chuyên sâu.
+   - Quy trình: Bắt buộc tuân thủ 4 cổng chất lượng tuần tự:
+     `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
+   - *Nguyên tắc linh hoạt:* Mặc định ưu tiên Bounded cho các thay đổi cục bộ có giải pháp rõ ràng. Chỉ nâng cấp lên Feature khi phát hiện phạm vi phình to chạm vào kiến trúc mới, DB mới hoặc luồng nghiệp vụ chưa rõ.
 ---
 
 ## 3. Bảng nhận diện suy nghĩ bao biện (Red Flags)

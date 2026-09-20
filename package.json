@@ -11,8 +11,11 @@
   },
   "files": [
     "bin",
+    "code-review",
+    "codebase-design",
     "delivery-inspection",
     "delivery-planning",
+    "diagnosing-bugs",
     "diagram-design",
     "product-discovery",
     "product-workflow",

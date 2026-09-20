@@ -71,6 +71,12 @@ Một task không được tự đổi hợp đồng dùng chung mà không báo
 
 Xác định shared-write areas: schema/migration, auth, shared components, build/deployment config. Chỉ ra nơi phải có chủ tích hợp hoặc trình tự thay đổi trước khi giao nhiều người.
 
+### Design lens theo ảnh hưởng kiến trúc
+
+Khi scope thay đổi module, interface/invariants, seam, adapter, dependency direction hoặc testability, đọc `skill://codebase-design`; nếu URI chưa khám phá, đọc `.agents/skills/codebase-design/SKILL.md`. Thiếu cả hai nguồn thì nêu đúng skill/path và dừng phần thiết kế phụ thuộc, không tự bịa Design Delta.
+
+Tiêu thụ Design Delta gồm status, module, interface, seam, adapters, invariants, caller impact, test surface và rejected abstractions. `not-needed` hợp lệ khi trigger kiến trúc đã thỏa nhưng lens không tìm thấy delta hữu ích; thay đổi đã xác nhận là cục bộ thì bỏ qua specialist. Giữ `drafted` và `needs-revalidation` là chưa sẵn sàng, không xử lý như `approved-input`. Lens này không tạo gate mới và không tự duyệt G3. Không tạo seam/adapter giả khi chỉ có một implementation và không có variation thật.
+
 ## 6. Ghi ADR cho quyết định đáng lưu
 
 Mẫu ADR:

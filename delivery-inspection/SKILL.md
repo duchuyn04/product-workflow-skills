@@ -75,6 +75,12 @@ Kiểm tra DoD/AC, review và bằng chứng đúng revision tích hợp. Code x
 
 Nếu Jira đã Done nhưng chưa chứng minh DoD: hiển thị “Jira: Done; kiểm chứng: chưa đủ” cùng phần thiếu. Không tự certify, reopen hay sửa lịch sử bên ngoài quyền được cấp.
 
+### Kiểm tra evidence review hai trục
+
+Với Feature hoặc Risky Bounded (ảnh hưởng contract/interface, security/quyền, dữ liệu/migration hoặc nhiều module), yêu cầu Review Input Packet đúng baseline/owned areas và Review Output có hai phần riêng `standards`/`spec`. Cả hai verdict phải đạt; missing input, trạng thái `blocked` hoặc finding ảnh hưởng chưa được sửa và review lại phải giữ task ở Review/Blocked. Accepted exception chỉ hợp lệ khi có nguồn và người có thẩm quyền theo policy dự án.
+
+Docs-only và Bounded cục bộ rủi ro thấp tiếp tục policy review hiện hữu. Review pass không thay AC/checks hoặc Browser Native evidence bắt buộc; kiểm tra từng nghĩa vụ độc lập trước khi ghi `[x]`.
+
 ### Kiểm chứng Giao diện Web trên Browser Native trước khi Tick Done
 
 #### 1. File sơ đồ HTML/SVG: kiểm thử bắt buộc

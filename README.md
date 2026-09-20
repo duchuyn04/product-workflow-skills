@@ -10,7 +10,7 @@ Thay vì để AI tự suy đoán nghiệp vụ hoặc nhảy vào viết code n
 
 ## Cấu trúc các kỹ năng
 
-Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hướng dự án và bảy kỹ năng chuyên môn:
+Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hướng dự án, bảy kỹ năng chuyên môn chính và ba kỹ năng chuyên gia nội bộ được tự động điều phối theo trigger:
 
 ```text
                   [ Người dùng (PO, Tech Lead, Dev) ]
@@ -49,6 +49,13 @@ Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hư
 - `task-execution` (Thực thi code): Nhận task có kiểm soát, viết code đúng phạm vi, kiểm chứng và cập nhật điểm nghiệm thu cùng bằng chứng vào backlog.
 - `delivery-inspection` (Kiểm tra và nghiệm thu): Đối chiếu AC, review và kiểm chứng tích hợp trước khi tích hoàn thành; báo tổng điểm và điều kiện phát hành.
 - `diagram-design` (Thiết kế sơ đồ trực quan thay Mermaid): Tạo sơ đồ kiến trúc, DB schema, flow, sequence dưới dạng file HTML/SVG độc lập, hiển thị sắc nét trong `docs/workflow/diagrams/`.
+
+### Kỹ năng chuyên gia nội bộ (Tự động kích hoạt theo trigger)
+
+Ba kỹ năng này được thiết lập `hide: true`, không làm quá tải danh sách kỹ năng ban đầu và chỉ được router hoặc các cổng kiểm soát tự động kích hoạt khi thỏa điều kiện:
+- `diagnosing-bugs`: Tự động kích hoạt khi gặp bug, regression hoặc suy giảm hiệu năng chưa rõ nguyên nhân; tạo feedback loop kiểm chứng và trả về Diagnosis Packet có bằng chứng trước khi lập đề xuất Bounded.
+- `codebase-design`: Tự động kích hoạt khi có thay đổi liên quan đến module, interface, seam, adapter hoặc khả năng kiểm thử; cung cấp lăng kính deep-module và trả về Design Delta cho `solution-design`.
+- `code-review`: Tự động kích hoạt trước khi hoàn thành Feature hoặc Risky Bounded; thẩm định độc lập theo hai trục (Standards và Spec) song song hoặc tuần tự.
 
 ## Các cổng kiểm soát chất lượng
 
@@ -108,7 +115,7 @@ Giao diện terminal sẽ hiển thị bảng danh sách 9 skills:
 - Phím `Space` để chọn hoặc bỏ chọn từng kỹ năng, hoặc chọn `Select All (0/9)`.
 - Phím `Enter` để xác nhận cài đặt.
 
-**Kích hoạt quy trình trước khi sửa source:** Cài skills không bảo đảm agent tự đọc chúng. Để dùng toàn bộ workflow ở cấp dự án, chạy thêm installer dưới đây; lệnh cài/cập nhật cả 9 skills vào `.agents/skills/` và tích hợp một khối chỉ dẫn ngắn vào `AGENTS.md`:
+**Kích hoạt quy trình trước khi sửa source:** Cài skills không bảo đảm agent tự đọc chúng. Để dùng toàn bộ workflow ở cấp dự án, chạy thêm installer dưới đây; lệnh cài/cập nhật đầy đủ 12 skills (bao gồm 3 chuyên gia nội bộ) vào `.agents/skills/` và tích hợp một khối chỉ dẫn ngắn vào `AGENTS.md`:
 
 ```bash
 npx github:duchuyn04/product-workflow-skills --project
