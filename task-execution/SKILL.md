@@ -24,7 +24,7 @@ Kiểm tra nhánh và bằng chứng người dùng duyệt đúng phạm vi tr�
 | Nhánh | Điều kiện được thực thi |
 |---|---|
 | Spike | Đã duyệt câu hỏi, cách thử và phạm vi throwaway; không sửa sản phẩm ngoài phạm vi thử nghiệm. |
-| Bounded | Đã trình bày phạm vi, nguyên nhân/nhu cầu, giải pháp và cách kiểm thử; đã gọi `ask` và nhận duyệt. Không yêu cầu G1–G4. |
+| Bounded | Phần chat trước `ask` đã trình bày phạm vi, nguyên nhân có bằng chứng, thay đổi dự kiến theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó đã gọi `ask` và nhận duyệt. Kế hoạch chỉ xuất hiện trong câu hỏi hoặc `options[].description` không phải bằng chứng trình bày. Không yêu cầu G1–G4. |
 | Feature, kể cả repo có sẵn | Đã duyệt tuần tự G1 nghiệp vụ, G2 stories/UX, G3 kiến trúc/contracts, G4 tasks cho tính năng đó. |
 
 Đã đọc skill, tìm được file cần sửa hoặc yêu cầu ban đầu chưa phải bằng chứng duyệt. Thiếu duyệt: chỉ đọc/phân tích và soạn tài liệu theo cổng; nêu phần thiếu, hỏi và dừng trước edit. Không có `ask` thì hỏi bằng chat. Đã duyệt đúng scope thì không hỏi lại; scope đổi cần duyệt phần thay đổi.
@@ -133,23 +133,29 @@ Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm 
 - Chỉ sau khi quality gate đạt, AI mới dùng `ask` nếu người dùng muốn preview trực quan.
 
 #### 2. Giao diện Web khác
-Đối với HTML/CSS, frontend UI hoặc component không phải file sơ đồ, AI dùng `ask` để xin ý kiến trước khi mở Browser Native:
+Ngay sau khi thực thi, xác định `ui_changed` cho task. Đặt `ui_changed = true` khi code làm thay đổi bất kỳ bề mặt web nào người dùng nhìn thấy hoặc tương tác: page/component, style, form, navigation, nội dung động, hoặc trạng thái loading/error/empty. Tên task là “chức năng”, “logic” hay “refactor” không loại trừ checkpoint nếu kết quả hiển thị hoặc tương tác đã đổi.
+
+Với `ui_changed = true` và không phải diagram, checkpoint bắt buộc sau khi code/checks tự động hoàn tất nhưng trước khi báo hoàn thành:
+- Nếu người dùng chưa chọn cách kiểm thử Browser Native cho đúng scope, phải gọi `ask` theo mẫu dưới và dừng chờ quyết định.
+- Nếu người dùng đã chọn rõ trong cùng scope, thực hiện lựa chọn đó và không hỏi lặp lại.
+- Chọn bỏ qua phải ghi Browser Native là `not-run` cùng lý do; không được tuyên bố giao diện đã kiểm chứng trực quan.
+- Chưa có lựa chọn này thì chưa được báo hoàn thành.
+
 ```text
 ask(questions=[{
   "id": "browser_test_option",
-  "question": "Giao diện web đã hoàn thành. Bạn có muốn kích hoạt Engine Browser Native để kiểm thử trực quan không?",
+  "question": "Thay đổi giao diện web đã hoàn thành. Bạn muốn kiểm thử bằng OMP Browser Native theo cách nào?",
   "options": [
     {"label": "Mở Browser Native để kiểm thử", "description": "Tải trang, tương tác, kiểm tra console và chụp screenshot."},
-    {"label": "Bỏ qua kiểm thử browser", "description": "Chỉ áp dụng cho giao diện không phải file sơ đồ."},
-    {"label": "Chạy kiểm thử ngầm", "description": "Chụp screenshot ngầm để lưu vào evidence."}
+    {"label": "Chạy kiểm thử ngầm", "description": "Tự động tải trang và lưu screenshot/evidence mà không cần preview tương tác."},
+    {"label": "Bỏ qua kiểm thử browser", "description": "Ghi Browser Native là not-run; không xác nhận giao diện đã được kiểm chứng trực quan."}
   ],
   "recommended": 0
 }])
 ```
-
 ## 7. Hoàn thành và cập nhật trạng thái
 
-Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.
+Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Với `ui_changed = true`, phải có quyết định Browser Native và hoàn tất lựa chọn tương ứng trước khi báo hoàn thành; nếu bỏ qua, ghi `not-run` và không claim kiểm chứng trực quan. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.
 
 Có quyền ghi Jira: dùng transition thật, ghi evidence references theo quy ước, xác nhận kết quả. Không có quyền/kết nối: bàn giao đánh giá và nói Jira chưa cập nhật. PR merge không tự là story Done; children Done không tự đóng parent; Done không đồng nghĩa đã Released.
 

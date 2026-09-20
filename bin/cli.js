@@ -84,7 +84,8 @@ function syncAgentsMd(targetProjectRoot) {
 ## Product Workflow
 - Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc \`.agents/skills/product-workflow/SKILL.md\`. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
 - Trước duyệt chỉ đọc và phân tích source; soạn tài liệu theo cổng. Chờ người dùng duyệt đúng nhánh trước mọi thao tác ghi mã nguồn, kể cả qua shell hoặc subagent.
-- Bounded: trình bày phạm vi, giải pháp, cách kiểm thử; gọi ask và chờ duyệt. Feature trên repo có sẵn vẫn cần duyệt G1–G4; Spike cần duyệt thử nghiệm.
+- Bounded: trong chat, trình bày Đề xuất sửa lỗi gồm phạm vi, nguyên nhân có bằng chứng, thay đổi theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó mới gọi ask và chờ duyệt. Thẻ ask chỉ ghi nhận quyết định, không thay thế kế hoạch hiển thị trước đó. Feature trên repo có sẵn vẫn cần duyệt G1–G4; Spike cần duyệt thử nghiệm.
+- Thay đổi giao diện web người dùng nhìn thấy/tương tác: sau khi thực thi và trước khi báo hoàn thành, gọi ask để người dùng chọn cách kiểm thử bằng OMP Browser Native. Chỉ không hỏi khi người dùng đã chọn rõ cho đúng scope; nếu bỏ qua thì ghi not-run, không claim đã kiểm chứng trực quan. Diagram HTML/SVG dùng quality gate tự động riêng.
 - Duyệt chỉ có hiệu lực với đề xuất và phạm vi vừa chốt; đã đọc skill hoặc yêu cầu ban đầu không phải bằng chứng duyệt.
 - Không đọc được skill: báo thiếu cấu hình và dừng sửa source. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
 ${MARKER_END}`;

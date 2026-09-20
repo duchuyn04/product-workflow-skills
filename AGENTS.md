@@ -14,13 +14,14 @@ Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, �
 - **DOCS-FIRST:** Mọi tài liệu thiết kế phải lưu thành file vật lý trong `docs/workflow/` (specs, architecture, plans, diagrams), cấm chỉ in ra chat.
 - **BẢO VỆ CODE CŨ (BROWNFIELD):** Không tự ý refactor lan man, không xóa code cũ ngoài phạm vi task, luôn bảo đảm regression tests.
 - **SƠ ĐỒ & GIAO DIỆN:** Đọc `diagram-design` để vẽ sơ đồ, không dùng Mermaid code blocks. Kiểm thử mọi diagram HTML/SVG qua Engine Browser Native hoặc công cụ browser tương đương trước khi bàn giao. Nếu không có browser, báo rõ phần chưa kiểm chứng và khả năng còn thiếu; không đánh dấu nghiệm thu hoàn tất.
+- **CHECKPOINT GIAO DIỆN WEB:** Sau khi thêm hoặc sửa chức năng làm thay đổi giao diện web người dùng nhìn thấy/tương tác, phải gọi `ask` để người dùng chọn cách kiểm thử bằng OMP Browser Native trước khi báo hoàn thành. Chỉ bỏ qua câu hỏi khi người dùng đã chọn rõ cách kiểm thử cho đúng scope; chọn bỏ qua phải ghi `not-run`, không được tuyên bố đã kiểm chứng trực quan. Diagram HTML/SVG vẫn tự động kiểm thử theo quy tắc riêng.
 
 ---
 
 ## 2. Phân loại 3 nhánh công việc (Three Paths)
 Với yêu cầu thuộc phạm vi triển khai ở trên, xác định nhánh trước khi sửa:
 1. **Spike (Thử nghiệm tính khả thi):** Trình bày câu hỏi và cách thử (2–3 câu) ──► Xin duyệt và chờ phản hồi ──► Thử nghiệm (mã nguồn dán nhãn throwaway).
-2. **Bounded (Code cũ / Sửa lỗi nhỏ):** Nêu nguyên nhân gốc rễ và giải pháp ngắn trong chat ──► Xin duyệt và chờ phản hồi ──► Sửa đúng phạm vi và kiểm thử qua `task-execution`.
+2. **Bounded (Code cũ / Sửa lỗi nhỏ):** Trong chat thông thường, trình bày **Đề xuất sửa lỗi (Bounded)** gồm phạm vi, nguyên nhân gốc rễ có bằng chứng, thay đổi dự kiến theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm chứng ──► Sau đó mới gọi `ask` xin duyệt và chờ phản hồi ──► Sửa đúng phạm vi và kiểm thử qua `task-execution`. Thẻ `ask` chỉ ghi nhận quyết định, không phải nơi duy nhất chứa kế hoạch.
 3. **Greenfield / New Feature:** Bắt buộc tuân thủ 4 cổng chất lượng tuần tự:
    `G1 (Nghiệp vụ)` ──► [Duyệt] ──► `G2 (Stories & UX)` ──► [Duyệt] ──► `G3 (Kiến trúc & Contracts)` ──► [Duyệt] ──► `G4 (Tasks)` ──► `task-execution (Code)`
    *Khi phân vân giữa Bounded và Feature: Luôn chọn nhánh nặng hơn (Feature).*

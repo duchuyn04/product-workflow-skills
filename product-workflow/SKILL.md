@@ -22,7 +22,7 @@ Một đầu vào cho người dùng; chỉ nạp chuyên gia cần thiết. Gia
 
 Nêu nhánh, phạm vi, bước hiện tại và bằng chứng duyệt trong hội thoại. Yêu cầu ban đầu không phải duyệt phương án chưa trình bày. Nếu đã có duyệt rõ cho đúng phạm vi thì tiếp tục, không hỏi lại; scope đổi phải xin duyệt phần thay đổi.
 
-- Bounded: sau khi đọc source, nêu thay đổi và cách kiểm thử, gọi `ask` rồi chờ trả lời. Nếu không có `ask`, hỏi bằng chat và dừng. Bỏ G1–G4 không có nghĩa bỏ duyệt.
+- Bounded: sau khi đọc source, phải trình bày **Đề xuất sửa lỗi (Bounded)** trong phần chat thông thường, theo đúng thứ tự: (1) nhánh và phạm vi; (2) nguyên nhân gốc rễ cùng bằng chứng file/symbol; (3) các thay đổi dự kiến theo file/symbol; (4) phần ngoài phạm vi và rủi ro; (5) cách tái hiện và kiểm chứng sau sửa. Nếu nguyên nhân mới là giả thuyết, tiếp tục chẩn đoán và chưa xin duyệt. Chỉ sau khi đề xuất đã hiển thị đầy đủ mới gọi `ask` rồi chờ trả lời. Nội dung trong câu hỏi hoặc mô tả lựa chọn của `ask` không thay thế đề xuất trong chat. Nếu không có `ask`, hỏi bằng chat và dừng. Bỏ G1–G4 không có nghĩa bỏ duyệt.
 - Feature trên repo có sẵn: G1–G4 chỉ tập trung phần bổ sung và ảnh hưởng lên hành vi cũ; tái sử dụng stack/conventions hiện hữu. Có source không đồng nghĩa đã duyệt tính năng mới.
 - Spike: chỉ thử nghiệm throwaway trong phạm vi đã duyệt.
 
@@ -46,6 +46,8 @@ Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu
 
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
 
+Thay đổi giao diện web gồm mọi thay đổi làm khác bề mặt người dùng nhìn thấy hoặc tương tác: page/component, style, form, navigation và các trạng thái loading/error/empty. Sau khi thực thi loại thay đổi này, trước khi báo hoàn thành phải chuyển qua checkpoint Browser Native trong `task-execution`: gọi `ask` để người dùng chọn cách kiểm thử, trừ khi họ đã chọn rõ cho đúng scope. Diagram HTML/SVG theo quality gate tự động riêng, không dùng câu hỏi này.
+
 ## Quy tắc bắt buộc: Chống đốt cháy giai đoạn (Hard-Gate & Hard-Stop)
 
 ### 1. Phân loại 3 nhánh công việc (Three Paths)
@@ -66,6 +68,8 @@ Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
 
 ### 3. Quy tắc dừng lượt (Hard-Stop Policy) và công cụ `ask` trong Oh My Pi
 Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để người dùng phản hồi/duyệt. Tuyệt đối không vừa trình bày thiết kế vừa gọi công cụ tạo file mã nguồn trong cùng một turn.
+
+Với Bounded, thứ tự bắt buộc trong cùng lượt là: **trình bày Đề xuất sửa lỗi trong chat → gọi `ask` → chờ quyết định**. Thẻ `ask` chỉ ghi nhận quyết định; giữ câu hỏi và mô tả lựa chọn ngắn, không giấu kế hoạch trong `options[].description`. Chưa có phần chat chứa đủ phạm vi, nguyên nhân có bằng chứng, thay đổi dự kiến, rủi ro/ngoài phạm vi và cách kiểm chứng thì chưa được gọi `ask`.
 
 **Tận dụng công cụ `ask` của OMP:** Tại điểm dừng của mỗi cổng (G1, G2, G3, G4), AI ưu tiên gọi công cụ `ask` để người dùng bấm chọn duyệt trực quan:
 - Duyệt cổng: `ask` với các tùy chọn `[Duyệt và tiếp tục]` (recommended), `[Cần điều chỉnh]`, `[Hỏi thêm chi tiết]`.

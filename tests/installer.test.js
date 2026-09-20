@@ -37,6 +37,56 @@ test('project install creates instructions pointing to an installed router', t =
   assert.ok(existsSync(path.resolve(p.dir, pointer[1])));
 });
 
+test('installed bounded workflow requires a visible proposal before approval', t => {
+  const p = project(t);
+  installSuccessfully(p);
+
+  assert.match(
+    p.read(),
+    /trình bày Đề xuất sửa lỗi[\s\S]+sau đó mới gọi ask/,
+    'installed project instructions must put the visible proposal before ask',
+  );
+
+  const router = readFileSync(
+    path.join(p.dir, '.agents', 'skills', 'product-workflow', 'SKILL.md'),
+    'utf8',
+  );
+  const proposal = router.indexOf('phải trình bày **Đề xuất sửa lỗi (Bounded)**');
+  const approval = router.indexOf('Chỉ sau khi đề xuất đã hiển thị đầy đủ mới gọi `ask`');
+  assert.ok(proposal >= 0, 'installed router must require a visible bounded proposal');
+  assert.ok(approval > proposal, 'installed router must present the proposal before asking approval');
+  assert.match(
+    router,
+    /không giấu kế hoạch trong `options\[\]\.description`/,
+    'ask option descriptions must not become the only visible plan',
+  );
+});
+
+test('installed workflow requires a Browser Native decision for web UI changes', t => {
+  const p = project(t);
+  installSuccessfully(p);
+
+  assert.match(
+    p.read(),
+    /thay đổi giao diện web[\s\S]+gọi ask[\s\S]+Browser Native/i,
+    'installed project instructions must expose the Browser Native checkpoint',
+  );
+
+  const execution = readFileSync(
+    path.join(p.dir, '.agents', 'skills', 'task-execution', 'SKILL.md'),
+    'utf8',
+  );
+  const trigger = execution.indexOf('`ui_changed = true`');
+  const checkpoint = execution.indexOf('phải gọi `ask`');
+  assert.ok(trigger >= 0, 'execution skill must classify user-visible web changes');
+  assert.ok(checkpoint > trigger, 'execution skill must ask after detecting a web UI change');
+  assert.match(
+    execution,
+    /chưa có lựa chọn này thì chưa được báo hoàn thành/i,
+    'completion must wait for the Browser Native decision',
+  );
+});
+
 test('install preserves existing rules and repeated installation is idempotent', t => {
   const original = '# Team rules\r\nKeep TypeScript strict.\r\n';
   const p = project(t, original);
