@@ -293,6 +293,10 @@ These six rules are **non-negotiable**. Run the pre-output checklist (§9) to ve
 
 8. **Intuitive flow direction — no long reverse U-turns.** The primary flow of the diagram must read naturally: Top-to-Bottom, Left-to-Right, or an orderly Z-pattern. Never route an arrow backwards 180 degrees across the entire width of the diagram (e.g. from the far right back to the far left). If node B is downstream of node A, position node B adjacent to or directly below node A so the arrow is direct, short, and immediately obvious to any reader. Secondary relationships (e.g. trigger-based specialists or async callbacks) must use dashed lines (`stroke-dasharray="4,3"`) with clear, non-overlapping routing.
 
+9. **No connector transit through intervening cards.** A connector must NEVER transit across the body of an unrelated node or card. If node A links to node C, never place node B between them on the connector path. **Reorder the cards** so linked nodes sit directly adjacent (e.g. place `code-review` adjacent to `task-execution`), or route the connector around the perimeter corridor with ample clearance.
+
+10. **Tag chip vs node title clearance (≥8px vertical space).** Tag chips (`ACTOR`, `ROUTER`, `CỔNG G1`, etc.) and node titles must never share the same horizontal baseline or collide horizontally. When a title is long, **always stack vertically**: tag chip on the top row (`y=10..22`), node title on the second row (`y=38..48`) with at least 8px of clear vertical space between them.
+
 ### Node box — full pattern
 
 ```svg
@@ -510,14 +514,15 @@ Khi tạo hoặc sửa bất kỳ file sơ đồ HTML/SVG nào, AI **bắt buộ
    - Chờ `document.fonts.ready`, sau đó chờ thêm hai `requestAnimationFrame` để layout ổn định trước khi đo.
    - Nếu file dùng font remote và font chưa tải được, ghi nhận lỗi; không dùng fallback để claim Pass.
 
-2. **Đo Font chữ thực tế & chống tràn hộp:**
+2. **Đo Font chữ thực tế, chống tràn hộp & chống đè chữ lên Tag Chip:**
    - Dùng `tab.run`/DOM thật để lấy `getBBox()` và `getComputedTextLength()` của các node text, đặc biệt nhãn tiếng Việt có dấu.
    - Đối chiếu text box với node `<rect>` tương ứng. Text không được tràn và phải có padding tối thiểu 16px mỗi bên.
+   - **Kiểm tra va chạm Tag Chip vs Title:** Lấy `getBBox()` của tag chip `<rect>` và title `<text>`; assert rằng title không đè lên tag chip (khoảng cách tối thiểu 8px). Nếu title dài, bắt buộc xếp dọc (chip ở trên, title ở dưới).
    - Nếu phát hiện lỗi, sửa file nguồn, mở lại trang và đo lại từ đầu.
 
-3. **Kiểm tra connector và va chạm:**
-   - Xác nhận connector `<path>`/`<line>` bám đúng mép node, không đâm vào thân node và không đi xuyên node trung gian.
-   - Đo label mask và đường stroke: khoảng cách nhìn thấy phải từ 6px đến 10px.
+3. **Kiểm tra connector và va chạm xuyên khối (No transit through intervening cards):**
+   - Xác nhận connector `<path>`/`<line>` bám đúng mép node, không đâm vào thân node và **tuyệt đối không đi xuyên qua bất kỳ node trung gian nào**. Nếu phát hiện connector cắt qua thẻ khác (ví dụ: mũi tên review cắt qua thẻ diagram), phải đổi thứ tự sắp xếp các thẻ hoặc định tuyến lại qua hành lang biên.
+   - Đo label mask và đường stroke: khoảng cách nhìn thấy phải từ 6px đến 10px; mask rect phải có màu nền trùng khớp với container hoặc canvas bên dưới.
    - Connector song song phải cách nhau tối thiểu 12px; không có hai connector trùng stroke hoặc che nhau.
    - Diagram mới nên gắn semantic attributes ổn định (`data-diagram-node`, `data-diagram-connector`, `data-diagram-label`) để việc đo và liên kết node/connector không phụ thuộc vào vị trí DOM.
 
