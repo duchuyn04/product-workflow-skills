@@ -289,6 +289,10 @@ These six rules are **non-negotiable**. Run the pre-output checklist (§9) to ve
 
 6. **A label mask must not overlap a node drawn after it.** Rule 2 keeps the label off its own connector; this one keeps it off the boxes. Because nodes are painted after labels, a mask that lands partly inside a node is covered by the node fill and the text renders as a fragment sitting on the node border. Place the label on a segment of the connector that runs through open canvas — for a connector leaving a node's right edge, that means clearing the node's `x + width` before the mask starts. A mask fully *inside* a node is a badge chip and is fine; a mask overlapping a zone container is fine too, since zones are painted first. From a repository checkout, verify with `python3 <repo-root>/scripts/verify-geometry.py <file>`.
 
+7. **No crossing container headers, borders, or zone titles.** Connectors and arrow labels must never slice through container borders, zone header chips, or zone titles. When connecting between two containers or zones, route the connector through clear corridors (buffers of ≥16px from borders and text). The label's mask rect must match the underlying background color exactly (e.g. `fill="#ececec"` when over a container, `fill="#f5f5f5"` when over canvas) so it never creates discolored patches, covers borders, or cuts text in half.
+
+8. **Intuitive flow direction — no long reverse U-turns.** The primary flow of the diagram must read naturally: Top-to-Bottom, Left-to-Right, or an orderly Z-pattern. Never route an arrow backwards 180 degrees across the entire width of the diagram (e.g. from the far right back to the far left). If node B is downstream of node A, position node B adjacent to or directly below node A so the arrow is direct, short, and immediately obvious to any reader. Secondary relationships (e.g. trigger-based specialists or async callbacks) must use dashed lines (`stroke-dasharray="4,3"`) with clear, non-overlapping routing.
+
 ### Node box — full pattern
 
 ```svg
@@ -476,7 +480,9 @@ Run before producing any diagram.
 - [ ] **When several connectors enter or exit the same edge of a box, each has its own attach point (≥12px apart)? No connector hides another?**
 - [ ] **No connector passes behind a non-endpoint box, except the unavoidable-intervening-box case (§6 rule 5) — and in that case, the stroke is dashed and the label sits at the visible end?**
 - [ ] **No label mask overlaps a node drawn after it? (Node fill would clip the text — §6 rule 6. From a repository checkout, run `python3 <repo-root>/scripts/verify-geometry.py <file>`.)**
-- [ ] Every arrow label has an opaque `fill="#f5f5f5"` rect behind it?
+- [ ] **No connector or label slices through container borders, zone titles, or headers (§6 rule 7)? Clear corridors ≥16px preserved?**
+- [ ] **Label mask fill matches the underlying zone background color exactly (no discolored patches or cuts)?**
+- [ ] **Flow reads naturally without reverse 180° U-turn connectors across the canvas (§6 rule 8)? Downstream nodes placed adjacent or directly below?**
 - [ ] Legend is a horizontal bottom strip, not floating?
 - [ ] No vertical `writing-mode` text?
 - [ ] `viewBox` expanded for the legend strip (~60px)?

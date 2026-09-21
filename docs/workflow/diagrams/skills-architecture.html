@@ -9,255 +9,296 @@
     :root { --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399; --rule:rgba(45,49,66,.12); --accent:#eb6c36; --accent-tint:rgba(235,108,54,.08); }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--paper); color:var(--ink); font-family:'Geist',sans-serif; }
-    main { width:min(1200px,96vw); padding:32px 24px; }
+    main { width:min(1200px,96vw); padding:24px 16px; }
     h1 { margin:0; font:400 36px 'Instrument Serif',serif; }
-    .dek { margin:8px 0 24px; color:var(--muted); font-size:14px; }
+    .dek { margin:8px 0 20px; color:var(--muted); font-size:14px; }
     svg { display:block; width:100%; height:auto; }
   </style>
 </head>
 <body>
 <main>
   <h1>Architecture — Product Workflow Skills</h1>
-  <p class="dek">Hệ thống điều phối quy trình phát triển sản phẩm toàn diện với 12 Agent Skills chuyên môn bám sát 4 cổng chất lượng tuần tự.</p>
-  <svg viewBox="0 0 1140 650" role="img" aria-labelledby="arch-title arch-desc" xmlns="http://www.w3.org/2000/svg">
+  <p class="dek">Hệ thống điều phối quy trình phát triển phần mềm toàn diện với 12 Agent Skills chuyên môn bám sát 4 cổng chất lượng tuần tự.</p>
+  <svg viewBox="0 0 1140 710" role="img" aria-labelledby="arch-title arch-desc" xmlns="http://www.w3.org/2000/svg">
     <title id="arch-title">Cấu trúc các kỹ năng Product Workflow</title>
-    <desc id="arch-desc">Sơ đồ kiến trúc phân tầng thể hiện người dùng tương tác qua router product-workflow đến 4 cổng chất lượng tuần tự G1-G4, thực thi, nghiệm thu và các chuyên gia nội bộ theo trigger.</desc>
+    <desc id="arch-desc">Sơ đồ kiến trúc phân tầng thể hiện người dùng tương tác qua router product-workflow đến chuỗi 4 cổng chất lượng G1-G4, thực thi mã nguồn, nghiệm thu và các chuyên gia nội bộ theo trigger.</desc>
     <defs>
       <style>
-        .zone { font:500 9px 'Geist Mono',monospace; letter-spacing:.14em; fill:rgba(45,49,66,.55); }
-        .tag { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#4f5d75; }
-        .tag-accent { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#eb6c36; }
-        .node-title { font:600 13px 'Geist',sans-serif; fill:#2d3142; }
-        .node-sub { font:400 9px 'Geist Mono',monospace; fill:#4f5d75; }
-        .node-sub-detail { font:400 8px 'Geist Mono',monospace; fill:#7a8399; }
+        .zone-tag { font:600 8px 'Geist Mono',monospace; letter-spacing:.14em; fill:#4f5d75; }
+        .node-tag { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#4f5d75; }
+        .node-tag-acc { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#eb6c36; }
+        .node-h { font:600 13px 'Geist',sans-serif; fill:#2d3142; }
+        .node-sub { font:500 9px 'Geist Mono',monospace; fill:#4f5d75; }
+        .node-desc { font:400 8.5px 'Geist Mono',monospace; fill:#7a8399; }
         .arrow-lbl { font:500 8px 'Geist Mono',monospace; fill:#4f5d75; letter-spacing:.03em; }
+        .arrow-lbl-acc { font:600 8px 'Geist Mono',monospace; fill:#eb6c36; letter-spacing:.03em; }
       </style>
       <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4f5d75"/></marker>
       <marker id="arr-acc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#eb6c36"/></marker>
     </defs>
-    <rect width="1140" height="650" fill="#f5f5f5"/>
+    <rect width="1140" height="710" fill="#f5f5f5"/>
 
-    <!-- Top Container: User & Coordinator -->
-    <rect x="20" y="20" width="1100" height="110" rx="8" fill="#ececec" stroke="rgba(45,49,66,.12)"/>
-    <rect x="40" y="24" width="160" height="16" rx="2" fill="#f5f5f5"/>
-    <text class="zone" x="120" y="35" text-anchor="middle">ROUTER &amp; INITIATION</text>
+    <!-- ============================================================ -->
+    <!-- TẦNG 1: KHỞI TẠO & ĐIỀU PHỐI (INITIATION & ROUTING)          -->
+    <!-- ============================================================ -->
+    <rect x="20" y="20" width="1100" height="96" rx="8" fill="#ececec" stroke="rgba(45,49,66,.12)"/>
+    <rect x="40" y="24" width="160" height="15" rx="2" fill="#f5f5f5"/>
+    <text class="zone-tag" x="120" y="35" text-anchor="middle">ROUTER &amp; INITIATION</text>
 
-    <!-- Node User -->
-    <g transform="translate(40,48)">
-      <rect width="240" height="66" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="12" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="35" y="20" text-anchor="middle">ACTOR</text>
-      <text class="node-title" x="135" y="32" text-anchor="middle">Người dùng (PO / Lead / Dev)</text>
-      <text class="node-sub" x="135" y="50" text-anchor="middle">Ý tưởng · Scope · Phê duyệt cổng</text>
+    <!-- Node: Người dùng -->
+    <g transform="translate(40,46)">
+      <rect width="250" height="60" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="12" y="9" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="35" y="19" text-anchor="middle">ACTOR</text>
+      <text class="node-h" x="135" y="28" text-anchor="middle">Người dùng (PO / Lead / Dev)</text>
+      <text class="node-sub" x="135" y="46" text-anchor="middle">Ý tưởng · Scope · Phê duyệt cổng</text>
     </g>
 
-    <!-- Node Router -->
-    <g transform="translate(390,46)">
-      <rect width="360" height="70" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.6"/>
-      <rect x="14" y="10" width="62" height="14" rx="2" fill="rgba(235,108,54,.18)"/>
-      <text class="tag-accent" x="45" y="20" text-anchor="middle">ROUTER</text>
-      <text class="node-title" x="195" y="32" text-anchor="middle">product-workflow</text>
-      <text class="node-sub" x="195" y="50" text-anchor="middle">Điều phối 3 nhánh: Spike · Bounded · Feature</text>
-      <text class="node-sub-detail" x="195" y="62" text-anchor="middle">Kiểm soát dừng lượt Hard-Stop &amp; Duyệt tương tác qua ask</text>
+    <!-- Node: product-workflow -->
+    <g transform="translate(390,44)">
+      <rect width="360" height="64" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/>
+      <rect x="14" y="9" width="60" height="13" rx="2" fill="rgba(235,108,54,.18)"/>
+      <text class="node-tag-acc" x="44" y="19" text-anchor="middle">ROUTER</text>
+      <text class="node-h" x="195" y="28" text-anchor="middle">product-workflow</text>
+      <text class="node-sub" x="195" y="45" text-anchor="middle">Điều phối 3 nhánh: Spike · Bounded · Feature</text>
+      <text class="node-desc" x="195" y="56" text-anchor="middle">Kiểm soát dừng lượt Hard-Stop &amp; Duyệt tương tác qua ask</text>
     </g>
 
-    <!-- Node Project Guide -->
-    <g transform="translate(860,48)">
-      <rect width="240" height="66" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="12" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="35" y="20" text-anchor="middle">GUIDE</text>
-      <text class="node-title" x="135" y="32" text-anchor="middle">project-guide</text>
-      <text class="node-sub" x="135" y="50" text-anchor="middle">Định hướng hiện trạng dự án</text>
+    <!-- Node: project-guide -->
+    <g transform="translate(850,46)">
+      <rect width="250" height="60" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="12" y="9" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="35" y="19" text-anchor="middle">GUIDE</text>
+      <text class="node-h" x="135" y="28" text-anchor="middle">project-guide</text>
+      <text class="node-sub" x="135" y="46" text-anchor="middle">Khảo sát hiện trạng codebase &amp; docs</text>
     </g>
 
-    <!-- Arrows Top -->
+    <!-- Connectors Top Container (clean masks matching #ececec) -->
     <g fill="none" stroke="#4f5d75" stroke-width="1.3" marker-end="url(#arr)">
-      <line x1="280" y1="81" x2="388" y2="81"/>
-      <line x1="750" y1="81" x2="858" y2="81" stroke-dasharray="4 3"/>
+      <line x1="290" y1="76" x2="388" y2="76"/>
+      <line x1="750" y1="76" x2="848" y2="76" stroke-dasharray="4 3"/>
     </g>
-    <rect x="298" y="72" width="70" height="16" fill="#ececec"/>
-    <text class="arrow-lbl" x="333" y="83" text-anchor="middle">yêu cầu mới</text>
-    <rect x="768" y="72" width="72" height="16" fill="#ececec"/>
-    <text class="arrow-lbl" x="804" y="83" text-anchor="middle">chưa rõ vị trí</text>
+    <!-- Label 1 -->
+    <rect x="304" y="66" width="70" height="14" rx="2" fill="#ececec"/>
+    <text class="arrow-lbl" x="339" y="76" text-anchor="middle">yêu cầu mới</text>
+    <!-- Label 2 -->
+    <rect x="764" y="66" width="70" height="14" rx="2" fill="#ececec"/>
+    <text class="arrow-lbl" x="799" y="76" text-anchor="middle">chưa rõ vị trí</text>
 
-    <!-- Middle Container: 4 Quality Gates (G1 - G4) + Execution -->
-    <rect x="20" y="150" width="1100" height="230" rx="8" fill="rgba(45,49,66,.02)" stroke="rgba(45,49,66,.12)"/>
-    <rect x="40" y="154" width="280" height="16" rx="2" fill="#f5f5f5"/>
-    <text class="zone" x="180" y="165" text-anchor="middle">CHUỖI 4 CỔNG CHẤT LƯỢNG TUẦN TỰ (G1 ➔ G4)</text>
-
-    <!-- Connector from Router down to Gate G1 -->
-    <g fill="none" stroke="#eb6c36" stroke-width="1.6" marker-end="url(#arr-acc)">
-      <path d="M 570 116 L 570 138 L 140 138 L 140 188"/>
+    <!-- ============================================================ -->
+    <!-- CORRIDOR: Arrow from Router to Gate G1 (CLEAR BUFFER)        -->
+    <!-- ============================================================ -->
+    <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#arr-acc)">
+      <path d="M 450 108 L 450 134 A 8 8 0 0 1 442 142 L 170 142 A 8 8 0 0 0 162 150 L 162 173"/>
     </g>
-    <rect x="290" y="130" width="120" height="16" fill="#f5f5f5"/>
-    <text class="arrow-lbl" x="350" y="141" text-anchor="middle" fill="#eb6c36">Kích hoạt Feature G1</text>
+    <rect x="250" y="132" width="130" height="16" rx="2" fill="#f5f5f5"/>
+    <text class="arrow-lbl-acc" x="315" y="143" text-anchor="middle">KÍCH HOẠT FEATURE (G1)</text>
+
+    <!-- ============================================================ -->
+    <!-- TẦNG 2: CHUỖI 4 CỔNG CHẤT LƯỢNG (QUALITY GATES PIPELINE)     -->
+    <!-- ============================================================ -->
+    <rect x="20" y="155" width="1100" height="195" rx="8" fill="rgba(45,49,66,.02)" stroke="rgba(45,49,66,.12)"/>
+    <rect x="40" y="159" width="280" height="15" rx="2" fill="#f5f5f5"/>
+    <text class="zone-tag" x="180" y="170" text-anchor="middle">PIPELINE 4 CỔNG CHẤT LƯỢNG TUẦN TỰ (G1 ➔ G4)</text>
 
     <!-- Gate G1 -->
-    <g transform="translate(40,190)">
-      <rect width="195" height="170" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="10" y="10" width="68" height="15" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="44" y="21" text-anchor="middle">CỔNG G1</text>
-      <text class="node-title" x="97" y="44" text-anchor="middle">product-discovery</text>
-      <text class="node-sub" x="97" y="64" text-anchor="middle">Phân tích nghiệp vụ</text>
-      <line x1="10" y1="74" x2="185" y2="74" stroke="rgba(45,49,66,.1)"/>
-      <text class="node-sub-detail" x="15" y="92">• Khảo sát quy mô qua ask</text>
-      <text class="node-sub-detail" x="15" y="108">• Case Study 6 Trụ cột Core</text>
-      <text class="node-sub-detail" x="15" y="124">• Không trần 50 câu (100+)</text>
-      <text class="node-sub-detail" x="15" y="140">• Subagent Audit: PASS</text>
-      <text class="node-sub-detail" x="15" y="156" fill="#eb6c36">► docs/.../&lt;phân-hệ&gt;-brief.md</text>
+    <g transform="translate(40,180)">
+      <rect width="240" height="155" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="60" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="40" y="20" text-anchor="middle">CỔNG G1</text>
+      <text class="node-h" x="120" y="38" text-anchor="middle">product-discovery</text>
+      <text class="node-sub" x="120" y="55" text-anchor="middle">Phân tích nghiệp vụ</text>
+      <line x1="10" y1="64" x2="230" y2="64" stroke="rgba(45,49,66,.1)"/>
+      <text class="node-desc" x="15" y="80">• Khảo sát quy mô qua ask</text>
+      <text class="node-desc" x="15" y="96">• Case Study 6 Trụ cột Core</text>
+      <text class="node-desc" x="15" y="112">• Không trần 50 câu (100+)</text>
+      <text class="node-desc" x="15" y="128" fill="#eb6c36">• Subagent Audit: PASS</text>
+      <text class="node-desc" x="15" y="144" fill="#4f5d75">► &lt;phân-hệ&gt;-brief.md</text>
     </g>
 
     <!-- Gate G2 -->
-    <g transform="translate(260,190)">
-      <rect width="195" height="170" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="10" y="10" width="68" height="15" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="44" y="21" text-anchor="middle">CỔNG G2</text>
-      <text class="node-title" x="97" y="44" text-anchor="middle">story-and-experience</text>
-      <text class="node-sub" x="97" y="64" text-anchor="middle">Thiết kế trải nghiệm</text>
-      <line x1="10" y1="74" x2="185" y2="74" stroke="rgba(45,49,66,.1)"/>
-      <text class="node-sub-detail" x="15" y="92">• User Stories (Given-When-Then)</text>
-      <text class="node-sub-detail" x="15" y="108">• Ma trận Actor vs Stories</text>
-      <text class="node-sub-detail" x="15" y="124">• UI States: 4 trạng thái</text>
-      <text class="node-sub-detail" x="15" y="140" fill="#2e5aa8">• Prototype Mockup HTML</text>
-      <text class="node-sub-detail" x="15" y="156" fill="#eb6c36">► docs/.../&lt;phân-hệ&gt;-stories.md</text>
+    <g transform="translate(320,180)">
+      <rect width="240" height="155" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="60" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="40" y="20" text-anchor="middle">CỔNG G2</text>
+      <text class="node-h" x="120" y="38" text-anchor="middle">story-and-experience</text>
+      <text class="node-sub" x="120" y="55" text-anchor="middle">Thiết kế trải nghiệm</text>
+      <line x1="10" y1="64" x2="230" y2="64" stroke="rgba(45,49,66,.1)"/>
+      <text class="node-desc" x="15" y="80">• User Stories (Given-When-Then)</text>
+      <text class="node-desc" x="15" y="96">• Ma trận Actor vs Stories</text>
+      <text class="node-desc" x="15" y="112">• UI States (4 trạng thái)</text>
+      <text class="node-desc" x="15" y="128" fill="#2e5aa8">• Prototype Mockup HTML</text>
+      <text class="node-desc" x="15" y="144" fill="#4f5d75">► &lt;phân-hệ&gt;-stories.md</text>
     </g>
 
     <!-- Gate G3 -->
-    <g transform="translate(480,190)">
-      <rect width="195" height="170" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="10" y="10" width="68" height="15" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="44" y="21" text-anchor="middle">CỔNG G3</text>
-      <text class="node-title" x="97" y="44" text-anchor="middle">solution-design</text>
-      <text class="node-sub" x="97" y="64" text-anchor="middle">Kiến trúc kỹ thuật</text>
-      <line x1="10" y1="74" x2="185" y2="74" stroke="rgba(45,49,66,.1)"/>
-      <text class="node-sub-detail" x="15" y="92">• Kế thừa/Chọn Tech Stack</text>
-      <text class="node-sub-detail" x="15" y="108">• Database Schema &amp; DDL</text>
-      <text class="node-sub-detail" x="15" y="124" fill="#2e5aa8">• Sơ đồ ERD Browser Native</text>
-      <text class="node-sub-detail" x="15" y="140">• API Contracts &amp; ADRs</text>
-      <text class="node-sub-detail" x="15" y="156" fill="#eb6c36">► docs/.../&lt;phân-hệ&gt;-design.md</text>
+    <g transform="translate(600,180)">
+      <rect width="240" height="155" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="60" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="40" y="20" text-anchor="middle">CỔNG G3</text>
+      <text class="node-h" x="120" y="38" text-anchor="middle">solution-design</text>
+      <text class="node-sub" x="120" y="55" text-anchor="middle">Kiến trúc kỹ thuật</text>
+      <line x1="10" y1="64" x2="230" y2="64" stroke="rgba(45,49,66,.1)"/>
+      <text class="node-desc" x="15" y="80">• Kế thừa Tech Stack đã duyệt</text>
+      <text class="node-desc" x="15" y="96">• Database Schema &amp; DDL</text>
+      <text class="node-desc" x="15" y="112" fill="#2e5aa8">• Sơ đồ ERD Browser Native</text>
+      <text class="node-desc" x="15" y="128">• API Contracts &amp; ADRs</text>
+      <text class="node-desc" x="15" y="144" fill="#4f5d75">► &lt;phân-hệ&gt;-design.md</text>
     </g>
 
     <!-- Gate G4 -->
-    <g transform="translate(700,190)">
-      <rect width="195" height="170" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-      <rect x="10" y="10" width="68" height="15" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="44" y="21" text-anchor="middle">CỔNG G4</text>
-      <text class="node-title" x="97" y="44" text-anchor="middle">delivery-planning</text>
-      <text class="node-sub" x="97" y="64" text-anchor="middle">Kế hoạch thực thi</text>
-      <line x1="10" y1="74" x2="185" y2="74" stroke="rgba(45,49,66,.1)"/>
-      <text class="node-sub-detail" x="15" y="92">• Khảo sát Team Size qua ask</text>
-      <text class="node-sub-detail" x="15" y="108">• Tasks chia theo folder role</text>
-      <text class="node-sub-detail" x="15" y="124">• Ma trận Dependencies</text>
-      <text class="node-sub-detail" x="15" y="140">• Phân phối Luồng Song song</text>
-      <text class="node-sub-detail" x="15" y="156" fill="#eb6c36">► docs/workflow/product-backlog.md</text>
+    <g transform="translate(880,180)">
+      <rect width="220" height="155" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="60" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="40" y="20" text-anchor="middle">CỔNG G4</text>
+      <text class="node-h" x="110" y="38" text-anchor="middle">delivery-planning</text>
+      <text class="node-sub" x="110" y="55" text-anchor="middle">Kế hoạch thực thi</text>
+      <line x1="10" y1="64" x2="210" y2="64" stroke="rgba(45,49,66,.1)"/>
+      <text class="node-desc" x="15" y="80">• Khảo sát Team Size qua ask</text>
+      <text class="node-desc" x="15" y="96">• Tasks chia theo folder role</text>
+      <text class="node-desc" x="15" y="112">• Ma trận Dependencies</text>
+      <text class="node-desc" x="15" y="128">• Phân phối Luồng Song song</text>
+      <text class="node-desc" x="15" y="144" fill="#4f5d75">► product-backlog.md</text>
     </g>
 
-    <!-- Execution Node -->
-    <g transform="translate(920,190)">
-      <rect width="180" height="170" rx="7" fill="rgba(235,108,54,.04)" stroke="rgba(45,49,66,.25)"/>
-      <rect x="10" y="10" width="68" height="15" rx="2" fill="rgba(45,49,66,.08)"/>
-      <text class="tag" x="44" y="21" text-anchor="middle">BUILD</text>
-      <text class="node-title" x="90" y="44" text-anchor="middle">task-execution</text>
-      <text class="node-sub" x="90" y="64" text-anchor="middle">Thực thi mã nguồn</text>
-      <line x1="10" y1="74" x2="170" y2="74" stroke="rgba(45,49,66,.1)"/>
-      <text class="node-sub-detail" x="15" y="92">• Subagents hoặc Inline</text>
-      <text class="node-sub-detail" x="15" y="108">• Task Worker &amp; Reviewer</text>
-      <text class="node-sub-detail" x="15" y="124">• Unit &amp; Integration Tests</text>
-      <text class="node-sub-detail" x="15" y="140">• Browser Native Gate</text>
-      <text class="node-sub-detail" x="15" y="156" fill="#eb6c36">► Bằng chứng Evidence</text>
+    <!-- Connectors between gates (clean line with arrow) -->
+    <g fill="none" stroke="#4f5d75" stroke-width="1.4" marker-end="url(#arr)">
+      <line x1="280" y1="257" x2="318" y2="257"/>
+      <line x1="560" y1="257" x2="598" y2="257"/>
+      <line x1="840" y1="257" x2="878" y2="257"/>
     </g>
 
-    <!-- Arrows between gates -->
-    <g fill="none" stroke="#4f5d75" stroke-width="1.3" marker-end="url(#arr)">
-      <line x1="235" y1="275" x2="258" y2="275"/>
-      <line x1="455" y1="275" x2="478" y2="275"/>
-      <line x1="675" y1="275" x2="698" y2="275"/>
-      <line x1="895" y1="275" x2="918" y2="275"/>
+    <!-- ============================================================ -->
+    <!-- TẦNG 3 (BÊN PHẢI): THỰC THI ➔ NGHIỆM THU (DOWNWARD FLOW)     -->
+    <!-- ============================================================ -->
+    <rect x="800" y="370" width="320" height="320" rx="8" fill="#ececec" stroke="rgba(45,49,66,.12)"/>
+    <rect x="820" y="374" width="160" height="15" rx="2" fill="#f5f5f5"/>
+    <text class="zone-tag" x="900" y="385" text-anchor="middle">THỰC THI &amp; PHÁT HÀNH</text>
+
+    <!-- Node: task-execution -->
+    <g transform="translate(820,402)">
+      <rect width="280" height="116" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="56" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="node-tag" x="38" y="20" text-anchor="middle">THỰC THI</text>
+      <text class="node-h" x="140" y="34" text-anchor="middle">task-execution</text>
+      <text class="node-sub" x="140" y="50" text-anchor="middle">Triển khai code &amp; Kiểm thử</text>
+      <line x1="10" y1="58" x2="270" y2="58" stroke="rgba(45,49,66,.1)"/>
+      <text class="node-desc" x="15" y="74">• Mô hình: Subagents hoặc Inline</text>
+      <text class="node-desc" x="15" y="88">• Task Worker ➔ Task Reviewer</text>
+      <text class="node-desc" x="15" y="102">• Unit Test &amp; Browser Native Evidence</text>
     </g>
 
-    <!-- Bottom Container: Inspection & Trigger Specialists -->
-    <rect x="20" y="400" width="1100" height="230" rx="8" fill="#ececec" stroke="rgba(45,49,66,.12)"/>
-
-    <!-- Left: Delivery Inspection (Release Gate) -->
-    <rect x="40" y="404" width="220" height="16" rx="2" fill="#f5f5f5"/>
-    <text class="zone" x="150" y="415" text-anchor="middle">NGHIỆM THU &amp; PHÁT HÀNH</text>
-    <g transform="translate(40,430)">
-      <rect width="320" height="180" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/>
-      <rect x="14" y="12" width="78" height="15" rx="2" fill="rgba(235,108,54,.18)"/>
-      <text class="tag-accent" x="53" y="23" text-anchor="middle">INSPECTION</text>
-      <text class="node-title" x="160" y="46" text-anchor="middle">delivery-inspection</text>
-      <text class="node-sub" x="160" y="66" text-anchor="middle">Nghiệm thu toàn diện &amp; Đóng Sprint</text>
-      <line x1="14" y1="78" x2="306" y2="78" stroke="rgba(235,108,54,.2)"/>
-      <text class="node-sub-detail" x="20" y="100">• Chấm điểm AC đạt / tổng số AC áp dụng</text>
-      <text class="node-sub-detail" x="20" y="120">• Đối chiếu Story Points hoàn tất</text>
-      <text class="node-sub-detail" x="20" y="140">• Đạt Definition of Done (DoD) ➔ Tick [x] Backlog</text>
-      <text class="node-sub-detail" x="20" y="160">• Sprint Review, Retrospective &amp; Release Ready</text>
-    </g>
-
-    <!-- Connector from Execution down to Inspection -->
+    <!-- Arrow from Gate G4 down to task-execution (DIRECT DOWNWARD) -->
     <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#arr-acc)">
-      <path d="M 1010 360 L 1010 385 L 200 385 L 200 428"/>
+      <line x1="990" y1="335" x2="990" y2="400"/>
     </g>
-    <rect x="520" y="377" width="150" height="16" fill="#f5f5f5"/>
-    <text class="arrow-lbl" x="595" y="388" text-anchor="middle" fill="#eb6c36">Bàn giao kiểm chứng</text>
+    <rect x="940" y="354" width="100" height="14" rx="2" fill="#f5f5f5"/>
+    <text class="arrow-lbl-acc" x="990" y="364" text-anchor="middle">BÀN GIAO TASKS</text>
 
-    <!-- Right: Trigger-based Specialists -->
-    <rect x="400" y="404" width="310" height="16" rx="2" fill="#f5f5f5"/>
-    <text class="zone" x="555" y="415" text-anchor="middle">CHUYÊN GIA NỘI BỘ (TỰ ĐỘNG KÍCH HOẠT THEO TRIGGER)</text>
+    <!-- Node: delivery-inspection -->
+    <g transform="translate(820,556)">
+      <rect width="280" height="118" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/>
+      <rect x="10" y="10" width="70" height="14" rx="2" fill="rgba(235,108,54,.18)"/>
+      <text class="node-tag-acc" x="45" y="20" text-anchor="middle">NGHIỆM THU</text>
+      <text class="node-h" x="140" y="34" text-anchor="middle">delivery-inspection</text>
+      <text class="node-sub" x="140" y="50" text-anchor="middle">Nghiệm thu toàn diện &amp; Release</text>
+      <line x1="10" y1="58" x2="270" y2="58" stroke="rgba(235,108,54,.2)"/>
+      <text class="node-desc" x="15" y="74">• Chấm điểm AC đạt / tổng số AC áp dụng</text>
+      <text class="node-desc" x="15" y="88">• Đạt Definition of Done (DoD) ➔ Tick [x]</text>
+      <text class="node-desc" x="15" y="104">• Sprint Review, Retrospective &amp; Phát hành</text>
+    </g>
 
-    <g transform="translate(400,430)">
+    <!-- Arrow from task-execution down to delivery-inspection (DIRECT DOWNWARD) -->
+    <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#arr-acc)">
+      <line x1="960" y1="518" x2="960" y2="554"/>
+    </g>
+    <rect x="915" y="528" width="90" height="14" rx="2" fill="#ececec"/>
+    <text class="arrow-lbl-acc" x="960" y="538" text-anchor="middle">KIỂM CHỨNG (DoD)</text>
+
+    <!-- ============================================================ -->
+    <!-- TẦNG 3 (BÊN TRÁI): CHUYÊN GIA NỘI BỘ (TRIGGER-BASED)         -->
+    <!-- ============================================================ -->
+    <rect x="20" y="370" width="760" height="320" rx="8" fill="rgba(45,49,66,.02)" stroke="rgba(45,49,66,.12)"/>
+    <rect x="40" y="374" width="310" height="15" rx="2" fill="#f5f5f5"/>
+    <text class="zone-tag" x="195" y="385" text-anchor="middle">CHUYÊN GIA NỘI BỘ (TỰ ĐỘNG THEO TRIGGER)</text>
+
+    <!-- 4 Specialist Cards (Clean spacing, no overlaps) -->
+    <g transform="translate(40,402)">
       <!-- Spec 1: diagnosing-bugs -->
       <g transform="translate(0,0)">
-        <rect width="170" height="180" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-        <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="33" y="20" text-anchor="middle">DEBUG</text>
-        <text class="node-title" x="85" y="42" text-anchor="middle">diagnosing-bugs</text>
-        <text class="node-sub" x="85" y="60" text-anchor="middle">Chẩn đoán lỗi</text>
-        <line x1="10" y1="70" x2="160" y2="70" stroke="rgba(45,49,66,.1)"/>
-        <text class="node-sub-detail" x="12" y="88">• Trigger: Bug, regression</text>
-        <text class="node-sub-detail" x="12" y="106">• Vòng lặp feedback loop</text>
-        <text class="node-sub-detail" x="12" y="124">• Trả Diagnosis Packet</text>
-        <text class="node-sub-detail" x="12" y="142">• Dùng cho Bounded Fix</text>
+        <rect width="165" height="272" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+        <rect x="10" y="10" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="node-tag" x="33" y="20" text-anchor="middle">DEBUG</text>
+        <text class="node-h" x="82" y="38" text-anchor="middle">diagnosing-bugs</text>
+        <text class="node-sub" x="82" y="55" text-anchor="middle">Chẩn đoán lỗi</text>
+        <line x1="10" y1="64" x2="155" y2="64" stroke="rgba(45,49,66,.1)"/>
+        <text class="node-desc" x="12" y="84">• Trigger: Bug /</text>
+        <text class="node-desc" x="12" y="98">  regression chưa rõ</text>
+        <text class="node-desc" x="12" y="120">• Feedback loop</text>
+        <text class="node-desc" x="12" y="134">  tái hiện có chứng cớ</text>
+        <text class="node-desc" x="12" y="156">• Trả Diagnosis Packet</text>
+        <text class="node-desc" x="12" y="170">  gồm root cause</text>
+        <text class="node-desc" x="12" y="192">• Hỗ trợ Đề xuất</text>
+        <text class="node-desc" x="12" y="206">  Bounded Fix chuẩn</text>
       </g>
 
       <!-- Spec 2: codebase-design -->
-      <g transform="translate(180,0)">
-        <rect width="170" height="180" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-        <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="33" y="20" text-anchor="middle">DESIGN</text>
-        <text class="node-title" x="85" y="42" text-anchor="middle">codebase-design</text>
-        <text class="node-sub" x="85" y="60" text-anchor="middle">Thiết kế module</text>
-        <line x1="10" y1="70" x2="160" y2="70" stroke="rgba(45,49,66,.1)"/>
-        <text class="node-sub-detail" x="12" y="88">• Trigger: Seam, adapter</text>
-        <text class="node-sub-detail" x="12" y="106">• Lăng kính deep-module</text>
-        <text class="node-sub-detail" x="12" y="124">• Trả Design Delta</text>
-        <text class="node-sub-detail" x="12" y="142">• Hỗ trợ G3 Solution</text>
+      <g transform="translate(185,0)">
+        <rect width="165" height="272" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+        <rect x="10" y="10" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="node-tag" x="33" y="20" text-anchor="middle">DESIGN</text>
+        <text class="node-h" x="82" y="38" text-anchor="middle">codebase-design</text>
+        <text class="node-sub" x="82" y="55" text-anchor="middle">Thiết kế module</text>
+        <line x1="10" y1="64" x2="155" y2="64" stroke="rgba(45,49,66,.1)"/>
+        <text class="node-desc" x="12" y="84">• Trigger: Đổi seam,</text>
+        <text class="node-desc" x="12" y="98">  adapter, interface</text>
+        <text class="node-desc" x="12" y="120">• Lăng kính</text>
+        <text class="node-desc" x="12" y="134">  deep-module</text>
+        <text class="node-desc" x="12" y="156">• Trả Design Delta</text>
+        <text class="node-desc" x="12" y="170">  cho ranh giới code</text>
+        <text class="node-desc" x="12" y="192">• Hỗ trợ Cổng G3</text>
+        <text class="node-desc" x="12" y="206">  Solution Design</text>
       </g>
 
       <!-- Spec 3: code-review -->
-      <g transform="translate(360,0)">
-        <rect width="170" height="180" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-        <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="33" y="20" text-anchor="middle">REVIEW</text>
-        <text class="node-title" x="85" y="42" text-anchor="middle">code-review</text>
-        <text class="node-sub" x="85" y="60" text-anchor="middle">Review 2 trục</text>
-        <line x1="10" y1="70" x2="160" y2="70" stroke="rgba(45,49,66,.1)"/>
-        <text class="node-sub-detail" x="12" y="88">• Trigger: Xong task/code</text>
-        <text class="node-sub-detail" x="12" y="106">• Trục 1: Standards</text>
-        <text class="node-sub-detail" x="12" y="124">• Trục 2: Spec / AC</text>
-        <text class="node-sub-detail" x="12" y="142">• Parallel subagents</text>
+      <g transform="translate(370,0)">
+        <rect width="165" height="272" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+        <rect x="10" y="10" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="node-tag" x="33" y="20" text-anchor="middle">REVIEW</text>
+        <text class="node-h" x="82" y="38" text-anchor="middle">code-review</text>
+        <text class="node-sub" x="82" y="55" text-anchor="middle">Review 2 trục</text>
+        <line x1="10" y1="64" x2="155" y2="64" stroke="rgba(45,49,66,.1)"/>
+        <text class="node-desc" x="12" y="84">• Trigger: Hoàn tất</text>
+        <text class="node-desc" x="12" y="98">  task code Feature</text>
+        <text class="node-desc" x="12" y="120">• Trục 1: Standards</text>
+        <text class="node-desc" x="12" y="134">  (Chuẩn repo)</text>
+        <text class="node-desc" x="12" y="156">• Trục 2: Spec</text>
+        <text class="node-desc" x="12" y="170">  (Khớp Stories &amp; AC)</text>
+        <text class="node-desc" x="12" y="192">• Parallel subagents</text>
+        <text class="node-desc" x="12" y="206">  thẩm định độc lập</text>
       </g>
 
       <!-- Spec 4: diagram-design -->
-      <g transform="translate(540,0)">
-        <rect width="170" height="180" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
-        <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="33" y="20" text-anchor="middle">VISUAL</text>
-        <text class="node-title" x="85" y="42" text-anchor="middle">diagram-design</text>
-        <text class="node-sub" x="85" y="60" text-anchor="middle">Sơ đồ trực quan</text>
-        <line x1="10" y1="70" x2="160" y2="70" stroke="rgba(45,49,66,.1)"/>
-        <text class="node-sub-detail" x="12" y="88">• HTML/SVG độc lập</text>
-        <text class="node-sub-detail" x="12" y="106">• Không dùng Mermaid</text>
-        <text class="node-sub-detail" x="12" y="124">• ERD, Flow, Sequence</text>
-        <text class="node-sub-detail" x="12" y="142">• Browser Native QA</text>
+      <g transform="translate(555,0)">
+        <rect width="165" height="272" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+        <rect x="10" y="10" width="46" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="node-tag" x="33" y="20" text-anchor="middle">VISUAL</text>
+        <text class="node-h" x="82" y="38" text-anchor="middle">diagram-design</text>
+        <text class="node-sub" x="82" y="55" text-anchor="middle">Sơ đồ trực quan</text>
+        <line x1="10" y1="64" x2="155" y2="64" stroke="rgba(45,49,66,.1)"/>
+        <text class="node-desc" x="12" y="84">• HTML/SVG độc lập</text>
+        <text class="node-desc" x="12" y="98">  tự chứa, không phụ thuộc</text>
+        <text class="node-desc" x="12" y="120">• Không dùng Mermaid</text>
+        <text class="node-desc" x="12" y="134">  (tránh lỗi render)</text>
+        <text class="node-desc" x="12" y="156">• ERD, Flow, Sequence</text>
+        <text class="node-desc" x="12" y="170">  chuẩn editorial</text>
+        <text class="node-desc" x="12" y="192">• Browser Native QA</text>
+        <text class="node-desc" x="12" y="206">  kiểm thử font &amp; mũi tên</text>
       </g>
     </g>
+
+    <!-- Trigger connector: From task-execution to code-review (CLEAN HORIZONTAL DASHED) -->
+    <g fill="none" stroke="#4f5d75" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#arr)">
+      <line x1="820" y1="460" x2="583" y2="460"/>
+    </g>
+    <rect x="670" y="452" width="94" height="15" rx="2" fill="#f5f5f5"/>
+    <text class="arrow-lbl" x="717" y="463" text-anchor="middle">KÍCH HOẠT REVIEW</text>
 
   </svg>
 </main>
