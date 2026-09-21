@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quy trình làm việc Product Workflow Skills</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-paper: #f5f5f5;
+      --color-paper-2: #ececec;
+      --color-ink: #2d3142;
+      --color-muted: #4f5d75;
+      --color-soft: #7a8399;
+      --color-rule: rgba(45,49,66,0.12);
+      --color-rule-solid: rgba(79,93,117,0.25);
+      --color-accent: #eb6c36;
+      --color-accent-tint: rgba(235,108,54,0.08);
+      --color-link: #2e5aa8;
+      --font-sans: 'Geist', system-ui, sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--color-paper);
+      color: var(--color-ink);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 1180px;
+    }
+    .header {
+      margin-bottom: 2rem;
+    }
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.5vw + 0.5rem, 2.75rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.625rem;
+    }
+    .subtitle {
+      font-size: 0.9375rem;
+      line-height: 1.55;
+      color: var(--color-muted);
+      max-width: 76ch;
+    }
+    .diagram-container {
+      background: transparent;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 1040px;
+      height: auto;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid var(--color-rule);
+      padding: 1.25rem;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.625rem;
+      border-bottom: 1px solid rgba(45,49,66,0.08);
+    }
+    .card-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .card-dot.coral { background: var(--color-accent); }
+    .card-dot.link  { background: var(--color-link); }
+    .card-dot.muted { background: var(--color-muted); }
+    .card h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-ink);
+    }
+    .card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.25rem;
+    }
+    .card p {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    .card ul {
+      list-style: none;
+      font-size: 0.8125rem;
+      line-height: 1.55;
+      color: var(--color-muted);
+    }
+    .card li {
+      position: relative;
+      padding-left: 1rem;
+      margin-bottom: 0.35rem;
+    }
+    .card li::before {
+      content: "–";
+      position: absolute;
+      left: 0;
+      color: var(--color-soft);
+    }
+    .footer-note {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-rule);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <p class="header-eyebrow">Product Workflow Architecture · Editorial Overview</p>
+    <h1>Quy trình làm việc của Product Workflow Skills</h1>
+    <p class="subtitle">Mô hình tuần tự từ định hướng hiện trạng, phân nhánh theo bán kính ảnh hưởng (Spike, Bounded, Feature), kiểm soát 4 cổng chất lượng (G1–G4), thực thi kèm review hai trục và nghiệm thu trên Product Backlog.</p>
+  </header>
+
+  <div class="diagram-container">
+    <svg viewBox="0 0 1100 456" role="img" aria-labelledby="pws-title pws-desc" data-diagram-root="product-workflow-sequence">
+      <title id="pws-title">Sơ đồ quy trình tổng quan của Product Workflow Skills</title>
+      <desc id="pws-desc">Quy trình 6 bước qua 4 làn trách nhiệm: Quản trị và duyệt cổng, Skills thực hiện, Chuyên gia hỗ trợ và Hồ sơ tài liệu chuẩn tắc.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
+        </marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/>
+        </marker>
+      </defs>
+
+      <!-- Background paper -->
+      <rect width="1100" height="456" fill="#f5f5f5"/>
+
+      <!-- Lane lines & background zones -->
+      <line x1="128" y1="44" x2="128" y2="396" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+      <line x1="0" y1="44" x2="1100" y2="44" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+      <line x1="0" y1="132" x2="1100" y2="132" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+      <line x1="0" y1="220" x2="1100" y2="220" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+      <line x1="0" y1="308" x2="1100" y2="308" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+      <line x1="0" y1="396" x2="1100" y2="396" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+
+      <!-- Subtle lane tints -->
+      <rect x="128" y="44" width="972" height="88" fill="rgba(45,49,66,0.015)"/>
+      <rect x="128" y="220" width="972" height="88" fill="rgba(45,49,66,0.015)"/>
+
+      <!-- Lane Labels -->
+      <text x="64" y="84" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">ĐIỀU PHỐI</text>
+      <text x="64" y="98" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">&amp; DUYỆT CỔNG</text>
+
+      <text x="64" y="172" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">SKILLS CHỦ ĐẠO</text>
+      <text x="64" y="186" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">WORKFLOW</text>
+
+      <text x="64" y="260" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">CHUYÊN GIA</text>
+      <text x="64" y="274" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">&amp; CÔNG CỤ</text>
+
+      <text x="64" y="348" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">HỒ SƠ TÀI LIỆU</text>
+      <text x="64" y="362" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">DOCS-FIRST</text>
+
+      <!-- Step Column Headers (Slots: width 156 each, starting x=136) -->
+      <!-- Step 0: x=136..292 -->
+      <g transform="translate(196, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(45,49,66,0.12)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#2d3142" text-anchor="middle">01</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">KHỞI ĐỘNG</text>
+      </g>
+
+      <!-- Step 1: x=292..448 -->
+      <g transform="translate(352, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(235,108,54,0.20)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#eb6c36" text-anchor="middle">02</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#eb6c36" text-anchor="middle" letter-spacing="0.08em">PHÂN NHÁNH</text>
+      </g>
+
+      <!-- Step 2: x=448..604 -->
+      <g transform="translate(508, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(45,49,66,0.12)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#2d3142" text-anchor="middle">03</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">ĐẶC TẢ G1-G2</text>
+      </g>
+
+      <!-- Step 3: x=604..760 -->
+      <g transform="translate(664, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(45,49,66,0.12)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#2d3142" text-anchor="middle">04</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">THIẾT KẾ G3-G4</text>
+      </g>
+
+      <!-- Step 4: x=760..916 -->
+      <g transform="translate(820, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(235,108,54,0.20)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#eb6c36" text-anchor="middle">05</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#eb6c36" text-anchor="middle" letter-spacing="0.08em">THỰC THI &amp; REV</text>
+      </g>
+
+      <!-- Step 5: x=916..1072 -->
+      <g transform="translate(976, 10)">
+        <rect width="36" height="16" rx="8" fill="rgba(45,49,66,0.12)"/>
+        <text x="18" y="12" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#2d3142" text-anchor="middle">06</text>
+        <text x="18" y="27" font-family="'Geist Mono', monospace" font-size="8" font-weight="500" fill="#4f5d75" text-anchor="middle" letter-spacing="0.08em">NGHIỆM THU</text>
+      </g>
+
+      <!-- ── Connectors (Drawn behind node boxes) ────────────────────────── -->
+      <!-- Horizontal main sequence arrows in Lane 2 -->
+      <g fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)">
+        <!-- Step 0 to Step 1 -->
+        <line x1="278" y1="176" x2="304" y2="176"/>
+        <!-- Step 1 to Step 2 -->
+        <line x1="434" y1="176" x2="460" y2="176"/>
+        <!-- Step 2 to Step 3 -->
+        <line x1="590" y1="176" x2="616" y2="176"/>
+        <!-- Step 3 to Step 4 -->
+        <line x1="746" y1="176" x2="772" y2="176"/>
+      </g>
+
+      <!-- Focal sequence arrow to Step 5 (Done) -->
+      <g fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)">
+        <line x1="902" y1="176" x2="928" y2="176"/>
+      </g>
+
+      <!-- Vertical inter-lane connectors -->
+      <g fill="none" stroke="#4f5d75" stroke-width="1.1" marker-end="url(#arrow)">
+        <!-- Step 0: project-guide reads docs (Lane 2 -> Lane 4) -->
+        <line x1="214" y1="206" x2="214" y2="330"/>
+
+        <!-- Step 1: product-workflow branch triage to chat approval (Lane 2 -> Lane 1) -->
+        <line x1="370" y1="146" x2="370" y2="124"/>
+
+        <!-- Step 2: Discovery & Stories submit for Gate G1/G2 approval (Lane 2 -> Lane 1) -->
+        <line x1="526" y1="146" x2="526" y2="124"/>
+
+        <!-- Step 2: Discovery writes specs (Lane 2 -> Lane 4) -->
+        <line x1="526" y1="206" x2="526" y2="330"/>
+
+        <!-- Step 3: Solution & Planning submit for Gate G3/G4 approval (Lane 2 -> Lane 1) -->
+        <line x1="682" y1="146" x2="682" y2="124"/>
+
+        <!-- Step 3: Architecture & Backlog written to docs (Lane 2 -> Lane 4) -->
+        <line x1="682" y1="206" x2="682" y2="330"/>
+
+        <!-- Step 4: task-execution engages code-review & browser (Lane 2 -> Lane 3) -->
+        <line x1="838" y1="206" x2="838" y2="228"/>
+        <!-- Step 4: Review results recorded into canonical task records (Lane 3 -> Lane 4) -->
+        <line x1="838" y1="294" x2="838" y2="330"/>
+
+        <!-- Step 5: delivery-inspection updates product-backlog [x] (Lane 2 -> Lane 4) -->
+        <line x1="994" y1="206" x2="994" y2="330"/>
+
+        <!-- Step 5: delivery-inspection reports to PO (Lane 2 -> Lane 1) -->
+        <line x1="994" y1="146" x2="994" y2="124"/>
+      </g>
+
+      <!-- ── NODES ──────────────────────────────────────────────────────── -->
+
+      <!-- STEP 01: KHỞI ĐỘNG (x=150, w=128) -->
+      <!-- Lane 1: Khách / PO -->
+      <g transform="translate(150, 58)" data-diagram-node="step1-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">USER</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Yêu cầu mới</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">onboarding · scope</text>
+      </g>
+
+      <!-- Lane 2: project-guide -->
+      <g transform="translate(150, 146)" data-diagram-node="step1-skill">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">GUIDE</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">project-guide</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">chỉ đọc hiện trạng</text>
+      </g>
+
+      <!-- Lane 4: Readme / Repo -->
+      <g transform="translate(150, 334)" data-diagram-node="step1-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="28" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="22" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">DOC</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">README &amp; Code</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">conventions sẵn có</text>
+      </g>
+
+      <!-- STEP 02: PHÂN NHÁNH (x=306, w=128) -->
+      <!-- Lane 1: Duyệt Bounded / Spike -->
+      <g transform="translate(306, 58)" data-diagram-node="step2-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">ASK</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Duyệt nhánh</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">chat / proposal</text>
+      </g>
+
+      <!-- Lane 2: product-workflow (FOCAL 1) -->
+      <g transform="translate(306, 146)" data-diagram-node="step2-skill">
+        <rect width="128" height="60" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.5"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(235,108,54,0.16)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#eb6c36" text-anchor="middle">ROUTER</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">product-workflow</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#eb6c36" text-anchor="middle">phân loại 3 nhánh</text>
+      </g>
+
+      <!-- Lane 3: diagnosing-bugs -->
+      <g transform="translate(306, 234)" data-diagram-node="step2-tool">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="28" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="22" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">DBG</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">diagnosing-bugs</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">chẩn đoán nguyên nhân</text>
+      </g>
+
+      <!-- Lane 4: Bounded proposal -->
+      <g transform="translate(306, 334)" data-diagram-node="step2-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="36" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="26" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">PROPOSAL</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">Đề xuất chat</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">phạm vi 1–2 files</text>
+      </g>
+
+      <!-- STEP 03: ĐẶC TẢ G1-G2 (x=462, w=128) -->
+      <!-- Lane 1: Duyệt Cổng G1 & G2 -->
+      <g transform="translate(462, 58)" data-diagram-node="step3-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">GATE</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Duyệt G1 &amp; G2</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">one gate per turn</text>
+      </g>
+
+      <!-- Lane 2: Discovery & Stories -->
+      <g transform="translate(462, 146)" data-diagram-node="step3-skill">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">G1-G2</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Discovery &amp; Story</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">rules · actors · AC</text>
+      </g>
+
+      <!-- Lane 4: Brief & Stories doc -->
+      <g transform="translate(462, 334)" data-diagram-node="step3-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="32" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="24" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">SPECS</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">brief &amp; stories.md</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">actor-story matrix</text>
+      </g>
+
+      <!-- STEP 04: THIẾT KẾ G3-G4 (x=618, w=128) -->
+      <!-- Lane 1: Duyệt Cổng G3 & G4 -->
+      <g transform="translate(618, 58)" data-diagram-node="step4-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">GATE</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Duyệt G3 &amp; G4</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">contracts &amp; tasks</text>
+      </g>
+
+      <!-- Lane 2: Solution & Planning -->
+      <g transform="translate(618, 146)" data-diagram-node="step4-skill">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">G3-G4</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Solution &amp; Plan</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">schema · roadmap</text>
+      </g>
+
+      <!-- Lane 3: diagram-design & codebase-design -->
+      <g transform="translate(618, 234)" data-diagram-node="step4-tool">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">DESIGN</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">diagram-design</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">sơ đồ HTML / SVG</text>
+      </g>
+
+      <!-- Lane 4: Design & Roadmap -->
+      <g transform="translate(618, 334)" data-diagram-node="step4-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="32" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="24" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">PLANS</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">design &amp; roadmap</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">backlog + task cards</text>
+      </g>
+
+      <!-- STEP 05: THỰC THI & REVIEW (x=774, w=128) -->
+      <!-- Lane 1: Checkpoint Browser Native -->
+      <g transform="translate(774, 58)" data-diagram-node="step5-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">CHECK</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">Browser Native</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">kiểm thử giao diện</text>
+      </g>
+
+      <!-- Lane 2: task-execution -->
+      <g transform="translate(774, 146)" data-diagram-node="step5-skill">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">EXEC</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">task-execution</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">inline / delegated</text>
+      </g>
+
+      <!-- Lane 3: code-review (FOCAL 2) -->
+      <g transform="translate(774, 234)" data-diagram-node="step5-tool">
+        <rect width="128" height="60" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.5"/>
+        <rect x="8" y="6" width="28" height="12" rx="2" fill="rgba(235,108,54,0.16)"/>
+        <text x="22" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#eb6c36" text-anchor="middle">REV</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">code-review</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#eb6c36" text-anchor="middle">standards &amp; spec</text>
+      </g>
+
+      <!-- Lane 4: Source code & Tests -->
+      <g transform="translate(774, 334)" data-diagram-node="step5-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="30" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="23" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">CODE</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">Code &amp; Evidence</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">unit tests · diff</text>
+      </g>
+
+      <!-- STEP 06: NGHIỆM THU (x=930, w=128) -->
+      <!-- Lane 1: Sprint Review & PO Sign-off -->
+      <g transform="translate(930, 58)" data-diagram-node="step6-gov">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.20)" stroke-width="1"/>
+        <rect x="8" y="6" width="28" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="22" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">SIGN</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">Sprint Review</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">demo &amp; retrospective</text>
+      </g>
+
+      <!-- Lane 2: delivery-inspection -->
+      <g transform="translate(930, 146)" data-diagram-node="step6-skill">
+        <rect width="128" height="60" rx="6" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <rect x="8" y="6" width="34" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="25" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">INSP</text>
+        <text x="64" y="34" font-family="'Geist', sans-serif" font-size="11.5" font-weight="600" fill="#2d3142" text-anchor="middle">delivery-inspection</text>
+        <text x="64" y="48" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">đối chiếu DoD · SP</text>
+      </g>
+
+      <!-- Lane 4: Product Backlog [x] -->
+      <g transform="translate(930, 334)" data-diagram-node="step6-doc">
+        <rect width="128" height="54" rx="6" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <rect x="8" y="6" width="32" height="12" rx="2" fill="rgba(45,49,66,0.06)"/>
+        <text x="24" y="15" font-family="'Geist Mono', monospace" font-size="7" font-weight="600" fill="#4f5d75" text-anchor="middle">DONE</text>
+        <text x="64" y="31" font-family="'Geist', sans-serif" font-size="11" font-weight="600" fill="#2d3142" text-anchor="middle">Product Backlog</text>
+        <text x="64" y="44" font-family="'Geist Mono', monospace" font-size="8" fill="#7a8399" text-anchor="middle">tick [x] · tính SP</text>
+      </g>
+
+      <!-- ── Legend Strip (Bottom) ──────────────────────────────────────── -->
+      <line x1="24" y1="416" x2="1076" y2="416" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+      <text x="28" y="438" font-family="'Geist Mono', monospace" font-size="8" font-weight="600" fill="#4f5d75" letter-spacing="0.14em">CHÚ THÍCH</text>
+
+      <!-- Legend items -->
+      <g transform="translate(136, 428)">
+        <rect width="18" height="14" rx="3" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+        <text x="26" y="11" font-family="'Geist Mono', monospace" font-size="8" fill="#4f5d75">Focal Hub / Hard Gate</text>
+      </g>
+      <g transform="translate(320, 428)">
+        <rect width="18" height="14" rx="3" fill="#fff" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <text x="26" y="11" font-family="'Geist Mono', monospace" font-size="8" fill="#4f5d75">Standard Workflow Node</text>
+      </g>
+      <g transform="translate(520, 428)">
+        <rect width="18" height="14" rx="3" fill="rgba(45,49,66,0.04)" stroke="rgba(45,49,66,0.16)" stroke-width="1"/>
+        <text x="26" y="11" font-family="'Geist Mono', monospace" font-size="8" fill="#4f5d75">Docs-First Physical Artifact</text>
+      </g>
+      <g transform="translate(740, 428)">
+        <line x1="0" y1="7" x2="20" y2="7" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <text x="28" y="11" font-family="'Geist Mono', monospace" font-size="8" fill="#4f5d75">Trình tự chuyển bước chính</text>
+      </g>
+      <g transform="translate(940, 428)">
+        <line x1="0" y1="7" x2="20" y2="7" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+        <text x="28" y="11" font-family="'Geist Mono', monospace" font-size="8" fill="#eb6c36">Nghiệm thu chuyển Done</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="cards">
+    <div class="card">
+      <p class="card-eyebrow">Phân loại theo bán kính</p>
+      <div class="card-header">
+        <span class="card-dot coral"></span>
+        <h3>3 Nhánh công việc cốt lõi</h3>
+      </div>
+      <p>Router <code>product-workflow</code> phân loại yêu cầu ngay khi bắt đầu để tối ưu tốc độ:</p>
+      <ul>
+        <li><strong>Spike (Thử nghiệm):</strong> Đề xuất câu hỏi và cách thử (2–3 câu) ──► Duyệt ──► Code throwaway.</li>
+        <li><strong>Bounded (Sửa nhỏ 1–2 file):</strong> Đề xuất giải pháp trong chat ──► Duyệt qua <code>ask</code> ──► Thực thi &amp; kiểm chứng.</li>
+        <li><strong>Feature (Tính năng mới):</strong> Bắt buộc đi tuần tự qua 4 Cổng G1–G4 trước khi sửa code.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <p class="card-eyebrow">Kiểm soát chất lượng</p>
+      <div class="card-header">
+        <span class="card-dot link"></span>
+        <h3>4 Cổng chất lượng tuần tự (G1–G4)</h3>
+      </div>
+      <p>Nguyên tắc <em>One Gate per Turn</em>: Trình bày xong một cổng thì gọi <code>ask</code> và dừng chờ phản hồi:</p>
+      <ul>
+        <li><strong>Cổng G1 (Discovery):</strong> Đặc tả bài toán, rules, actors, glossary lưu tại <code>specs/brief.md</code>.</li>
+        <li><strong>Cổng G2 (Stories &amp; UX):</strong> User stories, Given-When-Then, Test Scenarios &amp; UX flows.</li>
+        <li><strong>Cổng G3 (Architecture):</strong> Kế thừa stack, API contracts, Schema DB &amp; ADRs.</li>
+        <li><strong>Cổng G4 (Planning):</strong> Product Backlog, Sprint Roadmap, Checklist / Task Cards.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <p class="card-eyebrow">Thực thi &amp; Nghiệm thu</p>
+      <div class="card-header">
+        <span class="card-dot muted"></span>
+        <h3>Review hai trục &amp; Nghiệm thu Done</h3>
+      </div>
+      <p>Bảo đảm chất lượng code và tính toàn vẹn của sản phẩm trước khi bàn giao:</p>
+      <ul>
+        <li><strong>Review hai trục:</strong> Subagent Reviewer kiểm tra độc lập <em>Standards</em> (chất lượng) &amp; <em>Spec</em> (DoD/AC).</li>
+        <li><strong>Browser Native:</strong> Tự động đo đạc DOM/SVG cho sơ đồ; checkpoint xin ý kiến cho Web UI.</li>
+        <li><strong>Nghiệm thu [x]:</strong> <code>delivery-inspection</code> đối chiếu AC, tính Story Points và cập nhật Backlog.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="footer-note">
+    <span>Docs-First Standard · Hệ thống Product Workflow Skills</span>
+    <span>Generated with diagram-design · Single file HTML/SVG</span>
+  </footer>
+</div>
+</body>
+</html>

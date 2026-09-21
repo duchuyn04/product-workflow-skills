@@ -21,5 +21,8 @@ skills-lock.json
 
 # Third-party reference
 superpowers/
-docs/
+docs/*
+!docs/workflow/
+docs/workflow/*
+!docs/workflow/diagrams/
 Tuan_03_Backlog.pdf

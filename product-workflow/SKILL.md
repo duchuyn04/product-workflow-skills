@@ -36,9 +36,9 @@ Ví dụ: đổi các mức tốc độ giọng đọc thành 0.5x, 1x, 1.2x, 1.
 |---|---|---|
 | Mới vào team, chưa biết dự án ở đâu, nên làm gì tiếp | `skill://project-guide` | Hiện trạng có nguồn, tài liệu đọc trước, bước tiếp |
 | Ý tưởng, mục tiêu, nghiệp vụ mơ hồ, domain/rules | `skill://product-discovery` | Business brief, rules, câu hỏi mở, G1 |
-| User stories, hành trình, màn hình, UI/UX flows | `skill://story-and-experience` | Story map, AC, flows, G2 |
-| Chọn stack, kiến trúc, data/API, ranh giới module | `skill://solution-design` | So sánh lựa chọn, contracts, ADR, G3 |
-| Thứ tự module, tạo Product Backlog, sprint, việc song song | `skill://delivery-planning` | Backlog chính, checklist hoặc task cards phù hợp và điều kiện G4 |
+| User stories, hành trình, màn hình, UI/UX flows | `skill://story-and-experience` | Story map, AC, flows, tùy chọn Prototype Mockup tương tác qua Browser Native, G2 |
+| Chọn stack, kiến trúc, data/API, ranh giới module | `skill://solution-design` | So sánh lựa chọn, contracts, ADR, sơ đồ ERD HTML/SVG kiểm thử Browser Native, G3 |
+| Thứ tự module, tạo Product Backlog, sprint, việc song song | `skill://delivery-planning` | Khảo sát team size, tasks chia theo folder, ma trận dependencies & luồng song song, G4 |
 | Nhận task, giao/bàn giao, code, kiểm chứng task | `skill://task-execution` | Nhận việc có xác nhận, handoff, evidence và cập nhật backlog |
 | Xem board/ma trận, chấm điểm nghiệm thu, tick Done, release | `skill://delivery-inspection` | Đối chiếu evidence, AC đạt/tổng, SP hoàn tất và checkbox |
 | Vẽ sơ đồ kiến trúc, DB schema, flows, sequence thay Mermaid | `skill://diagram-design` | File sơ đồ HTML/SVG độc lập trong docs/workflow/diagrams/ |
@@ -47,6 +47,8 @@ Intent giao nhau: chọn chuyên gia phục vụ kết quả người dùng yêu
 Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta, inspection để tìm ảnh hưởng rồi gọi chuyên gia cho phần phải sửa. Bug đã rõ trong một task không buộc phỏng vấn lại toàn sản phẩm; dùng kỹ thuật debug phù hợp trong task-execution.
 
 ### Chuyên gia nội bộ theo trigger
+
+- Trước khi trình duyệt Cổng G1 (Nghiệp vụ): `product-discovery` bắt buộc kích hoạt subagent `reviewer` (hoặc isolated auditor pass) để thực hiện **G1 Discovery Quality Audit**. Subagent kiểm định độc lập xem bộ case study có bị hời hợt không, có tương xứng với quy mô dự án và bao quát đủ 6 Trụ cột Cốt lõi (State Machine, Money/Math Invariants, Concurrency, Permissions, Edge Cases, Integration) hay không. Chỉ khi Subagent xác nhận `PASS` mới được gọi `ask` xin người dùng duyệt Cổng G1. Nếu nhận kết luận `REVISE`, AI buộc phải phỏng vấn người dùng tiếp bằng các case study còn thiếu.
 
 - Bug/regression/performance chưa có root cause chắc chắn: đọc `skill://diagnosing-bugs` trước khi lập Đề xuất sửa lỗi Bounded. Nếu URI chưa khám phá, đọc `.agents/skills/diagnosing-bugs/SKILL.md`. Root cause và evidence đã rõ thì bỏ qua specialist. Thiếu cả URI và fallback: nêu đúng nguồn thiếu và dừng phần chẩn đoán, không bịa root cause.
 - Thay đổi module/interface/seam/adapter/dependency direction/testability: đọc `skill://codebase-design`; fallback `.agents/skills/codebase-design/SKILL.md`. Khi đã xác nhận thay đổi cục bộ không ảnh hưởng kiến trúc, bắt buộc bỏ qua specialist; `not-needed` chỉ dùng khi trigger hợp lệ nhưng lens không tìm thấy Design Delta hữu ích. Parent G3/Bounded approval vẫn là gate duy nhất. Thiếu cả URI và fallback: nêu đúng skill/path đã kiểm tra và dừng phần thiết kế phụ thuộc.
@@ -69,9 +71,9 @@ Ngay khi nhận yêu cầu, router phân loại theo ranh giới ảnh hưởng 
 ### 2. Quy tắc trạng thái kết thúc khép kín (Terminal States)
 Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
 - Hoàn thành G1 (`product-discovery`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `story-and-experience` (G2). Nghiêm cấm nhảy cóc sang G3 hay code.
-- Hoàn thành G2 (`story-and-experience`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `solution-design` (G3).
-- Hoàn thành G3 (`solution-design`) ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `delivery-planning` (G4).
-- Hoàn thành G4 (`delivery-planning`) ──► Bàn giao từng task cụ thể cho `task-execution`.
+- Hoàn thành G2 (`story-and-experience`) kèm tùy chọn tạo Prototype Mockup tương tác để người dùng bấm thử trên Browser Native ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `solution-design` (G3).
+- Hoàn thành G3 (`solution-design`) kèm sơ đồ ERD HTML/SVG đã kiểm thử Browser Native ──► Dừng lại xin duyệt ──► Duyệt xong CHỈ ĐƯỢC gọi `delivery-planning` (G4).
+- Hoàn thành G4 (`delivery-planning`) sau khi khảo sát team size, chia tasks theo folder vai trò và lập ma trận dependencies & song song ──► Bàn giao từng task cụ thể cho `task-execution`.
 
 ### 3. Quy tắc dừng lượt (Hard-Stop Policy) và công cụ `ask` trong Oh My Pi
 Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để người dùng phản hồi/duyệt. Tuyệt đối không vừa trình bày thiết kế vừa gọi công cụ tạo file mã nguồn trong cùng một turn.

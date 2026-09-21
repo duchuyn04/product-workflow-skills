@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quy trình điều phối specialist skills</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399; --rule:rgba(45,49,66,.12); --accent:#eb6c36; --accent-tint:rgba(235,108,54,.08); }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--paper); color:var(--ink); font-family:'Geist',sans-serif; display:grid; place-items:center; }
+    main { width:min(1180px,96vw); padding:40px 24px 32px; }
+    h1 { margin:0; font-family:'Instrument Serif',serif; font-size:38px; font-weight:400; }
+    .dek { margin:8px 0 28px; color:var(--muted); font-size:14px; }
+    svg { display:block; width:100%; height:auto; }
+    .lane-label { font:500 11px 'Geist Mono',monospace; letter-spacing:.08em; fill:var(--muted); }
+    .step-label { font:500 8px 'Geist Mono',monospace; letter-spacing:.1em; fill:var(--muted); }
+    .step-label.focal { fill:var(--accent); }
+    .step-number { font:600 9px 'Geist Mono',monospace; fill:var(--ink); }
+    .step-number.focal { fill:var(--accent); }
+    .node-title { font:600 12px 'Geist',sans-serif; fill:var(--ink); }
+    .node-sub { font:400 8px 'Geist Mono',monospace; fill:var(--muted); }
+    .node-tool { font:400 8px 'Geist Mono',monospace; fill:var(--soft); }
+    .role { font:600 7px 'Geist Mono',monospace; fill:var(--muted); }
+    .role.focal { fill:var(--accent); }
+    .note { margin:20px 0 0; color:var(--muted); font-size:13px; }
+    code { font-family:'Geist Mono',monospace; color:var(--ink); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Specialist skills trong Product Workflow</h1>
+  <p class="dek">Router chỉ gọi đúng chuyên gia khi trigger xuất hiện; ba skill được ẩn khỏi danh sách mặc định.</p>
+  <svg viewBox="0 0 1000 292" role="img" aria-labelledby="title desc">
+    <title id="title">Quy trình tích hợp diagnosing-bugs, codebase-design và code-review</title>
+    <desc id="desc">Hai tuyến Bounded bug và Feature đi qua các specialist có điều kiện trước khi hoàn thành.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#eb6c36"/></marker>
+    </defs>
+
+    <rect width="1000" height="292" fill="#f5f5f5"/>
+    <line x1="150" y1="42" x2="150" y2="242" stroke="rgba(45,49,66,.20)"/>
+    <line x1="0" y1="42" x2="1000" y2="42" stroke="rgba(45,49,66,.12)"/>
+    <line x1="0" y1="142" x2="1000" y2="142" stroke="rgba(45,49,66,.12)"/>
+    <line x1="0" y1="242" x2="1000" y2="242" stroke="rgba(45,49,66,.12)"/>
+    <rect x="150" y="42" width="850" height="100" fill="rgba(45,49,66,.018)"/>
+
+    <text class="lane-label" x="75" y="96" text-anchor="middle">BOUNDED BUG</text>
+    <text class="lane-label" x="75" y="196" text-anchor="middle">FEATURE</text>
+
+    <g aria-label="step headers">
+      <g transform="translate(181,8)"><rect width="22" height="18" rx="9" fill="rgba(45,49,66,.12)"/><text class="step-number" x="11" y="13" text-anchor="middle">1</text><text class="step-label" x="11" y="29" text-anchor="middle">PHÂN LOẠI</text></g>
+      <g transform="translate(329,8)"><rect width="22" height="18" rx="9" fill="rgba(45,49,66,.12)"/><text class="step-number" x="11" y="13" text-anchor="middle">2</text><text class="step-label" x="11" y="29" text-anchor="middle">CHUYÊN GIA</text></g>
+      <g transform="translate(477,8)"><rect width="22" height="18" rx="9" fill="rgba(45,49,66,.12)"/><text class="step-number" x="11" y="13" text-anchor="middle">3</text><text class="step-label" x="11" y="29" text-anchor="middle">DUYỆT</text></g>
+      <g transform="translate(625,8)"><rect width="22" height="18" rx="9" fill="rgba(45,49,66,.12)"/><text class="step-number" x="11" y="13" text-anchor="middle">4</text><text class="step-label" x="11" y="29" text-anchor="middle">THỰC THI</text></g>
+      <g transform="translate(773,8)"><rect width="22" height="18" rx="9" fill="rgba(235,108,54,.20)"/><text class="step-number focal" x="11" y="13" text-anchor="middle">5</text><text class="step-label focal" x="11" y="29" text-anchor="middle">REVIEW</text></g>
+      <g transform="translate(921,8)"><rect width="22" height="18" rx="9" fill="rgba(45,49,66,.12)"/><text class="step-number" x="11" y="13" text-anchor="middle">6</text><text class="step-label" x="11" y="29" text-anchor="middle">DONE</text></g>
+    </g>
+
+    <g fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)">
+      <line x1="250" y1="92" x2="300" y2="92"/><line x1="398" y1="92" x2="448" y2="92"/><line x1="546" y1="92" x2="596" y2="92"/><line x1="694" y1="92" x2="744" y2="92"/><line x1="842" y1="92" x2="892" y2="92"/>
+      <line x1="250" y1="192" x2="300" y2="192"/><line x1="398" y1="192" x2="448" y2="192"/><line x1="546" y1="192" x2="596" y2="192"/>
+    </g>
+    <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#arrow-accent)">
+      <line x1="694" y1="192" x2="744" y2="192"/><line x1="842" y1="192" x2="892" y2="192"/>
+    </g>
+
+    <g aria-label="bounded bug route">
+      <g transform="translate(152,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">RTR</text><text class="node-title" x="49" y="34" text-anchor="middle">Bug mơ hồ</text><text class="node-sub" x="49" y="47" text-anchor="middle">trigger</text><text class="node-tool" x="49" y="58" text-anchor="middle">router</text></g>
+      <g transform="translate(300,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">DBG</text><text class="node-title" x="49" y="34" text-anchor="middle">Chẩn đoán</text><text class="node-sub" x="49" y="47" text-anchor="middle">root cause</text><text class="node-tool" x="49" y="58" text-anchor="middle">diagnosing-bugs</text></g>
+      <g transform="translate(448,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">HITL</text><text class="node-title" x="49" y="34" text-anchor="middle">Duyệt sửa</text><text class="node-sub" x="49" y="47" text-anchor="middle">bounded proposal</text><text class="node-tool" x="49" y="58" text-anchor="middle">ask</text></g>
+      <g transform="translate(596,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">EXE</text><text class="node-title" x="49" y="34" text-anchor="middle">Sửa + test</text><text class="node-sub" x="49" y="47" text-anchor="middle">approved scope</text><text class="node-tool" x="49" y="58" text-anchor="middle">task-execution</text></g>
+      <g transform="translate(744,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">REV</text><text class="node-title" x="49" y="34" text-anchor="middle">Review</text><text class="node-sub" x="49" y="47" text-anchor="middle">risky changes</text><text class="node-tool" x="49" y="58" text-anchor="middle">code-review</text></g>
+      <g transform="translate(892,60)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">DOD</text><text class="node-title" x="49" y="34" text-anchor="middle">Done</text><text class="node-sub" x="49" y="47" text-anchor="middle">evidence</text><text class="node-tool" x="49" y="58" text-anchor="middle">inspection</text></g>
+    </g>
+
+    <g aria-label="feature route">
+      <g transform="translate(152,160)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">G1/2</text><text class="node-title" x="49" y="34" text-anchor="middle">Scope + AC</text><text class="node-sub" x="49" y="47" text-anchor="middle">feature gates</text><text class="node-tool" x="49" y="58" text-anchor="middle">workflow</text></g>
+      <g transform="translate(300,160)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">DSN</text><text class="node-title" x="49" y="34" text-anchor="middle">Design</text><text class="node-sub" x="49" y="47" text-anchor="middle">architecture only</text><text class="node-tool" x="49" y="58" text-anchor="middle">codebase-design</text></g>
+      <g transform="translate(448,160)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">G3/4</text><text class="node-title" x="49" y="34" text-anchor="middle">Duyệt G3</text><text class="node-sub" x="49" y="47" text-anchor="middle">contracts + tasks</text><text class="node-tool" x="49" y="58" text-anchor="middle">ask</text></g>
+      <g transform="translate(596,160)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">EXE</text><text class="node-title" x="49" y="34" text-anchor="middle">Thực thi</text><text class="node-sub" x="49" y="47" text-anchor="middle">approved tasks</text><text class="node-tool" x="49" y="58" text-anchor="middle">task-execution</text></g>
+      <g transform="translate(744,160)"><rect width="98" height="64" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(235,108,54,.16)"/><text class="role focal" x="19" y="17" text-anchor="middle">REV</text><text class="node-title" x="49" y="34" text-anchor="middle">Review</text><text class="node-sub" x="49" y="47" text-anchor="middle">spec + standards</text><text class="node-tool" x="49" y="58" text-anchor="middle">code-review</text></g>
+      <g transform="translate(892,160)"><rect width="98" height="64" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="7" y="7" width="24" height="13" rx="2" fill="rgba(45,49,66,.08)"/><text class="role" x="19" y="17" text-anchor="middle">DOD</text><text class="node-title" x="49" y="34" text-anchor="middle">Done</text><text class="node-sub" x="49" y="47" text-anchor="middle">evidence</text><text class="node-tool" x="49" y="58" text-anchor="middle">inspection</text></g>
+    </g>
+
+    <text x="152" y="270" class="node-sub">Trigger có điều kiện · skill ẩn · product-workflow là entry point duy nhất</text>
+  </svg>
+  <p class="note"><code>diagnosing-bugs</code> chỉ dành cho bug chưa rõ nguyên nhân; <code>codebase-design</code> chỉ chạy khi ảnh hưởng kiến trúc; <code>code-review</code> bắt buộc cho Feature và thay đổi rủi ro.</p>
+</main>
+</body>
+</html>

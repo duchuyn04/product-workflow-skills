@@ -97,19 +97,34 @@ AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tạ
 
 Nội dung file bao gồm:
 - Quyết định lựa chọn Tech Stack (kế thừa stack đã duyệt hoặc ADR mới nếu có lựa chọn mới).
-- Sơ đồ Kiến trúc và Database Schema / ER: chỉ tạo khi bảng/chữ chưa diễn đạt rõ quan hệ/ranh giới phức tạp hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Không đổi DB thì không tạo ER mới, thay đổi kiến trúc đơn giản cũng không tự bắt vẽ. Khi tạo/sửa, đọc `skill://diagram-design`, dùng HTML/SVG trong `docs/workflow/diagrams/`, không Mermaid, và vượt Browser Native quality gate trước bàn giao.
-- Database Schema: Chi tiết dạng bảng/DDL (khóa chính, khóa ngoại, kiểu dữ liệu, index) cho các bảng mới hoặc thay đổi. Nếu phạm vi không làm thay đổi cấu trúc dữ liệu, liên kết tới schema hiện có mà không bắt buộc tạo mới.
+- **Sơ đồ ERD & Database Schema (BẮT BUỘC KHI CÓ THIẾT KẾ HOẶC THAY ĐỔI DB):**
+  - Khi tính năng hoặc phân hệ có tạo bảng mới, sửa đổi thực thể, thêm quan hệ khóa ngoại (FK) hoặc mô hình hóa dữ liệu domain, **AI BẮT BUỘC PHẢI TẠO FILE SƠ ĐỒ ERD**:
+    - Đọc `skill://diagram-design` và áp dụng `references/type-db-schema.md` (cho physical database schema với các cột, types, PK/FK và hành vi `ON DELETE`) hoặc `references/type-er.md` (cho conceptual/logical domain model).
+    - Dùng công cụ `write` tạo file HTML độc lập tại: `docs/workflow/diagrams/<tên-phân-hệ>-erd.html` (hoặc `-db-schema.html`).
+    - Tuân thủ nghiêm ngặt quy chuẩn visual của `diagram-design`: Table box có header band và type tag `TABLE`, chiều cao mỗi dòng cột cố định 24px để neo connector chính xác, SQL data types và chips `PK`, `FK`, `UQ`, `NN` bằng Geist Mono, đường nối khóa ngoại (Foreign-key connectors) bẻ góc vuông bo tròn (orthogonal rounded elbows) nối chuẩn xác từ hàng cột nguồn sang hàng cột đích có nhãn `ON DELETE...`.
+  - **BẮT BUỘC KIỂM THỬ NATIVE BROWSER TRƯỚC KHI BÀN GIAO:**
+    - AI phải mở file HTML vừa tạo bằng Engine Browser Native (dùng `browser.open`, `observe`, `screenshot` hoặc script `scripts/self_check.py` của `diagram-design`).
+    - Kiểm chứng 3 yếu tố quan sát: (1) Font chữ (Geist, Geist Mono, Instrument Serif) render sắc nét, không bị lỗi font; (2) Toàn bộ mũi tên/connectors nối chính xác vào tâm hàng cột, không bị lệch tọa độ hay đè chữ; (3) Bố cục cân đối, trực quan.
+  - Chèn liên kết file diagram HTML vào mục Database Schema trong tài liệu design để người dùng truy cập.
+- Database Schema: Chi tiết dạng bảng/DDL (khóa chính, khóa ngoại, kiểu dữ liệu, index, default values, cascade rules) cho các bảng mới hoặc thay đổi. Nếu phạm vi hoàn toàn không thay đổi cấu trúc dữ liệu, liên kết tới schema hiện có mà không bắt buộc tạo mới.
 - API Contracts: REST/GraphQL contracts cụ thể cho các endpoint mới hoặc thay đổi (kèm Sequence Diagram qua `type-sequence.md` nếu có luồng auth/thanh toán đa bên phức tạp). Nếu API hiện có không đổi, chỉ cần dẫn chiếu contract sẵn có.
 - Ranh giới module, quyền sở hữu dữ liệu, cơ chế phân quyền và xử lý lỗi.
+
 ## Gate G3 và bàn giao (Hard-Stop)
 
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.
 
 G3 phải làm rõ ranh giới và contracts cần cho scope. Schema/API áp dụng thì lưu delta hoặc liên kết bản hiện hữu đúng revision; không có DB/API thì ghi không áp dụng kèm lý do, không tạo tài liệu giả để lấp mẫu.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu hoặc cập nhật file `docs/workflow/architecture/<tên-phân-hệ>-design.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
-- Câu hỏi: *"Tôi đã hoàn thành thiết kế giải pháp kỹ thuật tại `docs/workflow/architecture/<tên-phân-hệ>-design.md`. Bạn có duyệt tài liệu kiến trúc này (Cổng G3) để chuyển sang lập kế hoạch thực thi Sprint (Cổng G4) không?"*
-- Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Schema/API]`, `[Xem giải thích chi tiết]`.
-
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file kiến trúc `docs/workflow/architecture/<tên-phân-hệ>-design.md` và kiểm thử browser native sơ đồ ERD tại `docs/workflow/diagrams/<tên-phân-hệ>-erd.html`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã hoàn thành thiết kế giải pháp kỹ thuật tại `docs/workflow/architecture/<tên-phân-hệ>-design.md` và đã kiểm thử giao diện sơ đồ ERD (font chữ, mũi tên liên kết) tại `docs/workflow/diagrams/<tên-phân-hệ>-erd.html`. Bạn có muốn mở xem sơ đồ trực quan qua Browser Native và duyệt Cổng G3 không?"*
+- Tùy chọn:
+  ```json
+  [
+    {"label": "Duyệt và tiếp tục (G4)", "description": "Chấp thuận kiến trúc & DB schema để chuyển sang lập kế hoạch thực thi."},
+    {"label": "Mở xem sơ đồ ERD (Browser Native)", "description": "Mở tab trình duyệt trực quan để kiểm tra sơ đồ bảng, kiểu dữ liệu và mũi tên quan hệ."},
+    {"label": "Cần điều chỉnh Schema/API", "description": "Yêu cầu chỉnh sửa lại cấu trúc bảng, kiểu dữ liệu hoặc API contracts."}
+  ]
+  ```
 Sau khi G3 được duyệt, bàn giao sang `delivery-planning` (G4) để phân rã task. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.
 Khi yêu cầu đổi, trình delta và affected modules/contracts/ADRs. Chỉ phần ảnh hưởng cần duyệt lại; không tự thay toàn bộ stack hoặc tự sửa callers khi người dùng chỉ hỏi phương án.

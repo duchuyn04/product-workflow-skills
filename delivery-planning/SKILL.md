@@ -18,16 +18,33 @@ Product Goal/scope được duyệt; stories/AC/flows; module map, contracts/rev
 
 Liên kết actors, Epic và stories trong backlog chính → Sprint Planning → scope sprint được chọn → tasks cần thiết → board theo workflow thực tế. Mẫu và quy ước tên Epic/Module nằm trong `skill://product-workflow/references/records.md`; không sao chép mẫu thành backlog thứ hai.
 
-### 1.1. Năm tiêu chí Sprint Planning
+### 1.1. Khảo sát quy mô nhóm thực tế qua `ask` (Bắt buộc trước khi chia task)
 
-Không lấy máy móc các dòng đầu backlog. Xem xét:
+Trước khi phân rã task hoặc sắp xếp lịch trình, AI **BẮT BUỘC PHẢI GỌI CÔNG CỤ `ask`** để hỏi rõ quy mô đội ngũ thực tế:
+```text
+ask(questions=[{
+  "id": "team_size_and_capacity",
+  "question": "Nhóm thực hiện dự án/sprint này hiện có bao nhiêu người để tôi phân chia tasks theo folder và bố trí các luồng làm song song phù hợp?",
+  "options": [
+    {"label": "1 người (Solo Dev / Fullstack)", "description": "Tối ưu luồng làm tuần tự, gom task theo phase/module để tránh phân mảnh file."},
+    {"label": "2–3 người (Nhóm nhỏ / Core Squad)", "description": "Phân chia folder theo chuyên môn (Frontend, Backend, QA) và bóc tách các luồng song song."},
+    {"label": "4–6 người (Nhóm vừa / Agile Squad)", "description": "Tổ chức folder theo từng thành viên/vai trò, tối đa hóa các luồng làm việc độc lập song song."},
+    {"label": "Khác (Nhập số lượng cụ thể)", "description": "Người dùng tự nhập số lượng thành viên thực tế của nhóm."}
+  ],
+  "recommended": 1
+}])
+```
+Không tự suy diễn số người, không gán bừa capacity từ ví dụ. Số lượng người thực tế là cơ sở bắt buộc để quyết định: (1) Cấu trúc folder chứa tasks; (2) Số lượng luồng làm việc song song (Parallel Tracks); (3) Điểm hội tụ tích hợp (Sync Checkpoints).
+
+### 1.2. Năm tiêu chí Sprint Planning
+Sau khi có số lượng người, AI xem xét 5 tiêu chí:
 1. **Priority:** Mức ưu tiên nghiệp vụ do PO xác nhận; Rank là thứ tự backlog, không phải Priority.
 2. **Sizing:** SP khi đội sử dụng và đã duyệt, hoặc cách ước lượng hiện hữu. Chưa ước lượng ghi rõ; không tự áp Fibonacci.
 3. **Dependencies:** Đầu ra cụ thể cần có. Có thể chọn prerequisite và downstream cùng sprint nếu có kế hoạch thực hiện/tích hợp khả thi; downstream chỉ được bắt đầu khi prerequisite thực sự thỏa.
 4. **Sprint Goal:** Kết quả có giá trị, tập trung và kiểm chứng được.
-5. **Capacity:** Năng lực, kỹ năng và thời gian thực tế của đội; không suy từ ví dụ bán hàng hoặc số AI agents. Vượt capacity thì đề xuất giảm/dời scope mà vẫn bảo vệ Goal, để đội quyết định.
+5. **Capacity:** Năng lực, kỹ năng và thời gian thực tế của đội ngũ đã xác nhận ở bước 1.1.
 
-### 1.2. Chọn thứ tự dựa trên giá trị và dependency
+### 1.3. Chọn thứ tự dựa trên giá trị và dependency
 - Tìm walking skeleton: một đường hẹp end-to-end tạo giá trị cốt lõi và kiểm chứng được trên môi trường phù hợp.
 - Xác định enablers bắt buộc và rủi ro cần spike. Không làm toàn bộ “nền tảng dùng chung” trước mọi giá trị.
 - Ưu tiên đề xuất theo giá trị, rủi ro và việc được mở khóa; Product Owner quyết định thứ tự backlog.
@@ -41,39 +58,49 @@ Mỗi story cần mang lại một luồng hoạt động hoàn chỉnh từ đ�
 
 Đọc `Checklist phạm vi kỹ thuật` trong `skill://product-workflow/references/records.md`. Chỉ tạo tasks có đầu ra kiểm chứng hoặc bàn giao rõ; một task có thể bao trùm UI, logic và kiểm thử. Các phần không đổi chỉ liên kết tài liệu đã có.
 
-### 2.2. Chọn hồ sơ task
+### 2.2. Tổ chức cấu trúc Task theo Folder dựa trên Team Size
 
-Áp dụng mục `Hồ sơ task gọn và task card` trong cùng reference: checklist trong roadmap cho việc nhỏ, cùng người làm tuần tự; card riêng cho việc lớn hoặc bàn giao độc lập. Cả hai giữ ID, scope/AC, prerequisites, kiểm chứng và evidence. Khi giao nhiều workers, tách card cho vùng ghi độc lập; agent điều phối là người ghi roadmap/backlog.
+Căn cứ vào số lượng thành viên đã xác nhận ở bước 1.1, AI **BẮT BUỘC TỔ CHỨC CẤU TRÚC TASK THEO FOLDER RÕ RÀNG**:
+- **Nếu nhóm 1 người (Solo Dev):** Lưu task cards trong `tasks/sprint-X/` (hoặc `tasks/solo/task-XX-<slug>.md`), sắp xếp theo luồng tuần tự (phase/step), không chia vụn gây phân mảnh file.
+- **Nếu nhóm ≥ 2 người (Nhóm nhỏ hoặc Squad):** **BẮT BUỘC PHÂN CHIA THÀNH CÁC FOLDER CON** theo vai trò chuyên môn hoặc phân công thành viên để tránh xung đột vùng ghi (write conflict) và phân định quyền sở hữu:
+  - `tasks/sprint-X/backend/task-XX-<slug>.md` (DB, Migration, API, Business Services)
+  - `tasks/sprint-X/frontend/task-XX-<slug>.md` (Components, Pages, State Management, Mock Integration)
+  - `tasks/sprint-X/qa/task-XX-<slug>.md` (Test Fixtures, Integration Tests, E2E Scenarios)
+  *(hoặc chia theo track độc lập: `tasks/track-1-core/`, `tasks/track-2-ui/`...)*
+- **Cấu trúc nội dung mỗi task card:** Bắt buộc có Task ID chuẩn (`TASK-01`, `TASK-02`...), Tiêu đề, Folder & Role/Owner dự kiến, Prerequisites, Checklist hành động, Acceptance Criteria (Given-When-Then), và Lệnh kiểm chứng độc lập.
 
-Task quá lớn để giao/kiểm chứng rõ thì chia; đừng chia mỗi thay đổi một dòng thành issue. Jira có thể dùng Sub-task hoặc linked issue; đọc hierarchy thật, không giả Story chứa Task mặc định.
+## 3. Xây dựng Ma trận Ràng buộc giữa các tasks (Task Dependency Matrix)
 
-## 3. Xây dependency graph
+Cạnh A → B nghĩa là B cần đầu ra cụ thể của A. Phân biệt `blocks` với `related`; không biến mọi quan hệ tham khảo thành chuỗi tuần tự.
 
-Cạnh A → B nghĩa B cần đầu ra cụ thể của A. Phân biệt `blocks` với `related`; không biến mọi quan hệ tham khảo thành chuỗi tuần tự.
+AI **BẮT BUỘC PHẢI XUẤT BẢNG MA TRẬN RÀNG BUỘC (TASK DEPENDENCY MATRIX)** trong file roadmap và trình bày trực quan tại Cổng G4:
 
-1. Liệt kê nodes, hard prerequisites và blockers bên ngoài.
-2. Kiểm tra dangling references/thiếu quyền; chưa đọc được blocker là unknown, không phải Done.
-3. Phát hiện chu trình; nêu chu trình và contract/phạm vi cần tách để gỡ. Không xuất lịch khả thi khi còn cycle chặn scope.
-4. Tìm candidate frontier: task đủ Ready, prerequisites thỏa, không blocker ngoài, chưa có owner và nằm trong scope thực thi được chọn.
-5. Phân biệt graph kế hoạch tương lai với frontier hiện tại từ dữ liệu mới. Dự báo A xong không phải bằng chứng B đang Ready.
+| Task ID | Tên Task | Folder / Role | Hard Prerequisites (Phải xong trước) | Blocking (Chặn task nào tiếp theo) | Shared-Write Areas (Vùng code chung) |
+|---|---|---|---|---|---|
+| `TASK-01` | Tạo DB Schema & Migration | `tasks/backend/` | Không (Bắt đầu ngay tại T0) | Chặn `TASK-02`, `TASK-03` | `db/migrations/`, `src/models/` |
+| `TASK-02` | Viết REST API & Logic | `tasks/backend/` | Cần `TASK-01` xong | Chặn `TASK-04` | `src/api/`, `src/services/` |
+| `TASK-03` | Dựng UI Components & Mock API | `tasks/frontend/` | Không (Dùng Mock Contract từ G3) | Chặn `TASK-04` | `src/views/`, `src/components/` |
+| `TASK-04` | Tích hợp Frontend với API thật | `tasks/frontend/` | Cần `TASK-02` và `TASK-03` xong | Chặn `TASK-05` | `src/services/api-client.ts` |
+| `TASK-05` | Viết E2E Integration Tests | `tasks/qa/` | Cần `TASK-04` xong | Không (Nghiệm thu cuối) | `tests/e2e/` |
 
-Không mặc định prerequisite phải là cả module Done. Nếu chỉ cần duyệt contract, mô hình hóa đầu ra duyệt đó rõ ràng thay vì bỏ dependency của integration thật.
+1. Liệt kê rõ nodes, hard prerequisites và blockers bên ngoài.
+2. Phát hiện chu trình (cycles) và gỡ bỏ trước khi lập kế hoạch.
+3. Phân định rõ candidate frontier (những task thỏa prerequisites có thể nhận việc ngay).
 
-## 4. Xếp nhóm song song
+## 4. Phân phối Luồng làm song song (Parallel Workstreams / Tracks)
 
-Trong frontier, kiểm tra từng cặp:
-- Có dependency trực tiếp/gián tiếp chưa thỏa không?
-- Có cùng sửa schema/migration, API, shared component, build/deployment hoặc tài nguyên khác không?
-- Dù khác file, có thay invariants/semantics mà task kia đang dựa vào không?
-- Contracts đã thống nhất revision chưa; mocks chỉ hỗ trợ phát triển hay đã có provider thật?
-- Có người đủ kỹ năng, capacity/WIP và reviewer/integration bandwidth không?
+Dựa trên số lượng người trong nhóm đã khảo sát tại bước 1.1, AI **BẮT BUỘC LẬP BẢNG PHÂN PHỐI LUỒNG LÀM SONG SONG**:
 
-Chung nguồn chỉ đọc không tự là xung đột. Branch/worktree riêng không bảo đảm độc lập. Khu vực ghi chung có thể được phối hợp nhưng không tự coi an toàn trước khi có cách tích hợp đã thống nhất.
+| Luồng song song (Track) | Thành viên / Role | Tasks thực thi tại thời điểm T0 | Tasks tiếp theo sau khi mở khóa | Điểm hội tụ (Sync Checkpoint) |
+|---|---|---|---|---|
+| **Track A (Song song)** | Dev Backend | `TASK-01` (DB Schema) → `TASK-02` (API) | `TASK-06` (Webhook background job) | **Checkpoint T1:** Bàn giao API thật cho Frontend |
+| **Track B (Song song)** | Dev Frontend | `TASK-03` (UI layout với Mock Contract) | `TASK-04` (Tích hợp API thật) | **Checkpoint T1:** Nhận API thật từ Track A để tích hợp |
+| **Track C (Song song)** | QA / Tester | `TASK-07` (Viết Test Data & Fixtures) | `TASK-05` (Chạy Integration/E2E test) | **Checkpoint T2:** Nghiệm thu toàn bộ luồng trước Demo |
 
-| Nhóm có thể chạy | Tasks | Prerequisites | Vì sao độc lập | Xung đột/điều kiện | Kỹ năng/capacity | Người tích hợp cần xác nhận |
-|---|---|---|---|---|---|---|
-
-Đây là đề xuất nhận việc, không tự phân công thành viên. Tính lại frontier khi prerequisite thay đổi; không bắt chờ cả một đợt nếu task downstream đã đủ điều kiện.
+*Quy tắc điều phối song song:*
+- Tại thời điểm bắt đầu (T0), chỉ những task không có Hard Prerequisites mới được chạy đồng thời.
+- Nếu hai task cùng sửa chung một khu vực code (Shared-write areas) hoặc thay đổi schema, chúng **CẤM CHẠY SONG SONG** mà phải tuần tự hóa hoặc có người làm chủ tích hợp.
+- Nêu rõ thời điểm và điều kiện hội tụ (Sync Checkpoint) để các thành viên ghép nối mã nguồn an toàn.
 
 ## 5. Chuẩn bị backlog và sprint theo Scrum
 
@@ -123,29 +150,34 @@ Quyền publish issue không bao gồm start/close sprint, sửa schema hay assi
 
 ## Đầu ra: Lưu kế hoạch theo quy mô (Docs-First)
 
-Cập nhật roadmap của phân hệ/sprint đã có; chỉ tạo `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md` khi chưa có nơi phù hợp. Nội dung gồm Goal/scope, links backlog và đầu vào đã duyệt, tasks, dependencies, rủi ro/capacity và phương án kiểm chứng/tích hợp.
+AI cập nhật roadmap của phân hệ/sprint tại `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md`. Nội dung bắt buộc bao gồm:
+1. **Goal & Scope của Sprint:** Mục tiêu nghiệp vụ ngắn hạn kiểm chứng được.
+2. **Quy mô nhóm đã khảo sát:** Số lượng thành viên thực tế và cách phân bổ vai trò.
+3. **Cấu trúc Task Cards theo Folder:** Đường dẫn cụ thể tới từng file task card đã phân bổ theo folder vai trò/thành viên (ví dụ: `tasks/sprint-X/backend/task-01-...md`, `tasks/sprint-X/frontend/task-02-...md`).
+4. **Bảng Ma trận Ràng buộc (Task Dependency Matrix):** Hiển thị rõ ràng buộc hard prerequisite, task bị chặn, và vùng code chung (Shared-write areas).
+5. **Bảng Phân phối Luồng làm song song (Parallel Tracks):** Chỉ rõ các task làm song song tại T0, điều kiện mở khóa downstream, và điểm hội tụ (Sync Checkpoints).
+6. **Phương án kiểm chứng & DoD:** Tiêu chí nghiệm thu và lệnh test độc lập.
 
-- Việc nhỏ cùng người làm tuần tự: checklist theo mẫu shared, evidence ghi ngay trong entry.
-- Việc lớn hoặc giao độc lập: `tasks/task-XX-<slug>.md` theo mẫu shared; roadmap chỉ link tới card, không giữ thêm trạng thái chỉnh tay của task đó.
-- Dependency đơn giản: bảng ID → prerequisite/đầu ra cần là đủ. Chỉ tạo sơ đồ khi nhiều nhánh/quan hệ khó đọc hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Khi cần tạo/sửa, đọc `skill://diagram-design`, lưu HTML/SVG trong `docs/workflow/diagrams/` và vượt Browser Native quality gate trước bàn giao; không dùng Mermaid.
-- Ghi đủ test cases cho các AC/rủi ro áp dụng trong hồ sơ task; không tạo báo cáo test/handoff riêng nếu links evidence và record hiện hữu đã đủ.
-
-Việc nhỏ vẫn phải có inputs, AC, quyền thực thi và cách kiểm chứng rõ; giảm số file không giảm điều kiện G4.
+*Lưu ý về sơ đồ Dependency:* Bảng Ma trận Ràng buộc dạng Markdown là bắt buộc. Nếu đồ thị phụ thuộc quá phức tạp (nhiều nhánh rẽ chéo), AI có thể vẽ thêm sơ đồ flowchart/dependency bằng HTML/SVG qua `skill://diagram-design` (`references/type-dependency.md`) và kiểm thử bằng Browser Native trước khi nhúng link vào roadmap.
 
 ## Gate G4 và bàn giao (Hard-Stop)
 
-Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
+G4 chỉ đạt khi và chỉ khi:
+1. AI đã gọi `ask` khảo sát số lượng thành viên trong nhóm tại bước 1.1.
+2. Toàn bộ task cards đã được phân rã đầy đủ, lưu đúng cấu trúc folder tương ứng với quy mô nhóm.
+3. Bảng Ma trận Ràng buộc và Bảng Luồng làm song song đã được trình bày rõ ràng trong `roadmap.md` và tóm tắt ra chat.
+4. Người phụ trách phê duyệt kế hoạch qua công cụ `ask`.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi lưu backlog và kế hoạch (checklist hoặc cards phù hợp), AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+**Quy tắc dừng lượt bắt buộc:** Sau khi lưu backlog và roadmap, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 
 ```text
 ask(questions=[{
   "id": "gate_g4_approval",
-  "question": "Tôi đã cập nhật Product Backlog và kế hoạch có checklist/task cards phù hợp. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
+  "question": "Tôi đã phân rã tasks theo folder dựa trên quy mô nhóm, lập Ma trận ràng buộc (Dependencies) và Phân phối luồng làm song song tại `docs/workflow/plans/<phân-hệ>/roadmap.md`. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị thực thi không?",
   "options": [
-    {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline)."},
-    {"label": "Cần chỉnh sửa danh sách task", "description": "Thêm, bớt hoặc điều chỉnh lại phạm vi các task."},
-    {"label": "Xem giải thích thứ tự phụ thuộc", "description": "Giải thích vì sao các task được sắp xếp theo thứ tự này."}
+    {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline) dựa trên các luồng song song."},
+    {"label": "Cần chỉnh sửa danh sách task / folder", "description": "Thêm, bớt, gộp hoặc phân bổ lại cấu trúc folder task."},
+    {"label": "Xem giải thích ma trận phụ thuộc & luồng song song", "description": "Giải thích chi tiết thứ tự ưu tiên và các điểm hội tụ (Sync Checkpoints)."}
   ],
   "recommended": 0
 }])

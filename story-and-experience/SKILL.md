@@ -107,6 +107,42 @@ Tái sử dụng design system/component hiện có. Không chọn style, font h
 - Biên/concurrency nếu rule quy định.
 
 So từng AC với flow và màn hình. Rule không được stories nào bao phủ phải được nêu; UI behavior không có nguồn thì hỏi có phải feature mới. Không tuyên bố đã test trình duyệt khi mới walkthrough tài liệu.
+## 6. Tùy chọn Tạo bản Prototype Mockup tương tác (Interactive UI Mockup / Prototype)
+
+Sau khi đã chốt danh mục màn hình, ma trận trạng thái và các luồng thao tác (UX Flows), người dùng thường có nhu cầu **bấm thử trực quan để hình dung toàn diện cách hệ thống vận hành** trước khi bắt tay vào thiết kế kiến trúc DB/API hoặc viết code.
+
+### A. Quy tắc hỏi qua `ask` tại Cổng G2
+Sau khi hoàn thành file đặc tả `docs/workflow/specs/<tên-phân-hệ>-stories.md`, AI **bắt buộc dùng công cụ `ask`** để hỏi người dùng xem có muốn tạo bản Prototype Mockup tương tác hay không:
+
+```text
+ask(questions=[{
+  "id": "prototype_mockup_preference",
+  "question": "Tôi đã hoàn thành đặc tả User Stories & các luồng UX. Bạn có muốn tôi tạo một bản Prototype Mockup tương tác (HTML/CSS/JS độc lập) để bạn bấm thử và hình dung cách hệ thống vận hành trước khi duyệt Cổng G2 không?",
+  "options": [
+    {"label": "Tạo bản Prototype Mockup tương tác (Khuyến nghị)", "description": "Tạo 1 file HTML mockup trực quan, click qua lại giữa các màn hình và test thử các trạng thái UI trên Browser Native."},
+    {"label": "Bỏ qua Mockup và duyệt Cổng G2 luôn", "description": "Chấp thuận tài liệu Stories/UX và chuyển thẳng sang Cổng G3 (Thiết kế giải pháp kỹ thuật)."},
+    {"label": "Cần điều chỉnh User Stories hoặc Luồng UX", "description": "Yêu cầu sửa đổi lại hành trình, tiêu chí nghiệm thu hoặc danh mục màn hình."}
+  ],
+  "recommended": 0
+}])
+```
+
+### B. Tiêu chuẩn của bản Prototype Mockup tương tác
+Nếu người dùng chọn **"Tạo bản Prototype Mockup tương tác"**:
+- **Đường dẫn lưu file:** AI dùng công cụ `write` tạo file tại `docs/workflow/prototypes/<tên-phân-hệ>-mockup.html`.
+- **Đặc tính kỹ thuật của Mockup:**
+  1. *Độc lập (Self-contained):* Một file HTML duy nhất nhúng sẵn CSS (Tailwind CDN hoặc CSS hiện đại sạch sẽ) và JavaScript thuần, không đòi hỏi cài đặt backend server phức tạp.
+  2. *Mô phỏng chân thực các màn hình:* Bao gồm thanh điều hướng (Navigation bar / Sidebar / Breadcrumbs) và các màn hình chính được liệt kê trong danh mục màn hình.
+  3. *Tương tác click mượt mà:* Cho phép người dùng bấm chuyển đổi giữa các màn hình, chuyển tab, mở modal/dialog, submit form với dữ liệu mẫu (mock data thực tế).
+  4. *Mô phỏng đầy đủ 4 trạng thái UI:* Có nút hoặc toggle để người dùng xem thử:
+     - **Happy path:** Trạng thái thành công, có dữ liệu hiển thị đẹp.
+     - **Loading state:** Hiệu ứng skeleton hoặc spinner khi đang xử lý.
+     - **Empty state:** Giao diện khi chưa có bản ghi nào kèm nút kêu gọi hành động (CTA).
+     - **Error state:** Thông báo lỗi validation hoặc lỗi hệ thống có hướng dẫn khắc phục.
+- **Kiểm thử và Trải nghiệm trên Browser Native:**
+  - AI kiểm thử bản mockup bằng Engine Browser Native (`browser.open` hoặc công cụ tương đương).
+  - Trình bày đường dẫn file và mời người dùng mở xem qua trực quan.
+  - Sau khi người dùng trải nghiệm xong bản mockup và đồng ý, AI mới chuyển sang bước duyệt Cổng G2 để chuyển giao sang Cổng G3.
 
 ## Đầu ra: Lưu file tài liệu User Stories & UX (Docs-First)
 
@@ -122,15 +158,15 @@ Nội dung file bao gồm:
 - Chi tiết các User Stories kèm Acceptance Criteria quan sát được (chuẩn Given-When-Then).
 - Test Scenarios cấp cao theo các nhánh Happy Path, Negative, Boundary, Security và Recovery áp dụng.
 - Luồng thao tác chi tiết (Flow catalogue) và ma trận trạng thái UI (Loading, Empty, Error, Success).
+- Liên kết tới file Prototype Mockup tương tác tại `docs/workflow/prototypes/<tên-phân-hệ>-mockup.html` (nếu người dùng đã chọn tạo).
+
 ## Gate G2 và bàn giao (Hard-Stop)
 
-G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng.
+G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản (kèm việc xem qua bản Prototype Mockup nếu có chọn tạo). Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu hoặc cập nhật file `docs/workflow/specs/<tên-phân-hệ>-stories.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
-- Câu hỏi: *"Tôi đã hoàn thành User Stories và thiết kế UI States tại `docs/workflow/specs/<tên-phân-hệ>-stories.md`. Bạn có duyệt tài liệu này (Cổng G2) để chuyển sang thiết kế Kiến trúc & API Contracts (Cổng G3) không?"*
-- Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Stories/UX]`, `[Xem giải thích chi tiết]`.
+**Quy tắc dừng lượt bắt buộc:** Sau khi lưu file đặc tả stories (và tạo/kiểm thử prototype nếu người dùng chọn), AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` xin duyệt Cổng G2 trước khi chuyển sang G3.
 
-Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
+Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, bản mockup tương tác đã trải nghiệm (nếu có), yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.
 
 Khi G2 đã được người dùng duyệt, cập nhật hàng tính năng liên quan trong `docs/workflow/product-backlog.md` theo `skill://product-workflow/references/records.md`: giữ ID tính năng, liên kết story và các AC có ID ổn định, xác định tổng AC áp dụng. AC mới chưa kiểm chứng không có điểm đạt; duyệt stories không được tích hoàn thành. Nếu thay AC đã có, đánh giá lại evidence phần ảnh hưởng và ghi quyết định thay mẫu số, không tự giữ điểm cũ.
 

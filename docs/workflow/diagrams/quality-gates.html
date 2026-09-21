@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quality Gates — Product Workflow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399; --rule:rgba(45,49,66,.12); --accent:#eb6c36; --accent-tint:rgba(235,108,54,.08); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--paper); color:var(--ink); font-family:'Geist',sans-serif; }
+    main { width:min(1200px,96vw); padding:32px 24px; }
+    h1 { margin:0; font:400 36px 'Instrument Serif',serif; }
+    .dek { margin:8px 0 24px; color:var(--muted); font-size:14px; }
+    svg { display:block; width:100%; height:auto; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Quality Gates — Product Workflow</h1>
+  <p class="dek">Quy trình 4 cổng kiểm soát chất lượng tuần tự (G1 ➔ G4) từ ý tưởng ban đầu đến nghiệm thu bàn giao.</p>
+  <svg viewBox="0 0 1140 250" role="img" aria-labelledby="gates-title gates-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="gates-title">Quy trình 4 cổng kiểm soát chất lượng tuần tự</title>
+    <desc id="gates-desc">Luồng công việc đi từ Ý tưởng bài toán qua Gate G1 Nghiệp vụ, Gate G2 Stories và UX, Gate G3 Kiến trúc, Gate G4 Kế hoạch đến Thực thi code và Hoàn thành nghiệm thu.</desc>
+    <defs>
+      <style>
+        .gate-tag { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#4f5d75; }
+        .gate-tag-accent { font:600 8px 'Geist Mono',monospace; letter-spacing:.08em; fill:#eb6c36; }
+        .gate-title { font:600 13px 'Geist',sans-serif; fill:#2d3142; }
+        .gate-skill { font:500 10px 'Geist Mono',monospace; fill:#4f5d75; }
+        .gate-detail { font:400 8px 'Geist Mono',monospace; fill:#7a8399; }
+        .arrow-text { font:500 8px 'Geist Mono',monospace; fill:#eb6c36; letter-spacing:.04em; }
+      </style>
+      <marker id="g-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#eb6c36"/></marker>
+    </defs>
+    <rect width="1140" height="250" fill="#f5f5f5"/>
+
+    <!-- Background Track Container -->
+    <rect x="15" y="20" width="1110" height="210" rx="8" fill="#ececec" stroke="rgba(45,49,66,.12)"/>
+    <rect x="35" y="24" width="220" height="16" rx="2" fill="#f5f5f5"/>
+    <text x="145" y="35" font-family="'Geist Mono', monospace" font-size="9px" font-weight="500" letter-spacing="0.14em" fill="rgba(45,49,66,.55)" text-anchor="middle">PIPELINE 4 CỔNG CHẤT LƯỢNG</text>
+
+    <!-- Connectors Line between all boxes -->
+    <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#g-arr)">
+      <line x1="145" y1="130" x2="173" y2="130"/>
+      <line x1="345" y1="130" x2="373" y2="130"/>
+      <line x1="545" y1="130" x2="573" y2="130"/>
+      <line x1="745" y1="130" x2="773" y2="130"/>
+      <line x1="945" y1="130" x2="973" y2="130"/>
+    </g>
+
+    <!-- Node 1: Ý tưởng -->
+    <g transform="translate(30,55)">
+      <rect width="115" height="150" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="gate-tag" x="33" y="20" text-anchor="middle">START</text>
+      <text class="gate-title" x="57" y="44" text-anchor="middle">Ý tưởng</text>
+      <text class="gate-skill" x="57" y="62" text-anchor="middle">Input bài toán</text>
+      <line x1="10" y1="72" x2="105" y2="72" stroke="rgba(45,49,66,.1)"/>
+      <text class="gate-detail" x="12" y="90">• Vấn đề As-Is</text>
+      <text class="gate-detail" x="12" y="108">• Mục tiêu To-Be</text>
+      <text class="gate-detail" x="12" y="126">• Nhận diện User</text>
+      <text class="gate-detail" x="12" y="144">• Phân rã Epics</text>
+    </g>
+
+    <!-- Node 2: Gate G1 -->
+    <g transform="translate(175,55)">
+      <rect width="170" height="150" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/>
+      <rect x="10" y="10" width="56" height="14" rx="2" fill="rgba(235,108,54,.2)"/>
+      <text class="gate-tag-accent" x="38" y="20" text-anchor="middle">GATE G1</text>
+      <text class="gate-title" x="85" y="44" text-anchor="middle">Nghiệp vụ &amp; Rules</text>
+      <text class="gate-skill" x="85" y="62" text-anchor="middle">product-discovery</text>
+      <line x1="10" y1="72" x2="160" y2="72" stroke="rgba(235,108,54,.2)"/>
+      <text class="gate-detail" x="12" y="90">• Khảo sát quy mô qua ask</text>
+      <text class="gate-detail" x="12" y="108">• Case Study 6 Trụ cột Core</text>
+      <text class="gate-detail" x="12" y="126">• Không trần câu (100+)</text>
+      <text class="gate-detail" x="12" y="144" fill="#eb6c36">• Subagent Audit: PASS</text>
+    </g>
+
+    <!-- Node 3: Gate G2 -->
+    <g transform="translate(375,55)">
+      <rect width="170" height="150" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="56" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="gate-tag" x="38" y="20" text-anchor="middle">GATE G2</text>
+      <text class="gate-title" x="85" y="44" text-anchor="middle">Stories &amp; UX</text>
+      <text class="gate-skill" x="85" y="62" text-anchor="middle">story-and-experience</text>
+      <line x1="10" y1="72" x2="160" y2="72" stroke="rgba(45,49,66,.1)"/>
+      <text class="gate-detail" x="12" y="90">• User Stories (AC Given-When)</text>
+      <text class="gate-detail" x="12" y="108">• Ma trận Actor vs Stories</text>
+      <text class="gate-detail" x="12" y="126">• UI States (Empty/Error...)</text>
+      <text class="gate-detail" x="12" y="144" fill="#2e5aa8">• Prototype Mockup HTML</text>
+    </g>
+
+    <!-- Node 4: Gate G3 -->
+    <g transform="translate(575,55)">
+      <rect width="170" height="150" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="56" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="gate-tag" x="38" y="20" text-anchor="middle">GATE G3</text>
+      <text class="gate-title" x="85" y="44" text-anchor="middle">Kiến trúc &amp; API</text>
+      <text class="gate-skill" x="85" y="62" text-anchor="middle">solution-design</text>
+      <line x1="10" y1="72" x2="160" y2="72" stroke="rgba(45,49,66,.1)"/>
+      <text class="gate-detail" x="12" y="90">• Kế thừa Tech Stack</text>
+      <text class="gate-detail" x="12" y="108">• Database Schema &amp; DDL</text>
+      <text class="gate-detail" x="12" y="126" fill="#2e5aa8">• Sơ đồ ERD Browser Native</text>
+      <text class="gate-detail" x="12" y="144">• API Contracts &amp; ADRs</text>
+    </g>
+
+    <!-- Node 5: Gate G4 -->
+    <g transform="translate(775,55)">
+      <rect width="170" height="150" rx="7" fill="#ffffff" stroke="rgba(45,49,66,.25)"/>
+      <rect x="10" y="10" width="56" height="14" rx="2" fill="rgba(45,49,66,.08)"/>
+      <text class="gate-tag" x="38" y="20" text-anchor="middle">GATE G4</text>
+      <text class="gate-title" x="85" y="44" text-anchor="middle">Kế hoạch Tasks</text>
+      <text class="gate-skill" x="85" y="62" text-anchor="middle">delivery-planning</text>
+      <line x1="10" y1="72" x2="160" y2="72" stroke="rgba(45,49,66,.1)"/>
+      <text class="gate-detail" x="12" y="90">• Khảo sát Team Size qua ask</text>
+      <text class="gate-detail" x="12" y="108">• Chia task theo folder role</text>
+      <text class="gate-detail" x="12" y="126">• Ma trận Dependencies</text>
+      <text class="gate-detail" x="12" y="144">• Phân phối Luồng Song song</text>
+    </g>
+
+    <!-- Node 6: Code & Inspection -->
+    <g transform="translate(975,55)">
+      <rect width="135" height="150" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/>
+      <rect x="10" y="10" width="46" height="14" rx="2" fill="rgba(235,108,54,.2)"/>
+      <text class="gate-tag-accent" x="33" y="20" text-anchor="middle">DONE</text>
+      <text class="gate-title" x="67" y="44" text-anchor="middle">Code &amp; DoD</text>
+      <text class="gate-skill" x="67" y="62" text-anchor="middle">task-execution</text>
+      <line x1="10" y1="72" x2="125" y2="72" stroke="rgba(235,108,54,.2)"/>
+      <text class="gate-detail" x="12" y="90">• Subagents / Inline</text>
+      <text class="gate-detail" x="12" y="108">• Review Standards/Spec</text>
+      <text class="gate-detail" x="12" y="126">• Browser QA Gate</text>
+      <text class="gate-detail" x="12" y="144" fill="#eb6c36">• Tick [x] Backlog</text>
+    </g>
+
+  </svg>
+</main>
+</body>
+</html>

@@ -55,14 +55,14 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 
 ## 4. Câu hỏi và gates
 
-Đọc nguồn trước khi hỏi; chỉ hỏi quyết định nghiệp vụ còn thiếu, gom theo chủ đề khi có nhiều câu. Với hệ thống lớn, phân rã phân hệ và hỏi cuốn chiếu theo rủi ro. Dừng khi mục tiêu, scope, actors/rules đủ rõ và không còn câu hỏi chặn phần sắp làm; không dùng quota câu hỏi hay thêm vòng hỏi tiếp tục sau mỗi đợt. Đủ dữ kiện vẫn phải xin duyệt G1.
+Đọc nguồn trước khi hỏi; chỉ hỏi quyết định nghiệp vụ còn thiếu, gom theo chủ đề thành từng đợt case study trọng tâm. Với hệ thống lớn, phân rã phân hệ và hỏi cuốn chiếu theo rủi ro. Không áp đặt trần số câu cứng nhắc (như 50 câu); tùy theo độ lớn nhỏ của dự án, AI có thể và buộc phải hỏi hơn 100 câu cuốn chiếu qua các case study thực tế cho đến khi làm rõ mọi chi tiết cốt lõi (core). Nghiêm cấm hỏi qua loa 2–3 câu rồi vội vã chốt cổng, đồng thời cấm hỏi lan man ngoài lề. Dừng khi mục tiêu, scope, actors/rules và 6 trụ cột cốt lõi đã hoàn toàn sáng tỏ, không còn câu hỏi chặn phần sắp làm. Đủ dữ kiện vẫn phải xin duyệt G1.
 
 | Gate | Điều kiện | Người quyết định |
 |---|---|---|
-| G1 Nghiệp vụ | Mục tiêu và phạm vi rõ ràng, quy tắc của phần tính năng sắp làm không còn câu hỏi chặn | Người phụ trách nghiệp vụ được chỉ định |
+| G1 Nghiệp vụ | Subagent Reviewer xác nhận PASS (độ sâu case study khớp quy mô, phủ 6 trụ cột core, không hỏi qua loa); mục tiêu và phạm vi rõ ràng, không còn câu hỏi chặn | Người phụ trách nghiệp vụ được chỉ định |
 | G2 Stories/UX | AC và flow thống nhất, quyền/lỗi quan trọng được xét | Người phụ trách sản phẩm/UX được chỉ định |
-| G3 Giải pháp | Ràng buộc đáp ứng, contracts cần cho triển khai đủ rõ | Người phụ trách kỹ thuật được chỉ định |
-| G4 Thực thi | Scope công việc đã duyệt, prerequisites và quyền thực thi đáp ứng | Người/đội có trách nhiệm theo quy định dự án |
+| G3 Giải pháp | Ràng buộc đáp ứng, contracts đủ rõ; khi có DB bắt buộc có sơ đồ ERD HTML/SVG kiểm thử Browser Native (font, mũi tên) | Người phụ trách kỹ thuật được chỉ định |
+| G4 Thực thi | Scope công việc đã duyệt, đã khảo sát team size qua ask, tasks phân chia theo folder vai trò, có ma trận dependencies & song song | Người/đội có trách nhiệm theo quy định dự án |
 
 Chưa chỉ định người quyết định thì hỏi, không tự tạo approval. “OK” chỉ xác nhận đề xuất cụ thể ngay trước đó, không cấp quyền publish, claim, deploy hay duyệt mọi tài liệu tương lai.
 ### Vi phạm nghiêm trọng: Đốt cháy giai đoạn (Gate-skipping)
@@ -72,6 +72,9 @@ Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
 3. Tự chọn/thay stack khi có quyết định công nghệ mới đáng kể mà chưa trình phương án và xin duyệt; stack hiện hữu đã chốt thì kế thừa, không hỏi chọn lại.
 4. Chỉ in tài liệu thiết kế của cổng ra chat mà không lưu phần cập nhật vào hồ sơ vật lý trong `docs/workflow/`.
 5. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
+6. Tự ý trình duyệt Cổng G1 hoặc nhảy sang Cổng G2 khi Subagent Reviewer chưa chạy hoặc chưa có kết luận PASS.
+7. Thiết kế hoặc thay đổi DB tại Cổng G3 mà không tạo sơ đồ ERD HTML/SVG và không kiểm thử Browser Native (font chữ, mũi tên liên kết).
+8. Tự ý chia tasks tại Cổng G4 mà không gọi ask hỏi số lượng người trong nhóm, không tổ chức tasks theo folder hoặc không hiển thị rõ ma trận ràng buộc và luồng làm song song.
 
 Mỗi cổng là một điểm dừng bắt buộc. AI phải lưu file tài liệu vào `docs/workflow/`, trình bày tóm tắt và dùng công cụ `ask` để người dùng duyệt trước khi chuyển sang cổng kế tiếp.
 

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture — Specialist Skills Integration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --paper:#f5f5f5; --ink:#2d3142; --muted:#4f5d75; --soft:#7a8399; --rule:rgba(45,49,66,.12); --accent:#eb6c36; --accent-tint:rgba(235,108,54,.08); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--paper); color:var(--ink); font-family:'Geist',sans-serif; }
+    main { width:min(1220px,96vw); padding:40px 24px 32px; }
+    h1 { margin:0; font:400 38px 'Instrument Serif',serif; }
+    .dek { margin:8px 0 26px; color:var(--muted); font-size:14px; }
+    svg { display:block; width:100%; height:auto; }
+    .zone { font:500 8px 'Geist Mono',monospace; letter-spacing:.16em; fill:rgba(45,49,66,.55); }
+    .tag { font:600 7px 'Geist Mono',monospace; letter-spacing:.1em; fill:var(--muted); }
+    .tag.focal { fill:var(--accent); }
+    .title { font:600 13px 'Geist',sans-serif; fill:var(--ink); }
+    .sub { font:400 8px 'Geist Mono',monospace; fill:var(--muted); }
+    .arrow-label { font:500 8px 'Geist Mono',monospace; fill:var(--muted); letter-spacing:.04em; }
+    .note { margin:18px 0 0; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Architecture — Specialist Skills Integration</h1>
+  <p class="dek">Ba specialist được package sở hữu, installer sao chép deterministic và router chỉ nạp theo trigger.</p>
+  <svg viewBox="0 0 1120 500" role="img" aria-labelledby="title desc">
+    <title id="title">Kiến trúc tích hợp specialist skills</title>
+    <desc id="desc">CLI gọi installer; package registry và bundle được cài vào project, nơi router điều phối hidden specialists và evidence gate.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4f5d75"/></marker>
+      <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#eb6c36"/></marker>
+    </defs>
+    <rect width="1120" height="500" fill="#f5f5f5"/>
+
+    <rect x="168" y="54" width="390" height="374" rx="8" fill="rgba(45,49,66,.02)" stroke="rgba(45,49,66,.10)"/>
+    <rect x="188" y="58" width="116" height="14" rx="2" fill="#f5f5f5"/>
+    <text class="zone" x="246" y="68" text-anchor="middle">PACKAGE SOURCE</text>
+
+    <rect x="610" y="54" width="480" height="374" rx="8" fill="rgba(45,49,66,.02)" stroke="rgba(45,49,66,.10)"/>
+    <rect x="630" y="58" width="124" height="14" rx="2" fill="#f5f5f5"/>
+    <text class="zone" x="692" y="68" text-anchor="middle">INSTALLED PROJECT</text>
+
+    <g fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)">
+      <line x1="142" y1="188" x2="208" y2="188"/>
+      <line x1="348" y1="188" x2="386" y2="188"/>
+      <line x1="526" y1="188" x2="650" y2="188"/>
+      <line x1="790" y1="188" x2="874" y2="188"/>
+      <line x1="278" y1="298" x2="278" y2="226"/>
+      <line x1="456" y1="226" x2="456" y2="298"/>
+      <line x1="720" y1="226" x2="720" y2="298" stroke-dasharray="4 3"/>
+      <line x1="944" y1="226" x2="944" y2="298"/>
+    </g>
+    <g fill="none" stroke="#eb6c36" stroke-width="1.5" marker-end="url(#arrow-accent)">
+      <line x1="790" y1="336" x2="874" y2="336"/>
+    </g>
+
+    <rect x="18" y="150" width="124" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/>
+    <rect x="34" y="162" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="50" y="172" text-anchor="middle">CLI</text>
+    <text class="title" x="80" y="194" text-anchor="middle">npx command</text>
+    <text class="sub" x="80" y="210" text-anchor="middle">project | global</text>
+
+    <g aria-label="package source nodes">
+      <g transform="translate(208,150)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">CLI</text><text class="title" x="70" y="44" text-anchor="middle">Installer</text><text class="sub" x="70" y="61" text-anchor="middle">bin/cli.js</text></g>
+      <g transform="translate(386,150)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">REG</text><text class="title" x="70" y="44" text-anchor="middle">Skill registry</text><text class="sub" x="70" y="61" text-anchor="middle">SKILLS[]</text></g>
+      <g transform="translate(208,298)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">PKG</text><text class="title" x="70" y="44" text-anchor="middle">Manifest</text><text class="sub" x="70" y="61" text-anchor="middle">package.json · files[]</text></g>
+      <g transform="translate(386,298)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">SRC</text><text class="title" x="70" y="44" text-anchor="middle">Adapted bundle</text><text class="sub" x="70" y="61" text-anchor="middle">3 skills + licenses</text></g>
+    </g>
+
+    <g aria-label="installed project nodes">
+      <g transform="translate(650,150)"><rect width="140" height="76" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(235,108,54,.16)"/><text class="tag focal" x="32" y="22" text-anchor="middle">RTR</text><text class="title" x="70" y="44" text-anchor="middle">Workflow router</text><text class="sub" x="70" y="61" text-anchor="middle">product-workflow</text></g>
+      <g transform="translate(874,150)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">HID</text><text class="title" x="70" y="44" text-anchor="middle">Hidden skills</text><text class="sub" x="70" y="61" text-anchor="middle">3 adapted skills</text></g>
+      <g transform="translate(650,298)"><rect width="140" height="76" rx="7" fill="#fff" stroke="rgba(45,49,66,.25)"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(45,49,66,.08)"/><text class="tag" x="32" y="22" text-anchor="middle">PAR</text><text class="title" x="70" y="44" text-anchor="middle">Parent skills</text><text class="sub" x="70" y="61" text-anchor="middle">solution · execution</text></g>
+      <g transform="translate(874,298)"><rect width="140" height="76" rx="7" fill="rgba(235,108,54,.08)" stroke="#eb6c36" stroke-width="1.5"/><rect x="16" y="12" width="32" height="14" rx="2" fill="rgba(235,108,54,.16)"/><text class="tag focal" x="32" y="22" text-anchor="middle">DOD</text><text class="title" x="70" y="44" text-anchor="middle">Evidence gate</text><text class="sub" x="70" y="61" text-anchor="middle">review before Done</text></g>
+    </g>
+
+    <rect x="543" y="170" width="82" height="16" fill="#f5f5f5"/>
+    <text class="arrow-label" x="584" y="181" text-anchor="middle">copy folders</text>
+    <rect x="800" y="170" width="66" height="16" fill="#f5f5f5"/>
+    <text class="arrow-label" x="833" y="181" text-anchor="middle">read on trigger</text>
+
+    <text class="sub" x="18" y="468">Filesystem contracts only · no database · no network API · deterministic project/global installation</text>
+  </svg>
+  <p class="note">Runtime dependency vào global skills bị loại bỏ; mỗi specialist mang provenance và MIT notice trong package.</p>
+</main>
+</body>
+</html>

@@ -12,28 +12,10 @@ Thay vì để AI tự suy đoán nghiệp vụ hoặc nhảy vào viết code n
 
 Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hướng dự án, bảy kỹ năng chuyên môn chính và ba kỹ năng chuyên gia nội bộ được tự động điều phối theo trigger:
 
-```text
-                  [ Người dùng (PO, Tech Lead, Dev) ]
-                                   │
-                                   ▼
-                   ┌───────────────────────────────┐
-                   │       product-workflow        │  (Điều phối luồng công việc)
-                   └───────────────┬───────────────┘
-                                   │
-         ┌─────────────────────────┼─────────────────────────┐
-         ▼                         ▼                         ▼
-   project-guide           product-discovery        story-and-experience
- (Định hướng dự án)      (Nghiệp vụ và rules: G1)  (Stories và UX flows: G2)
-         │                         │                         │
-         ▼                         ▼                         ▼
-  solution-design          delivery-planning          task-execution
-(Kiến trúc và API: G3)    (Backlog và sprint: G4)    (Lập trình và test)
-         │                                                   │
-         └─────────────────────────┬─────────────────────────┘
-                                   ▼
-                          delivery-inspection
-                         (Nghiệm thu và phát hành)
-```
+<p align="center">
+  <img src="docs/workflow/diagrams/skills-architecture.svg" alt="Cấu trúc các kỹ năng Product Workflow" width="100%">
+</p>
+<p align="center"><em>Sơ đồ kiến trúc 12 Agent Skills và các chuyên gia nội bộ theo trigger (thiết kế theo <code>diagram-design</code>).</em></p>
 
 ### Kỹ năng điều phối và định hướng
 
@@ -42,10 +24,10 @@ Hệ thống gồm một kỹ năng điều phối, một kỹ năng định hư
 
 ### Các kỹ năng theo vai trò chuyên môn
 
-- `product-discovery` (Phân tích nghiệp vụ): Phỏng vấn nghiệp vụ chuyên sâu theo từng module bằng kỹ thuật Case Study & Cây quyết định (học hỏi từ Matt Pocock), loại bỏ câu hỏi chung chung, làm sắc bén thuật ngữ domain và chốt Business Brief rõ ràng trước khi sang Cổng G2.
-- `story-and-experience` (Thiết kế trải nghiệm người dùng): Chuyển nghiệp vụ thành user stories kèm tiêu chí nghiệm thu (Given-When-Then), danh mục màn hình và các trạng thái giao diện (Cổng G2).
-- `solution-design` (Kiến trúc kỹ thuật): Đánh giá phương án công nghệ theo ràng buộc thực tế, thiết kế schema dữ liệu, hợp đồng API và ghi nhận quyết định kiến trúc qua ADR (Cổng G3).
-- `delivery-planning` (Lập kế hoạch thực hiện): Tạo Product Backlog dạng ma trận, ghi Story Points được duyệt, liên kết AC và task cards, xác định dependency và việc có thể làm song song (Cổng G4).
+- `product-discovery` (Phân tích nghiệp vụ): Phỏng vấn nghiệp vụ chuyên sâu bằng kịch bản Case Study bám sát độ lớn nhỏ của dự án; không giới hạn trần 50 câu (có thể hỏi hơn 100 câu nếu cần), nghiêm cấm hỏi qua loa 2–3 câu rồi chốt cổng; bắt buộc qua Subagent Audit độc lập đạt PASS theo 6 trụ cột cốt lõi (core) mới được duyệt Cổng G1 sang G2.
+- `story-and-experience` (Thiết kế trải nghiệm người dùng): Chuyển nghiệp vụ thành user stories kèm tiêu chí nghiệm thu (Given-When-Then), danh mục màn hình, các trạng thái giao diện và cung cấp tùy chọn tạo bản Prototype Mockup tương tác qua Browser Native trước khi duyệt Cổng G2.
+- `solution-design` (Kiến trúc kỹ thuật): Đánh giá phương án công nghệ theo ràng buộc thực tế, thiết kế schema dữ liệu; khi có DB bắt buộc tạo sơ đồ ERD HTML/SVG và kiểm thử trực quan bằng Browser Native (font chữ, mũi tên liên kết), thiết lập hợp đồng API và ADR (Cổng G3).
+- `delivery-planning` (Lập kế hoạch thực hiện): Khảo sát quy mô nhóm qua `ask` trước khi chia task, phân chia task theo folder chuyên môn, lập ma trận ràng buộc (dependencies) và phân phối các luồng làm song song tại Cổng G4.
 - `task-execution` (Thực thi code): Nhận task có kiểm soát, viết code đúng phạm vi, kiểm chứng và cập nhật điểm nghiệm thu cùng bằng chứng vào backlog.
 - `delivery-inspection` (Kiểm tra và nghiệm thu): Đối chiếu AC, review và kiểm chứng tích hợp trước khi tích hoàn thành; báo tổng điểm và điều kiện phát hành.
 - `diagram-design` (Thiết kế sơ đồ trực quan thay Mermaid): Tạo sơ đồ kiến trúc, DB schema, flow, sequence dưới dạng file HTML/SVG độc lập, hiển thị sắc nét trong `docs/workflow/diagrams/`.
@@ -61,10 +43,10 @@ Ba kỹ năng này được thiết lập `hide: true`, không làm quá tải d
 
 Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng hoặc module, không bắt dự án phải dừng lại chờ đặc tả toàn bộ mới được làm:
 
-```text
-[Ý tưởng] ──► [Gate G1] ──► [Gate G2] ──► [Gate G3] ──► [Gate G4] ──► [Code và test] ──► [Hoàn thành]
-              Nghiệp vụ     Stories & UX   Kiến trúc     Kế hoạch
-```
+<p align="center">
+  <img src="docs/workflow/diagrams/quality-gates.svg" alt="Quy trình 4 Cổng kiểm soát chất lượng tuần tự" width="100%">
+</p>
+<p align="center"><em>Quy trình 4 Cổng kiểm soát chất lượng tuần tự (G1 ➔ G4) từ Ý tưởng đến Hoàn thành nghiệm thu.</em></p>
 
 - Gate G1 (Nghiệp vụ): Mục tiêu bài toán và các quy tắc nghiệp vụ cốt lõi đã được người phụ trách xác nhận.
 - Gate G2 (Stories và UX): Toàn bộ tiêu chí nghiệm thu và luồng thao tác của phần tính năng tiếp theo đã thống nhất.
@@ -92,7 +74,7 @@ Các cột gồm Rank, ID, Epic/phân hệ, tính năng, links actors/story, ưu
 - Task nhỏ cùng người làm tuần tự: checklist có ID, AC, prerequisites và evidence ngay trong roadmap. Task lớn hoặc bàn giao độc lập: card riêng; roadmap chỉ giữ link.
 - UI/DB/API/logic/kiểm chứng là checklist phạm vi, không phải năm task bắt buộc.
 - Tái dùng stack, contracts và sơ đồ còn phù hợp. Chỉ tạo sơ đồ khi bảng/chữ chưa diễn đạt rõ hoặc người dùng yêu cầu; sơ đồ đã tạo/sửa vẫn phải qua Browser Native quality gate.
-- Discovery dừng khi đủ dữ kiện và không còn câu hỏi chặn, sau đó xin duyệt G1. Evidence/review/handoff lưu trong record hiện hữu hoặc links output, không thêm báo cáo cho mỗi bước.
+- Discovery phỏng vấn đào sâu qua nhiều đợt case study theo độ lớn nhỏ dự án; chỉ trình duyệt G1 khi Subagent Reviewer xác nhận PASS và không còn câu hỏi chặn. Evidence/review/handoff lưu trong record hiện hữu hoặc links output, không thêm báo cáo cho mỗi bước.
 
 ## Tối ưu hóa cho Oh My Pi (OMP)
 
