@@ -73,9 +73,9 @@ Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng 
 
 ## Product Backlog dạng ma trận
 
-Trong dự án sử dụng skills, agent lưu ma trận tại `docs/workflow/product-backlog.md`, hoặc cập nhật backlog tương đương đã có. Mỗi hàng là một tính năng; chi tiết triển khai vẫn nằm trong các file `plans/<phân-hệ-hoặc-sprint>/tasks/task-XX-<slug>.md`.
+Trong dự án sử dụng skills, agent cập nhật backlog chính tại `docs/workflow/product-backlog.md`, hoặc backlog tương đương đã có. Mỗi hàng là một tính năng; roadmap chỉ liên kết các ID được chọn và kế hoạch sprint, không chép thêm bảng backlog.
 
-Các cột gồm ID, phân hệ, tính năng, ưu tiên, Story Points, AC đạt/tổng, trạng thái, `[ ]` / `[x]` và liên kết stories/tasks/bằng chứng.
+Các cột gồm Rank, ID, Epic/phân hệ, tính năng, links actors/story, ưu tiên, Story Points, AC đạt/tổng, trạng thái, `[ ]` / `[x]` và tasks/bằng chứng. Mẫu chi tiết dùng chung nằm trong `product-workflow/references/records.md`.
 
 - Story Points là ước lượng do đội duyệt; chưa ước lượng thì ghi `—`.
 - AC đạt/tổng là số tiêu chí nghiệm thu đã được kiểm chứng, không phải số tests hay tasks.
@@ -84,6 +84,15 @@ Các cột gồm ID, phân hệ, tính năng, ưu tiên, Story Points, AC đạt
 - Không có Jira thì dùng backlog local. Nếu đã chọn Jira làm nguồn chính, Markdown phản ánh trạng thái Jira và bằng chứng; mất kết nối không tự đổi nguồn. Workers cập nhật task cards, người điều phối cập nhật ma trận chung.
 
 Đây là hướng dẫn để agent tạo backlog trong dự án đích. Cài đặt hoặc chỉnh sửa bộ skills không tự tạo backlog mẫu trong repo này.
+
+### Hồ sơ vừa đủ theo phạm vi
+
+- Bounded/Spike: đề xuất trong chat, chờ duyệt đúng nhánh rồi thực thi và kiểm chứng; không sinh bộ tài liệu G1–G4.
+- Feature: giữ G1–G4, cập nhật brief/stories/design/plan của phân hệ hiện hữu. Không tạo bộ file mới cho mỗi chỉnh sửa.
+- Task nhỏ cùng người làm tuần tự: checklist có ID, AC, prerequisites và evidence ngay trong roadmap. Task lớn hoặc bàn giao độc lập: card riêng; roadmap chỉ giữ link.
+- UI/DB/API/logic/kiểm chứng là checklist phạm vi, không phải năm task bắt buộc.
+- Tái dùng stack, contracts và sơ đồ còn phù hợp. Chỉ tạo sơ đồ khi bảng/chữ chưa diễn đạt rõ hoặc người dùng yêu cầu; sơ đồ đã tạo/sửa vẫn phải qua Browser Native quality gate.
+- Discovery dừng khi đủ dữ kiện và không còn câu hỏi chặn, sau đó xin duyệt G1. Evidence/review/handoff lưu trong record hiện hữu hoặc links output, không thêm báo cáo cho mỗi bước.
 
 ## Tối ưu hóa cho Oh My Pi (OMP)
 
@@ -94,7 +103,7 @@ Khi chạy trong Oh My Pi, hệ thống tự động kích hoạt các tính nă
   1. **Spawn Subagents (Mô hình 3 tầng)**:
      - *Task Worker*: Thực thi trong phạm vi task, ghi evidence và bàn giao để review.
      - *Task Reviewer*: Thẩm định diff theo AC và quy ước dự án.
-     - *Agent điều phối và Reviewer tổng*: Chạy/đối chiếu kiểm chứng tích hợp, cập nhật task cards, backlog và checkbox theo Definition of Done.
+     - *Agent điều phối và Reviewer tổng*: Kiểm chứng tích hợp/shared contracts/AC xuyên module; tái dùng review đúng scope/revision, chỉ review lại phần bị ảnh hưởng. Cập nhật backlog và checkbox khi đủ DoD.
   2. **Thực thi tuần tự (Inline Execution)**: Main Agent tự làm từng task.
   3. **Từng task có xác nhận**: Dừng lại xin duyệt diff sau mỗi task.
 

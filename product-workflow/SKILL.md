@@ -38,7 +38,7 @@ Ví dụ: đổi các mức tốc độ giọng đọc thành 0.5x, 1x, 1.2x, 1.
 | Ý tưởng, mục tiêu, nghiệp vụ mơ hồ, domain/rules | `skill://product-discovery` | Business brief, rules, câu hỏi mở, G1 |
 | User stories, hành trình, màn hình, UI/UX flows | `skill://story-and-experience` | Story map, AC, flows, G2 |
 | Chọn stack, kiến trúc, data/API, ranh giới module | `skill://solution-design` | So sánh lựa chọn, contracts, ADR, G3 |
-| Thứ tự module, tạo Product Backlog, sprint, việc song song | `skill://delivery-planning` | Ma trận tính năng, Story Points, AC, task cards và điều kiện G4 |
+| Thứ tự module, tạo Product Backlog, sprint, việc song song | `skill://delivery-planning` | Backlog chính, checklist hoặc task cards phù hợp và điều kiện G4 |
 | Nhận task, giao/bàn giao, code, kiểm chứng task | `skill://task-execution` | Nhận việc có xác nhận, handoff, evidence và cập nhật backlog |
 | Xem board/ma trận, chấm điểm nghiệm thu, tick Done, release | `skill://delivery-inspection` | Đối chiếu evidence, AC đạt/tổng, SP hoàn tất và checkbox |
 | Vẽ sơ đồ kiến trúc, DB schema, flows, sequence thay Mermaid | `skill://diagram-design` | File sơ đồ HTML/SVG độc lập trong docs/workflow/diagrams/ |
@@ -86,14 +86,14 @@ Với Bounded, thứ tự bắt buộc trong cùng lượt là: **trình bày Đ
   3. `Từng task có xác nhận`: Làm xong mỗi task thì dừng lại xin duyệt diff trước khi sang task kế tiếp.
 
 ### 4. Nguyên tắc Docs-First (Lưu trữ file tài liệu vật lý ra `docs/workflow/`)
-CẤM CHỈ IN TÀI LIỆU TRONG CHAT. Mỗi cổng hoàn thành bắt buộc phải dùng công cụ `write` lưu file Markdown thật vào thư mục `docs/workflow/` để người dùng đọc lại, lưu trữ và theo dõi phiên bản:
-- Cổng G1: `docs/workflow/specs/<tên-tính-năng>-brief.md`
-- Cổng G2: `docs/workflow/specs/<tên-tính-năng>-stories.md`
-- Cổng G3: `docs/workflow/architecture/<tên-tính-năng>-design.md`
-- Cổng G4: `docs/workflow/plans/<tên-phân-hệ-hoặc-sprint>/roadmap.md` và từng file `tasks/task-XX-<slug>.md`.
+Cổng Feature phải có tài liệu vật lý để duyệt. Ưu tiên sửa đúng phần scope trong hồ sơ phân hệ hiện hữu, giữ revision/approval; chỉ tạo file theo các đường dẫn dưới khi chưa có nơi phù hợp:
+- Cổng G1: `docs/workflow/specs/<phân-hệ>-brief.md`
+- Cổng G2: `docs/workflow/specs/<phân-hệ>-stories.md`
+- Cổng G3: `docs/workflow/architecture/<phân-hệ>-design.md`
+- Cổng G4: `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md`; checklist có ID cho việc nhỏ tuần tự, `tasks/task-XX-<slug>.md` cho việc lớn/bàn giao độc lập theo `Hồ sơ task gọn và task card` trong records.md.
 - Product Backlog xuyên suốt workflow: `docs/workflow/product-backlog.md`, theo mẫu và quy tắc điểm trong `skill://product-workflow/references/records.md`. Ghi tính năng khi scope G1 được duyệt, liên kết AC sau G2, tasks/SP sau G4; cập nhật điểm và checkbox từ evidence trong quá trình thực thi. Không dồn chi tiết tasks vào file này.
-- Thư mục sơ đồ: `docs/workflow/diagrams/<tên-sơ-đồ>.html` (xuất qua `skill://diagram-design`, tuyệt đối không dùng Mermaid)
-Sau khi tạo file, thông báo đường dẫn file đã tạo để người dùng mở trong IDE xem lại, sau đó mới gọi công cụ `ask` để duyệt cổng.
+- Sơ đồ chỉ tạo khi bảng/chữ chưa diễn đạt rõ hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Sơ đồ mới/sửa lưu `docs/workflow/diagrams/<tên-sơ-đồ>.html` qua `skill://diagram-design`, không Mermaid, vẫn phải vượt Browser Native quality gate.
+Thông báo đường dẫn và phần đã cập nhật trước khi gọi `ask` duyệt cổng. Bounded/Spike giữ đề xuất, duyệt và kiểm chứng theo nhánh; không tự sinh bộ tài liệu Feature. Bằng chứng/handoff ghi trong record hiện hữu hoặc liên kết output, không tạo báo cáo riêng cho mỗi bước.
 
 ## Điểm quyết định theo scope
 
@@ -117,7 +117,7 @@ Nếu người dùng nói “OK”, gắn với đề xuất cụ thể ngay tr�
 
 ## Tích hợp và phân công
 
-- Không có Jira và chưa có nguồn chính khác: quản lý backlog local bằng Markdown và task cards theo hợp đồng chung. Không giả Jira key hoặc claim đồng thời; thực thi local cần phạm vi và người điều phối được ủy quyền.
+- Không có Jira và chưa có nguồn chính khác: quản lý backlog local và hồ sơ task theo hợp đồng chung. Không giả Jira key hoặc claim đồng thời; thực thi local cần phạm vi và người điều phối được ủy quyền.
 - Có Jira: xác minh công cụ, scope/quyền, mapping và data coverage trước. Không bịa project key, field ID hay transition.
 - Việc song song: delivery-planning xác định nhóm độc lập; task-execution kiểm tra lại trước claim. Đừng tự giao cho người chưa đồng ý.
 - Nếu cần subagents, Main giữ vai trò tích hợp và quyền quyết định của người dùng; mỗi agent nhận scope riêng cùng contracts. Subagents không được tự publish/claim nếu không được ủy quyền.

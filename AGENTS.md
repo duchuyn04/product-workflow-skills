@@ -35,12 +35,14 @@ Với yêu cầu thuộc phạm vi triển khai ở trên, phân loại dựa tr
 Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy nghĩ sau:
 | Suy nghĩ bao biện của AI | Sự thật / Lệnh cấm bắt buộc |
 |---|---|
-| *"Tôi tự đoán nghiệp vụ hoặc hỏi vụn vặt ngay."* | **SAI.** Đọc `product-discovery`, phân rã phân hệ và phỏng vấn case study chuyên sâu. |
-| *"Tôi chốt stack rồi nên tôi code luôn."* | **SAI.** Đọc `solution-design`, phải có schema chi tiết và API contracts lưu vào docs trước khi code. |
-| *"Tôi gom hết 40 tasks vào 1 file plan duy nhất."* | **SAI.** Đọc `delivery-planning`, chia thành các task cards độc lập trong `tasks/task-XX.md`. |
+| *"Tôi tự đoán nghiệp vụ hoặc hỏi lại dữ kiện đã có."* | **SAI.** Đọc `product-discovery`, tái dùng nguồn đã xác nhận, chỉ hỏi quyết định còn thiếu; đủ scope/rules và hết blocker thì chốt brief để duyệt G1. |
+| *"Tôi đặt tên Epic/Module bằng danh từ đơn lẻ."* | **SAI.** Theo mục `Quy ước tên Epic/Module` trong `product-workflow/references/records.md`: tên hiển thị bắt đầu bằng `Quản lý + …`. |
+| *"Tôi viết User Story không xác định ai thực hiện/hưởng lợi."* | **SAI.** Đọc `story-and-experience`, liên kết Actor–Story với rule quyền có nguồn; nhu cầu không tự cấp quyền. |
+| *"Tôi chốt stack rồi nên tôi code luôn."* | **SAI.** Đọc `solution-design`, kế thừa stack đã chốt, chỉ thiết kế delta và duyệt G3; schema/contracts không đổi thì liên kết bản hiện hữu. |
+| *"Tôi lấy bừa 5–10 tasks đầu tiên cho Sprint 1 mà không xem dependency."* | **SAI.** Đọc `delivery-planning`, xét đồng thời 5 tiêu chí: Priority, Story Point, Dependency chain, Sprint Goal và Team Capacity. |
+| *"Mỗi story phải có năm task và mỗi task phải có file riêng."* | **SAI.** Đọc `delivery-planning`: UI/DB/API/logic/test là checklist phạm vi; việc nhỏ tuần tự dùng checklist, việc lớn hoặc bàn giao độc lập dùng card riêng. |
 | *"Tôi vừa trình bày vừa tạo file code luôn."* | **SAI.** Vi phạm cổng. Phải lưu tài liệu vào `docs/`, dùng `ask` chờ người dùng duyệt. |
 | *"Người dùng nói 'OK' là tôi được code hết."* | **SAI.** 'OK' chỉ là duyệt cho cổng vừa xong. Tuần tự chuyển cổng tiếp theo. |
-
 ---
 
 ## 4. Bản đồ điều phối chuyên gia (Pointers over Payloads)
@@ -56,10 +58,10 @@ Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy n
 |---|---|---|
 | Mới vào team, định hướng dự án có sẵn | `skill://project-guide` | Báo cáo hiện trạng codebase & conventions |
 | Khởi động, điều phối tổng thể dự án | `skill://product-workflow` | Định tuyến tuần tự qua các cổng G1–G4 |
-| Phỏng vấn nghiệp vụ chuyên sâu (Cổng G1) | `skill://product-discovery` | `docs/workflow/specs/<phân-hệ>-brief.md` |
-| User Stories, UX flows & Test Scenarios (Cổng G2) | `skill://story-and-experience` | `docs/workflow/specs/<phân-hệ>-stories.md` |
+| Khảo sát thực tế, As-Is/To-Be, Epics & Phỏng vấn nghiệp vụ (Cổng G1) | `skill://product-discovery` | `docs/workflow/specs/<phân-hệ>-brief.md` (Epics, As-Is vs To-Be) |
+| User Stories, Ma trận Actor vs Story, UX flows & Test Scenarios (Cổng G2) | `skill://story-and-experience` | `docs/workflow/specs/<phân-hệ>-stories.md` (Ma trận Actor - Story) |
 | Tech Stack, Schema, API & ADR (Cổng G3) | `skill://solution-design` | `docs/workflow/architecture/<phân-hệ>-design.md` |
-| Product Backlog, Task Cards & Test Cases (Cổng G4) | `skill://delivery-planning` | `roadmap.md` & `tasks/task-XX-<slug>.md` |
-| Vẽ sơ đồ kiến trúc, DB, flows (thay Mermaid) | `skill://diagram-design` | `docs/workflow/diagrams/<sơ-đồ>.html` |
+| Backlog chính, sprint, checklist hoặc task cards (Cổng G4) | `skill://delivery-planning` | `roadmap.md`; `tasks/task-XX-<slug>.md` khi cần bàn giao độc lập |
+| Sơ đồ cho quan hệ/luồng khó diễn đạt bằng bảng/chữ hoặc theo yêu cầu | `skill://diagram-design` | HTML/SVG trong `docs/workflow/diagrams/`, phải kiểm chứng browser khi tạo/sửa |
 | Nhận việc, viết code, chạy Unit Test & Browser Native | `skill://task-execution` | Code, Unit tests, Browser evidence & DoD |
-| Nghiệm thu, tính điểm Product Backlog & Release | `skill://delivery-inspection` | Chấm điểm AC, SP và tick `[x]` Product Backlog |
+| Nghiệm thu, Sprint Review, Retrospective & Release | `skill://delivery-inspection` | Chấm điểm AC/SP, tick `[x]` Product Backlog, Review & Retro |

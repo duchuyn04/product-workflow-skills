@@ -18,7 +18,7 @@ Không hỏi “dự án đang ở giai đoạn nào?” hoặc “đã làm xon
 ## 2. Đọc nguồn theo thứ tự, vừa đủ để định hướng
 
 1. Chỉ dẫn repo, README và chỉ mục tài liệu: mục tiêu sản phẩm, cách tổ chức và nguồn chính thức.
-2. Chỉ mục/checkpoint và Product Backlog: đọc đường dẫn đã ghi; mặc định `docs/workflow/product-backlog.md`. Xác định scope/release, nguồn trạng thái local/Jira và thời điểm đối chiếu; đọc hàng liên quan cùng links stories/task cards/evidence, không xem checkbox là bằng chứng độc lập.
+2. Chỉ mục/checkpoint và Product Backlog: đọc đường dẫn đã ghi; mặc định `docs/workflow/product-backlog.md`. Xác định scope/release, nguồn local/Jira và thời điểm đối chiếu; theo links stories, hồ sơ task (checklist hoặc card) và evidence, không xem checkbox là bằng chứng độc lập.
 3. Tài liệu được tham chiếu: nghiệp vụ/glossary, scope, stories/UX, kiến trúc/ADR/contracts, module catalogue và approval. Đọc phần quyết định/nghiệm thu liên quan trước, không nạp mọi file.
 4. Nếu cần xác định mức triển khai: cấu trúc code, manifest/scripts, checks và evidence CI/review/deployment đã có. Đọc đủ để phân biệt thiết kế với implementation; không chạy cài đặt hoặc test chỉ để giới thiệu dự án.
 5. Nếu đã có công cụ Jira và quyền đọc: đọc scope/board/sprint, issue liên quan, blockers và owner mới nhất; xử lý phân trang/giới hạn quyền. Không yêu cầu credentials trong chat hoặc tự thiết lập kết nối.
@@ -41,7 +41,7 @@ Mỗi kết luận quan trọng có đường dẫn/link và revision/thời đi
 | Có checkpoint cũ | Đây là điểm tiếp tục đã ghi trước đó | Owner/status hiện tại vẫn như checkpoint |
 | Không thấy task hoặc thiếu quyền đọc Jira | Chưa xác minh được task/trạng thái | Không có việc, chưa ai nhận hoặc task đã Done |
 
-Ở chế độ local, backlog/task cards và evidence mới nhất là nguồn trạng thái, không phải checkpoint. Ở chế độ Jira, Jira mới nhất thắng snapshot Markdown về trạng thái issue; evidence/approval quyết định mức chứng minh chất lượng. Nếu Jira Done nhưng thiếu evidence, giữ cả hai thông tin, không âm thầm đổi trạng thái. Revision thay đổi thì nêu approval nào có thể cần xét lại.
+Ở chế độ local, backlog, hồ sơ task (checklist hoặc card) và evidence mới nhất là nguồn trạng thái, không phải checkpoint. Ở chế độ Jira, Jira mới nhất thắng snapshot Markdown về trạng thái issue; evidence/approval quyết định mức chứng minh chất lượng. Nếu Jira Done nhưng thiếu evidence, giữ cả hai thông tin. Revision thay đổi thì nêu approval nào cần xét lại.
 
 Nếu cần ma trận chi tiết, đọc `skill://delivery-inspection` và dùng quy tắc tổng hợp của nó; không tạo một hệ thống status khác. Bản giới thiệu thông thường chỉ cần vài dòng theo scope/module.
 

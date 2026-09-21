@@ -12,14 +12,37 @@ hide: true
 
 Yêu cầu hiện tại, dự án/scope, tài liệu và quyết định đã có, người hiểu nghiệp vụ, mục tiêu/ràng buộc đã biết. Nếu được yêu cầu tiếp tục, đọc checkpoint và các nguồn được trỏ tới, không bắt đầu một bảng hỏi mới từ đầu.
 
+## 0. Các hình thức thu thập và Phân tích bài toán thực tế (Practical Requirements Analysis)
+
+### A. 7 hình thức thu thập yêu cầu từ thực tế
+Khi tiếp cận một bài toán mới hoặc dự án thực tế, AI chủ động nhận diện nguồn thông tin và áp dụng các hình thức thu thập phù hợp:
+1. **Phỏng vấn khách hàng (Customer Interview):** Trao đổi trực tiếp để hiểu mong muốn, khó khăn và kỳ vọng của các bên liên quan.
+2. **Họp với khách hàng (Client Meeting):** Họp làm việc định kỳ để thống nhất phạm vi, giải quyết xung đột ý kiến.
+3. **Quan sát quy trình nghiệp vụ (Business Process Observation):** Đi thực tế, quan sát nhân viên thao tác hằng ngày để tìm điểm nghẽn (bottlenecks).
+4. **Phiếu khảo sát (Survey / Questionnaire):** Thu thập ý kiến số đông người dùng cuối về mức độ hài lòng hoặc nhu cầu tính năng.
+5. **Email / Tài liệu yêu cầu (Requirement Documents & Specs):** Đọc kỹ tài liệu mô tả, hợp đồng, RFP hoặc trao đổi qua email.
+6. **Feedback từ hệ thống đang sử dụng (Legacy System Feedback):** Khai thác phản hồi, báo cáo lỗi hoặc bất cập của hệ thống hiện tại.
+7. **Yêu cầu thay đổi / bổ sung chức năng (Change Requests):** Tiếp nhận yêu cầu mở rộng, cập nhật quy trình nghiệp vụ mới.
+
+### B. Phân tích bài toán thực tế: Chuyển đổi As-Is sang To-Be
+AI không chỉ ghi nhận yêu cầu rời rạc mà phải chuyển hóa thành bức tranh hệ thống:
+1. **Nêu ra vấn đề thực tế (Hiện trạng - As-Is):** Chỉ rõ các khó khăn, bất cập trong cách vận hành hiện tại (ví dụ: quản lý thủ công bằng Excel và sổ sách dẫn đến sai lệch tồn kho, thất thoát đơn hàng, khó tra cứu lịch sử khách hàng, tính toán tiền/giảm giá chậm chạp, thiếu báo cáo tức thời).
+2. **Đề xuất phương án công nghệ & Chuẩn hóa quy trình (Tương lai - To-Be):** Xây dựng hệ thống phần mềm xử lý tự động, chuẩn hóa dữ liệu tập trung, phân quyền vai trò minh bạch, tự động hóa tính tiền, trừ kho tức thời và xuất báo cáo tự động theo thời gian thực.
+
+### C. Nhận diện nhóm User (Actors) và Phân rã Danh mục Epic ban đầu
+Từ đoạn mô tả và phân tích nghiệp vụ, AI thực hiện hai nhiệm vụ nền tảng:
+1. **Xác định các nhóm User (Actors) chính:** Liệt kê các đối tượng sẽ trực tiếp sử dụng hoặc tương tác với hệ thống (ví dụ trong hệ thống bán hàng: *Nhân viên bán hàng*, *Nhân viên kho*, *Quản lý cửa hàng*, *Khách hàng*).
+2. **Phân rã thành Danh mục Epics (Nhóm chức năng lớn):** Gom các yêu cầu có cùng miền trách nhiệm thành từng Epic độc lập, gán mã chuẩn `EP01`, `EP02`, `EP03`...
+   - Đặt tên hiển thị theo mục `Quy ước tên Epic/Module` trong `skill://product-workflow/references/records.md`.
+   - Danh mục Epic này là cấu trúc gốc để phân rã thành User Stories tại Cổng G2 và quản lý trên Jira tại Cổng G4.
 ## Quy trình phỏng vấn nghiệp vụ (Bắt buộc dùng `ask`)
 
 ### 1. Đánh giá quy mô & Phân rã trước khi hỏi
-CẤM TỰ Ý ĐOÁN NGHIỆP VỤ rồi đưa ra bản tóm tắt có sẵn. AI phải đánh giá quy mô bài toán:
-- **Nếu là tính năng nhỏ / đơn lẻ:** Tiến hành 1 vòng phỏng vấn (3–5 câu hỏi trọng tâm qua `ask`) ──► Chốt brief.
+Đọc codebase, tài liệu, schema và các quyết định sẵn có trước khi hỏi; không bắt người dùng trả lời lại các dữ kiện đã có. CẤM TỰ Ý ĐOÁN NGHIỆP VỤ khi thiếu các quyết định kinh doanh cốt lõi. AI đánh giá quy mô bài toán:
+- **Nếu là phạm vi đơn giản / tính năng nhỏ / đã có tài liệu đủ rõ:** Chỉ hỏi các quyết định nghiệp vụ còn thiếu (nếu có), không tạo phỏng vấn nhân tạo kéo dài ──► Chốt brief.
 - **Nếu là dự án lớn / nền tảng phức tạp (Website hoàn chỉnh, SaaS, E-commerce, ERP...):**
-  - **Tuyệt đối không dồn hàng chục hay hàng trăm câu hỏi vào một lượt.**
-  - **Phân rã thành các phân hệ trước (Decomposition First):** Cùng người dùng vạch ra bức tranh toàn cảnh và phân rã thành danh mục các phân hệ độc lập (ví dụ: Auth & Phân quyền, Danh mục & Sản phẩm, Đặt hàng & Thanh toán, Quản lý kho, Quản trị Admin...).
+  - Tuyệt đối không dồn quá nhiều câu hỏi vào một lượt.
+  - **Phân rã thành các phân hệ trước (Decomposition First):** Cùng người dùng vạch ra bức tranh toàn cảnh và phân rã thành danh mục các phân hệ/module độc lập, tuân thủ quy ước `Quản lý + ...`.
   - **Bắt buộc dùng `ask` để duyệt Danh mục phân hệ & chọn phân hệ làm trước (MVP):**
     ```text
     ask(questions=[{
@@ -42,7 +65,7 @@ Với phân hệ đang được chọn, AI tiến hành phỏng vấn sâu qua t
 Thay vì để dự án rơi vào cảnh mù mịt hoặc hỏi tràn lan, AI chia lộ trình phỏng vấn phân hệ thành 4 vùng nhận thức:
 1. **Đích đến (Destination):** Xác định rõ mục tiêu cuối cùng của Cổng G1: Hoàn thành bản Business Brief chuẩn xác cho phân hệ đang phỏng vấn, sẵn sàng chuyển giao cho G2 (User Stories & UX).
 2. **Quyết định đã chốt (Decisions So Far):** Ghi nhận có hệ thống các quyết định nghiệp vụ đã chốt qua từng vòng case study. Đây là nền tảng vững chắc để mở khóa các câu hỏi tiếp theo.
-3. **Mặt trận câu hỏi (The Frontier):** Chỉ hỏi 3–5 câu hỏi/case study mà các tiền đề của nó đã được giải quyết ở *Decisions So Far*. Tuyệt đối không hỏi trước những câu hỏi mà điều kiện tiên quyết chưa được chốt.
+3. **Mặt trận câu hỏi (The Frontier):** Chỉ hỏi quyết định còn thiếu có tiền đề đã rõ trong *Decisions So Far*. Có nhiều câu thì gom một đợt nhỏ; còn một câu thì chỉ hỏi một câu.
 4. **Vùng sương mù (Not Yet Specified / Fog of War):** Những bài toán phức tạp (đối soát hoa hồng, tranh chấp khiếu nại, đồng bộ hệ thống cũ...) chưa đủ sắc bén sẽ tạm giữ trong sương mù. Khi Frontier tiến tới, sương mù tan dần và chúng mới "tốt nghiệp" thành câu hỏi cụ thể.
 5. **Ngoài phạm vi (Out of Scope):** Chủ động nhận diện và gạt bỏ những tính năng người dùng đã từ chối để bảo vệ dự án khỏi phình to phạm vi (scope creep).
 
@@ -50,63 +73,31 @@ Thay vì để dự án rơi vào cảnh mù mịt hoặc hỏi tràn lan, AI ch
 - AI tự động khai thác codebase, schema cơ sở dữ liệu hiện có, tài liệu API công khai của bên thứ ba (Stripe, VNPay, OAuth, Firebase...) hoặc thư viện kỹ thuật.
 - **TUYỆT ĐỐI KHÔNG HỎI NGƯỜI DÙNG** những thông tin kỹ thuật mà AI có thể tự tra cứu được. Chỉ hỏi người dùng những **Quyết định nghiệp vụ (Decisions & Tradeoffs)** qua các Case Study thực tế.
 
-#### C. CẤM HỎI CHUNG CHUNG TRỪU TƯỢNG — Bắt buộc dùng Case Study cụ thể (Concrete Scenarios)
-- **Sai lầm bị cấm:** Hỏi những câu vu vơ, chung chung như: *"Hệ thống xử lý thanh toán thế nào?"*, *"Quy tắc của bạn là gì?"*, *"Có những lỗi nào có thể xảy ra?"*.
-- **Bắt buộc đưa Case Study thực tế (Stress-testing Scenarios):**
-  Tạo ra các kịch bản va chạm thực tế có bối cảnh, số liệu, actors và xung đột nghiệp vụ rõ ràng:
-  - *Ví dụ Case Study Đặt hàng & Khuyến mãi:* *"Khách hàng A đặt đơn 500.000đ, áp mã giảm giá 50.000đ (điều kiện đơn từ 400.000đ). Đơn gồm 2 món. Sau đó người bán hết món 1 (200.000đ) và muốn hủy món 1. Giá trị đơn giảm còn 300.000đ (< 400.000đ). Hệ thống sẽ: A. Hủy toàn bộ voucher 50k (khách trả 300k)? B. Giữ voucher theo tỷ lệ (khách trả 270k)? C. Không cho phép hủy 1 phần, bắt buộc hủy cả đơn?"*
-  - *Ví dụ Case Study Tranh chấp kho:* *"Mặt hàng chỉ còn 1 cái cuối cùng. Khách 1 đang ở bước thanh toán chưa nhập OTP, khách 2 cũng bấm mua. Hệ thống sẽ khóa tạm 15 phút (Reservation lock) cho khách 1 hay ai thanh toán trước thì được (First-paid-first-served)?"*
+#### C. Đưa Case Study thực tế có trọng tâm (Concrete Scenarios)
+- Tránh câu hỏi trừu tượng, chung chung (*"Quy tắc của bạn là gì?"*).
+- Đưa kịch bản va chạm thực tế ngắn gọn có bối cảnh, số liệu, actors và xung đột nghiệp vụ cụ thể để người dùng ra quyết định (ví dụ: xử lý khuyến mãi khi hủy 1 phần đơn hàng, hoặc chính sách giữ hàng khi tranh chấp kho tồn cuối cùng).
 
 #### D. Làm sắc bén ngôn ngữ Domain (Sharpen Fuzzy Language)
-Khi người dùng dùng các từ ngữ mơ hồ hoặc nhập nhằng ngữ nghĩa, AI phải bắt bẻ và đề xuất thuật ngữ chuẩn xác ngay lập tức:
-- *"Bạn nói 'người dùng'/'khách' — hệ thống phân biệt Khách vãng lai (Guest) hay bắt buộc đăng ký tài khoản (Member)?"*
-- *"Bạn nói 'hủy đơn' — là Hủy khi chưa thanh toán (Abandon), Hủy sau khi đã trừ tiền cần hoàn trả (Cancel & Refund), hay Hủy khi hàng đang trên đường giao (Return)?"*
-- *"Bạn nói 'duyệt' — là hệ thống tự duyệt theo rule hay cần Admin thao tác thủ công?"*
+Khi người dùng dùng từ ngữ mơ hồ, AI làm rõ và đề xuất thuật ngữ chuẩn xác (ví dụ: phân biệt Guest vs Member, Abandon vs Cancel vs Return, hệ thống tự duyệt vs Admin duyệt thủ công).
 
-#### E. Vòng lặp Case Study chuyên sâu tối đa 50 câu hỏi cho 1 phân hệ
-- **Tuyệt đối không phỏng vấn hời hợt hay dừng sớm:** Nghiệp vụ chỉ thực sự rõ ràng khi các kịch bản va chạm thực tế (Case Studies) được đào sâu đa chiều.
-- **Quy mô phỏng vấn:** AI được phép hỏi sâu tới **tối đa 50 câu hỏi case study cho 1 phân hệ**, chia thành từng đợt cuốn chiếu:
-  - *Đợt 1 (Câu 1–5):* Luồng người dùng chính & Hành động cốt lõi (Happy Path & Actors).
-  - *Đợt 2 (Câu 6–10):* Điều kiện ràng buộc dữ liệu & Công thức tính toán (Invariants & Rules).
-  - *Đợt 3 (Câu 11–15):* Xung đột đồng thời, Tranh chấp tài nguyên & Lỗi hệ thống (Race conditions & Concurrency).
-  - *Đợt 4 (Câu 16–20):* Tích hợp bên thứ ba, Webhooks, Timeout & Đối soát dữ liệu (Integrations & Reconciliations).
-  - *Đợt 5 (Câu 21–25):* Phân quyền chi tiết, Xung đột vai trò & Chống rò rỉ dữ liệu (RBAC & Permissions).
-  - *Đợt 6 (Câu 26–30):* Xử lý vòng đời dữ liệu: Hủy, Trả hàng, Xóa mềm vs Xóa cứng, Lưu vết kiểm toán (Audit Log & Lifecycle).
-  - *Đợt 7–10 (Câu 31–50):* Các trường hợp góc khuất (Edge Cases), Khuyến mãi phức tạp, Biến thể nghiệp vụ nâng cao phát sinh từ các câu trả lời trước.
-- **Bộ đếm tiến độ minh bạch:** Đầu mỗi đợt, AI luôn hiển thị rõ: `[Tiến độ: Đã hỏi X/50 câu cho phân hệ <Tên>]`.
-
-#### F. Trạm kiểm soát quyết định qua công cụ `ask` sau mỗi đợt
-Sau mỗi đợt 3–5 câu hỏi case study, AI **bắt buộc dùng công cụ `ask`** để trao toàn quyền quyết định tiếp tục hay dừng lại cho người dùng:
-```text
-ask(questions=[{
-  "id": "case_study_checkpoint",
-  "question": "[Tiến độ: Đã hỏi X/50 câu cho phân hệ <Tên Phân Hệ>]. Bạn muốn tiếp tục đào sâu các Case Study tiếp theo hay đã đủ thông tin để chốt Business Brief?",
-  "options": [
-    {"label": "Tiếp tục đào sâu Case Study tiếp theo", "description": "Đi tiếp vào các kịch bản ngoại lệ, lỗi biên và tích hợp sâu tiếp theo (tối đa 50 câu)."},
-    {"label": "Đồng ý chấp nhận & Chốt Business Brief", "description": "Dừng phỏng vấn ngay lập tức, tổng hợp toàn bộ quyết định đã chốt thành tài liệu Brief Cổng G1."}
-  ],
-  "recommended": 0
-}])
-```
-
-#### G. Điểm dừng & Điều kiện chuyển sang Cổng G2
-- **Điều kiện dừng phỏng vấn:**
-  1. Người dùng bấm chọn **"Đồng ý chấp nhận & Chốt Business Brief"**.
-  2. Hoặc đạt giới hạn trần **50 câu hỏi** cho phân hệ đó.
-- Khi một trong hai điều kiện trên thỏa mãn:
-  - AI dừng hỏi ngay lập tức.
-  - Tổng hợp toàn bộ quyết định thành file `docs/workflow/specs/<tên-phân-hệ>-brief.md`.
-  - Dừng tin nhắn và gọi `ask` để xin duyệt Cổng G1.
-- **Chỉ khi Cổng G1 được duyệt, AI mới cho phép chuyển phân hệ đó sang Cổng G2 (Stories & UX).**
+#### E. Tiến hành phỏng vấn có trọng tâm và điều kiện kết thúc discovery
+- Phỏng vấn qua `ask` theo chủ đề/rủi ro áp dụng: luồng chính, ràng buộc, đồng thời, tích hợp, quyền và vòng đời dữ liệu. Số câu theo quyết định còn thiếu, không theo quota.
+- **Điều kiện dừng phỏng vấn:** Khi các thông tin về phạm vi (scope), mục tiêu (goals), actors, quy tắc cốt lõi (rules) và ràng buộc dữ liệu của phần việc sắp làm đã đủ rõ ràng, và không còn câu hỏi chặn (blocking questions).
+- Khi đủ điều kiện, AI dừng phỏng vấn ngay, tổng hợp Business Brief, lưu/cập nhật file và gọi `ask` xin duyệt Cổng G1.
+- **Dừng sớm không phải là Ready:** Nếu người dùng chủ động yêu cầu dừng sớm khi vẫn còn câu hỏi chặn hoặc quy tắc cốt lõi chưa rõ, AI ghi rõ các câu hỏi mở và blocker vào tài liệu brief, đánh dấu trạng thái `draft` hoặc `awaiting-resolution`. Việc dừng sớm khi còn blocker KHÔNG được coi là approved readiness để chuyển sang G2.
 ## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
-AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
-`docs/workflow/specs/<tên-tính-năng>-brief.md`
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tại đường dẫn:
+`docs/workflow/specs/<tên-phân-hệ>-brief.md`
+
+*Lưu ý cập nhật:* Khi bổ sung hoặc tinh chỉnh phạm vi của phân hệ đã có, cập nhật trực tiếp vào file brief hiện hữu của phân hệ đó, không tạo thêm file tài liệu mới rời rạc cho mỗi thay đổi nhỏ.
 
 Nội dung file bao gồm:
-- Stakeholders/actors và ma trận quyền theo hành động/dữ liệu.
+- Stakeholders/actors chính và ma trận quyền theo hành động/dữ liệu.
+- Danh mục Epics khởi tạo (`EP01`, `EP02`,...) theo mục `Quy ước tên Epic/Module` trong `skill://product-workflow/references/records.md`.
+- Bảng phân tích hiện trạng và mục tiêu (As-Is vs To-Be): từ vấn đề thực tế đến giải pháp công nghệ chuẩn hóa.
 - Glossary: thuật ngữ, định nghĩa domain, ví dụ và từ dễ nhầm.
-- As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ. Sơ đồ quy trình nghiệp vụ: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-process.md` hoặc `type-flowchart.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-process.html` và chèn liên kết vào tài liệu.
+- As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ. Sơ đồ quy trình nghiệp vụ: Chỉ bắt buộc khi quy trình có độ phức tạp cao, nhiều luồng rẽ nhánh/ngoại lệ hoặc khi người dùng yêu cầu rõ ràng; tái sử dụng sơ đồ hợp lệ đã có nếu quy trình không đổi. Với luồng nghiệp vụ đơn giản hoặc tuần tự, mô tả bảng luồng nghiệp vụ trong tài liệu là đủ. Khi tạo mới hoặc cập nhật sơ đồ: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-process.md` hoặc `type-flowchart.md`) tạo file `docs/workflow/diagrams/<tên-phân-hệ>-process.html`, chèn liên kết vào tài liệu và kiểm chứng hiển thị bằng browser-native.
 - Business rules có ID, phạm vi áp dụng, nguồn xác nhận, ví dụ và phản ví dụ.
 - Dữ liệu/lifecycle và yêu cầu phi chức năng có điều kiện kiểm chứng.
 - In-scope/out-of-scope và giả thuyết cần kiểm chứng.
@@ -126,8 +117,8 @@ Mẫu luồng nghiệp vụ:
 
 G1 đạt khi người phụ trách nghiệp vụ xác nhận mục tiêu và phạm vi, quy tắc của phần tính năng sắp làm đã đủ rõ ràng, và các câu hỏi còn mở không gây tắc nghẽn phần việc đó.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/specs/<tên-tính-năng>-brief.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
-- Câu hỏi: *"Tôi đã phỏng vấn và ghi lại Business Brief tại `docs/workflow/specs/<tên-tính-năng>-brief.md`. Bạn có duyệt tài liệu này (Cổng G1) để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu hoặc cập nhật file `docs/workflow/specs/<tên-phân-hệ>-brief.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã hoàn thành Business Brief tại `docs/workflow/specs/<tên-phân-hệ>-brief.md`. Bạn có duyệt tài liệu này (Cổng G1) để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh quy tắc]`, `[Xem giải thích chi tiết]`.
 
 Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.

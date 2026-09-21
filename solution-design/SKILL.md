@@ -18,11 +18,13 @@ Ghi yêu cầu bắt buộc, mong muốn và chưa biết: loại sản phẩm, 
 
 Không bịa con số tải, SLA hoặc năng lực thành viên. Ràng buộc chưa có nguồn phải hỏi hoặc ghi giả thuyết cần kiểm chứng. Không tự mặc định Next.js, microservices, monorepo hay cloud cụ thể.
 
-## 2. So sánh và lựa chọn Tech Stack (Bắt buộc dùng `ask`)
+## 2. Lựa chọn và kế thừa Tech Stack
 
-AI **TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý CHỌN TECH STACK TRONG ĐẦU**.
-- Phân tích yêu cầu và đề xuất 2–3 phương án công nghệ khả thi kèm ưu/nhược điểm cụ thể.
-- **Bắt buộc dùng công cụ `ask` của Oh My Pi** để người dùng trực tiếp bấm chọn phương án:
+- **Tái sử dụng Tech Stack đã duyệt:** Nếu dự án đã có tech stack được phê duyệt từ trước (thể hiện qua codebase hiện hữu, file cấu hình, package manifest, tài liệu kiến trúc hoặc ADR đã có), AI **tái sử dụng trực tiếp stack đó**. Không tổ chức lựa chọn lại nhân tạo hoặc hỏi lại người dùng những gì đã được thống nhất.
+- **Chỉ đề xuất phương án và hỏi qua `ask` khi:**
+  1. Bắt đầu dự án mới chưa có nền tảng công nghệ (greenfield), hoặc
+  2. Xuất hiện lựa chọn công nghệ mới có ảnh hưởng kiến trúc lớn (ví dụ: thêm loại cơ sở dữ liệu mới, message queue, giải pháp cache phân tán, hoặc framework mới chưa từng dùng trong dự án).
+  Khi rơi vào hai trường hợp trên, AI phân tích yêu cầu, đề xuất 2–3 phương án khả thi kèm ưu/nhược điểm và dùng công cụ `ask` của Oh My Pi để người dùng trực tiếp bấm chọn:
 
 ```text
 ask(questions=[{
@@ -36,8 +38,7 @@ ask(questions=[{
   "recommended": 0
 }])
 ```
-
-Chỉ sau khi người dùng xác nhận lựa chọn Tech Stack qua `ask`, AI mới tiến hành vẽ ranh giới, thiết kế Database Schema và API Contracts.
+- Dù tái sử dụng stack có sẵn hay chọn stack mới, toàn bộ giải pháp kỹ thuật, Database Schema và API Contracts vẫn phải được người phụ trách kỹ thuật duyệt tại Cổng G3 trước khi chuyển sang thực thi.
 
 ## 3. Giải quyết rủi ro bằng spike khi cần
 
@@ -89,23 +90,25 @@ Mẫu ADR:
 Không tạo ADR cho mọi lựa chọn vụn vặt. Không ghi rằng giải pháp đã triển khai khi mới thiết kế.
 ## Đầu ra: Lưu file tài liệu kiến trúc (Docs-First)
 
-AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
-`docs/workflow/architecture/<tên-tính-năng>-design.md`
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tại đường dẫn:
+`docs/workflow/architecture/<tên-phân-hệ>-design.md`
+
+*Lưu ý cập nhật:* Khi bổ sung hoặc tinh chỉnh thiết kế của phân hệ đã có, cập nhật trực tiếp vào file thiết kế hiện hữu của phân hệ đó, không tạo thêm file tài liệu mới rời rạc cho mỗi thay đổi nhỏ.
 
 Nội dung file bao gồm:
-- Quyết định lựa chọn Tech Stack và lý do (ADR).
-- Sơ đồ Kiến trúc hệ thống (System Architecture Diagram): **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-architecture.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-architecture.html` và chèn link vào tài liệu.
-- Sơ đồ Database Schema / ER: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-db-schema.md` hoặc `type-er.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-db-schema.html`.
-- Chi tiết Database Schema dạng bảng/DDL (khóa chính, khóa ngoại, kiểu dữ liệu, index).
-- REST/GraphQL API Contracts cụ thể kèm Sequence Diagram (dùng `type-sequence.md` qua `diagram-design` nếu có luồng auth/thanh toán phức tạp).
+- Quyết định lựa chọn Tech Stack (kế thừa stack đã duyệt hoặc ADR mới nếu có lựa chọn mới).
+- Sơ đồ Kiến trúc và Database Schema / ER: chỉ tạo khi bảng/chữ chưa diễn đạt rõ quan hệ/ranh giới phức tạp hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Không đổi DB thì không tạo ER mới, thay đổi kiến trúc đơn giản cũng không tự bắt vẽ. Khi tạo/sửa, đọc `skill://diagram-design`, dùng HTML/SVG trong `docs/workflow/diagrams/`, không Mermaid, và vượt Browser Native quality gate trước bàn giao.
+- Database Schema: Chi tiết dạng bảng/DDL (khóa chính, khóa ngoại, kiểu dữ liệu, index) cho các bảng mới hoặc thay đổi. Nếu phạm vi không làm thay đổi cấu trúc dữ liệu, liên kết tới schema hiện có mà không bắt buộc tạo mới.
+- API Contracts: REST/GraphQL contracts cụ thể cho các endpoint mới hoặc thay đổi (kèm Sequence Diagram qua `type-sequence.md` nếu có luồng auth/thanh toán đa bên phức tạp). Nếu API hiện có không đổi, chỉ cần dẫn chiếu contract sẵn có.
+- Ranh giới module, quyền sở hữu dữ liệu, cơ chế phân quyền và xử lý lỗi.
 ## Gate G3 và bàn giao (Hard-Stop)
 
 G3 đạt cho scope khi người phụ trách kỹ thuật được chỉ định duyệt lựa chọn có ảnh hưởng, rủi ro chặn đã được giải quyết hoặc có quyết định chấp nhận rõ, contracts cần cho việc sắp làm đủ ổn định và kiểm chứng được.
 
-*Lưu ý cốt lõi:* Việc chỉ chọn tên công nghệ (ví dụ: React + Express + SQLite) mới chỉ là 10% của G3. G3 bắt buộc phải có Database Schema chi tiết và API Contracts được lưu trữ vào file.
+G3 phải làm rõ ranh giới và contracts cần cho scope. Schema/API áp dụng thì lưu delta hoặc liên kết bản hiện hữu đúng revision; không có DB/API thì ghi không áp dụng kèm lý do, không tạo tài liệu giả để lấp mẫu.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/architecture/<tên-tính-năng>-design.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
-- Câu hỏi: *"Tôi đã thiết kế xong Schema và API Contracts tại `docs/workflow/architecture/<tên-tính-năng>-design.md`. Bạn có duyệt tài liệu kiến trúc này (Cổng G3) để chuyển sang lập kế hoạch bẻ task Sprint (Cổng G4) không?"*
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu hoặc cập nhật file `docs/workflow/architecture/<tên-phân-hệ>-design.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã hoàn thành thiết kế giải pháp kỹ thuật tại `docs/workflow/architecture/<tên-phân-hệ>-design.md`. Bạn có duyệt tài liệu kiến trúc này (Cổng G3) để chuyển sang lập kế hoạch thực thi Sprint (Cổng G4) không?"*
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Schema/API]`, `[Xem giải thích chi tiết]`.
 
 Sau khi G3 được duyệt, bàn giao sang `delivery-planning` (G4) để phân rã task. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không tự ý nhảy cóc sang `task-execution` để viết code ngay.

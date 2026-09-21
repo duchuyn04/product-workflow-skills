@@ -10,7 +10,7 @@ hide: true
 
 ## 1. Kiểm tra yêu cầu và nguồn mới nhất
 
-Xác định task/scope/mode; đọc AC, inputs/contracts/revisions, prerequisite, owner hiện tại và quality policy. Dữ liệu Jira phải mới và đủ quyền; không lấy cache/nháp làm bằng chứng Ready.
+Xác định task/scope/mode; đọc AC, inputs/contracts/revisions, prerequisite, owner hiện tại và quality policy từ hồ sơ task chuẩn tắc (mục checklist trong `roadmap.md` hoặc file task card tương ứng). Dữ liệu Jira phải mới và đủ quyền; không lấy cache/nháp làm bằng chứng Ready.
 
 Người dùng hỏi “có thể làm gì” chỉ cho phép đề xuất, không tự claim. Người dùng yêu cầu implement một thay đổi độc lập không thuộc backlog Jira vẫn có thể ủy quyền trực tiếp, nhưng phải nói rõ phạm vi này không phải task đã claim trên Jira; không dùng cách đó để vượt cơ chế claim cho issue đang quản lý chung.
 
@@ -59,31 +59,39 @@ ask(questions=[{
 }])
 ```
 
+### Hồ sơ task chuẩn tắc (Canonical Task Record)
+
+Mỗi task có duy nhất một hồ sơ chuẩn tắc (canonical record) theo quy ước tại `skill://product-workflow/references/records.md` (mục `Hồ sơ task gọn và task card`), tuyệt đối không tạo bản sao trùng lặp:
+- **Task nhỏ, tuần tự (Inline):** Lưu trực tiếp dưới dạng mục checklist có ID ổn định trong `roadmap.md` (chứa scope, links AC, prerequisites, cách kiểm chứng, link evidence và trạng thái). Không bắt buộc tạo file task card hay báo cáo rời.
+- **Task độc lập hoặc phân công subagent (Delegated):** Tạo file task card riêng biệt `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` tự chứa đầy đủ ngữ cảnh (self-contained) để subagent thực thi độc lập mà không cần đọc lại lịch sử chat.
+- **Không trùng lặp:** Nếu đã có task card thì roadmap chỉ dẫn link tới card; nếu là checklist entry gọn thì không tạo thêm file task card thừa.
+- **Cập nhật tại chỗ:** Handoff, kết quả review và links evidence được ghi trực tiếp vào canonical record hiện hữu, dùng links chứ không tạo file báo cáo mới cho từng bước.
+
+Bounded/Spike chưa có hồ sơ task: dùng đề xuất/duyệt trong chat và evidence thực thi theo nhánh; không tạo roadmap hoặc card chỉ để có nơi ghi báo cáo.
+
 ### Quy trình Chế độ Subagents 3 tầng:
 
 #### Tầng 1: Task Worker (Subagent thực thi từng task)
-- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task cụ thể.
-- Truyền file task card `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` cùng scope được giao. Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
-- Worker thực thi đúng phạm vi, ghi evidence theo AC vào task card và bàn giao ở trạng thái Review. Không tự tích Done hoặc sửa `product-backlog.md`/`roadmap.md`. Khi chạy nhiều workers đồng thời, để agent điều phối chạy kiểm chứng sau khi tích hợp, tránh checks giữa các chỉnh sửa đang dở.
+- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task độc lập.
+- Truyền task card tự chứa đầy đủ ngữ cảnh `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` cùng scope được giao (hoặc mục checklist cụ thể nếu thực thi inline). Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
+- Worker thực thi đúng phạm vi, ghi evidence theo AC vào task card được giao và bàn giao ở trạng thái Review. Không tự tích Done hoặc sửa `product-backlog.md`/`roadmap.md`. Khi chạy nhiều workers đồng thời, để agent điều phối chạy kiểm chứng sau khi tích hợp, tránh checks giữa các chỉnh sửa đang dở.
 
 #### Tầng 2: Task Reviewer (Subagent thẩm định từng task)
 - Ngay sau khi Task Worker nộp kết quả, Main Agent dispatch subagent reviewer (agent role `reviewer`).
-- Reviewer đọc file task card `task-XX-<slug>.md` và kiểm tra diff của task:
-  1. *Spec Compliance:* Code có thỏa mãn đúng AC của task card không? Có code thừa/tự ý mở rộng scope ngoài task không?
-  2. *Code Quality:* Mã nguồn có sạch, đúng quy ước dự án, xử lý lỗi đầy đủ và không phá vỡ logic cũ không?
-- Nếu Reviewer phát hiện lỗi: Trả feedback rõ ràng để Worker sửa lại ──► Reviewer kiểm tra lại.
-- Reviewer trả kết luận và phần cần sửa. Agent điều phối chỉ đánh dấu task Done khi đủ DoD và kiểm chứng cần thiết, rồi cập nhật roadmap và hàng backlog theo mục 7. Review từng task không tự chứng minh tính năng đã Done.
+- Reviewer đọc canonical task record (task card hoặc mục checklist) và kiểm tra diff của task theo hai trục bắt buộc (Spec Compliance và Standards/Code Quality).
+- **Hợp nhất nghĩa vụ review:** Một báo cáo review chuẩn hai trục (Standards & Spec) ở đúng scope và revision được công nhận là bằng chứng hoàn thành nghĩa vụ review của task; không bắt buộc tổ chức thêm vòng code-review trùng lặp riêng lẻ nếu cùng phạm vi và revision.
+- Kết quả review và findings được ghi nhận trực tiếp vào canonical record, kèm link diff/commit; không tạo file báo cáo mới. Nếu có finding: Worker sửa lại ──► Reviewer thẩm định lại. Finding chưa giải quyết là blocker ngăn chuyển sang Done.
 
-#### Tầng 3: Reviewer Tổng (Nghiệm thu toàn diện sau khi hết tasks)
-- Sau khi các workers bàn giao và review từng task đạt, thực hiện nghiệm thu tích hợp của tính năng. Không chờ tất cả ô tính năng được tích Done mới chạy kiểm chứng này.
-- Nhiệm vụ của Reviewer Tổng:
-  1. Quét toàn bộ `git diff` của toàn bộ tính năng/module từ đầu đến cuối.
-  2. Đối chiếu bằng chứng kiểm thử tích hợp/regression do agent điều phối chạy trên revision tích hợp.
-  3. Đối chiếu với Definition of Done (DoD) và tiêu chí nghiệm thu của Product Goal.
-  4. Xuất báo cáo tổng kết chất lượng và đề xuất sẵn sàng phát hành (release readiness).
-
+#### Tầng 3: Reviewer Tổng (Nghiệm thu tích hợp sau khi hoàn tất các tasks)
+- Sau khi các workers bàn giao và review từng task đạt, thực hiện nghiệm thu tích hợp của tính năng trên revision tích hợp.
+- **Giới hạn phạm vi của Reviewer Tổng:**
+  1. Quét diff tích hợp (integrated diff) giữa các tasks, đối chiếu hợp đồng dùng chung (shared contracts) và AC liên module.
+  2. Tái sử dụng kết quả review cùng revision của các task con; không lặp lại việc kiểm tra chi tiết các findings cục bộ đã được xử lý và không đổi.
+  3. Chỉ re-review lại các phần việc trước đó nếu các thay đổi tích hợp tạo ra tác động/ảnh hưởng có ý nghĩa (meaningful changes).
+  4. Đối chiếu bằng chứng kiểm thử tích hợp / regression do agent điều phối chạy trên revision tích hợp thực tế. Tuyệt đối không bypass bằng chứng tích hợp hoặc các cổng Standards/Spec nếu còn finding chưa xử lý (unresolved finding blockers).
+  5. Đối chiếu Definition of Done (DoD) và tiêu chí nghiệm thu của Product Goal để xuất kết luận chất lượng và đề xuất sẵn sàng phát hành (release readiness).
 ## 4. Gói bàn giao
-Đưa cho người/agent đủ thông tin để làm mà không cần chat gốc:
+Đưa cho người/agent đủ thông tin để làm mà không cần chat gốc, lưu trực tiếp vào canonical record (task card hoặc mục checklist) thay vì tạo file báo cáo mới cho từng bước:
 
 | Nội dung | Bắt buộc làm rõ |
 |---|---|
@@ -111,11 +119,12 @@ Không ép TDD máy móc cho tài liệu hoặc UI walkthrough. Dùng kiểm th�
 
 ## 6. Review và kiểm chứng
 
-- Thu evidence đúng revision/môi trường: lệnh hoặc thao tác, kết quả thật và artifact/link.
+- Thu evidence đúng revision/môi trường: lệnh hoặc thao tác, kết quả thật và artifact/link. Đối với thay đổi non-UI (backend, logic, DB, migration, CLI), chỉ thu thập bằng chứng kiểm thử tương ứng (unit/integration test, API call, migration log); không áp dụng hay ép buộc kiểm chứng browser.
 - Review sự phù hợp spec trước, chất lượng/bảo mật/khả năng vận hành theo scope tiếp theo.
-- Finding có ảnh hưởng phải sửa và chạy lại đường liên quan; không chỉ đổi status review.
+- Finding có ảnh hưởng phải sửa và chạy lại đường liên quan; không chỉ đổi status review. Unresolved finding là hard blocker.
 - Kiểm chứng ở nhánh riêng không thay checks cần thiết trên revision tích hợp.
 - Công cụ không chạy được: ghi `not-run` và nguyên nhân, không biến thành pass.
+- Lưu trữ kết quả review, handoff và evidence trực tiếp vào canonical record (task card hoặc checklist entry trong roadmap) kèm links; không sinh thêm file báo cáo rời cho từng bước.
 
 Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm tra → kết quả → link/output → reviewer khi bắt buộc. Dùng mẫu shared khi cần lưu.
 
@@ -123,9 +132,9 @@ Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm 
 
 Feature và **Risky Bounded** phải đọc `skill://code-review`; nếu URI chưa khám phá, đọc `.agents/skills/code-review/SKILL.md`. Risky Bounded là thay đổi ảnh hưởng contract/interface, security/quyền, dữ liệu hoặc migration, hay nhiều module. Docs-only và Bounded cục bộ rủi ro thấp tiếp tục policy review hiện hữu.
 
-Với Feature, ghi baseline revision khi nhận task sau G4. Với Bounded, trước first write ghi baseline revision và pre-existing dirty paths. Sau triển khai, giới hạn review vào owned changed areas. Tạo Review Input Packet C-SI-05 gồm `baseline_revision`, `owned_changed_areas`, task card, stories/AC, architecture contract, standards sources và required checks. Thiếu baseline hoặc spec bắt buộc là `blocked`, không phải pass.
+Với Feature, ghi baseline revision khi nhận task sau G4. Với Bounded, trước first write ghi baseline revision và pre-existing dirty paths. Sau triển khai, giới hạn review vào owned changed areas. Tạo Review Input Packet C-SI-05 gồm `baseline_revision`, `owned_changed_areas`, canonical task record (task card hoặc mục checklist), stories/AC, architecture contract, standards sources và required checks. Thiếu baseline hoặc spec bắt buộc là `blocked`, không phải pass.
 
-Có subagents: chạy Standards và Spec song song với context tách biệt. Không có subagents: chạy hai pass tuần tự, vẫn giữ hai báo cáo riêng; không bỏ axis hoặc gộp/rerank findings. Finding ảnh hưởng phải được sửa và review lại, hoặc có accepted exception kèm nguồn. Chỉ chuyển sang Verification/Done khi cả hai verdict đạt và không còn finding chưa xử lý.
+Có subagents: chạy Standards và Spec song song với context tách biệt. Không có subagents: chạy hai pass tuần tự, vẫn giữ hai báo cáo riêng; không bỏ axis hoặc gộp/rerank findings. Hợp nhất nghĩa vụ: một báo cáo review chuẩn hai trục (Standards và Spec) đúng scope và revision thỏa mãn cả yêu cầu code-review và review task, không tổ chức lặp lại. Tái sử dụng kết quả review cùng revision cho các task con; Reviewer Tổng chỉ tập trung vào diff tích hợp, shared contracts, cross-module AC và re-review khi có meaningful changes. Finding ảnh hưởng phải được sửa và review lại, hoặc có accepted exception kèm nguồn. Unresolved finding là blocker ngăn Done; chỉ chuyển sang Verification/Done khi cả hai verdict đạt và không còn finding chưa xử lý.
 
 Code review không thay Browser Native: task có thay đổi UI/diagram vẫn phải hoàn thành checkpoint tương ứng bên dưới.
 
@@ -165,22 +174,22 @@ ask(questions=[{
 ```
 ## 7. Hoàn thành và cập nhật trạng thái
 
-Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Với `ui_changed = true`, phải có quyết định Browser Native và hoàn tất lựa chọn tương ứng trước khi báo hoàn thành; nếu bỏ qua, ghi `not-run` và không claim kiểm chứng trực quan. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.
+Đối chiếu DoD của đội. Chỉ đề nghị/ghi Done khi AC, review bắt buộc và kiểm chứng tích hợp đều đáp ứng. Với `ui_changed = true`, phải có quyết định Browser Native và hoàn tất lựa chọn tương ứng trước khi báo hoàn thành; nếu bỏ qua, ghi `not-run` và không claim kiểm chứng trực quan. Với thay đổi non-UI, chỉ yêu cầu bằng chứng kiểm thử logic/tích hợp áp dụng, không ép browser verification. Người dùng nói “xong rồi” là yêu cầu kiểm tra/cập nhật, không tự là bằng chứng.
 
 Có quyền ghi Jira: dùng transition thật, ghi evidence references theo quy ước, xác nhận kết quả. Không có quyền/kết nối: bàn giao đánh giá và nói Jira chưa cập nhật. PR merge không tự là story Done; children Done không tự đóng parent; Done không đồng nghĩa đã Released.
 
 Nếu Jira đã Done nhưng evidence thiếu, báo bất nhất để người có quyền xử lý; không tự chứng nhận hoặc tự sửa lịch sử. Chuyển `delivery-inspection` khi cần nhìn ảnh hưởng lên module/sprint/release.
 
-### Cập nhật Product Backlog sau mỗi kết quả
+### Cập nhật Product Backlog và Lộ trình sau mỗi kết quả
 
-Trong scope thực thi được ủy quyền, agent điều phối phải cập nhật `docs/workflow/product-backlog.md` (hoặc backlog hiện hữu), không chỉ báo xong trong chat:
-1. Đọc hàng tính năng theo ID trong task card, stories/AC và evidence mới nhất; dùng quy tắc của `skill://product-workflow/references/records.md`.
+Trong scope có backlog và được ủy quyền cập nhật, agent điều phối cập nhật hồ sơ task và backlog hiện hữu theo các bước dưới. Bounded/Spike độc lập chưa có backlog thì báo evidence theo nhánh, không tạo backlog/roadmap mới chỉ để báo xong:
+1. Đọc hàng tính năng theo ID trong canonical record, stories/AC và evidence mới nhất; dùng quy tắc của `skill://product-workflow/references/records.md`.
 2. Ghi kết quả task/review/kiểm chứng, kể cả failed/not-run. Tính lại AC đạt/tổng của tính năng, không cộng điểm theo số tasks hoặc lời báo của worker.
 3. Khi đủ DoD và kiểm chứng tích hợp, tích `[x]` và cộng toàn bộ SP đã duyệt của tính năng. Còn thiếu review hoặc AC thì giữ `[ ]`, trạng thái tương ứng và 0 SP hoàn tất cho hàng đó.
 4. Tính lại tổng quan, cập nhật nguồn/thời điểm và link evidence. Nếu lỗi mới hoặc thay đổi làm bằng chứng mất hiệu lực, bỏ tích phần ảnh hưởng, tính lại điểm và giữ lịch sử.
 5. Chế độ Jira chỉ phản ánh transition được xác nhận; mất quyền/kết nối thì ghi chưa đồng bộ, không tự chuyển sang local. Không cần gọi Jira ở chế độ local.
 
-Chỉ agent điều phối ghi ma trận chung; workers/reviewers gửi kết quả qua task cards và handoff. Nếu file bị người khác thay đổi, đọc bản mới và đối chiếu trước khi ghi. Cuối lượt báo đường dẫn backlog, ID tính năng vừa cập nhật, điểm và nghĩa vụ còn thiếu.
+Chỉ agent điều phối ghi ma trận chung; workers/reviewers gửi kết quả qua canonical task records và handoff. Nếu file bị người khác thay đổi, đọc bản mới và đối chiếu trước khi ghi. Cuối lượt báo đường dẫn backlog/roadmap, ID tính năng vừa cập nhật, điểm và nghĩa vụ còn thiếu.
 
 ## 8. Gián đoạn, trả việc và tiếp tục
 

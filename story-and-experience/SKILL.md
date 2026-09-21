@@ -27,15 +27,23 @@ Mẫu story map:
 | Actor/journey | Hoạt động | Story ID | Kết quả người dùng | Rule nguồn | Scope/release đề xuất | Câu hỏi chặn |
 |---|---|---|---|---|---|---|
 
-## 2. Viết story và AC
+## 2. Viết User Story theo chuẩn và quy ước định danh
+
+### 2.0. Quy ước định danh Epic & User Story
+- **Epic ID & Tên Epic/Module:** Kế thừa từ G1; đặt tên theo mục `Quy ước tên Epic/Module` trong `skill://product-workflow/references/records.md`.
+- **User Story ID:** Sử dụng tiền tố `US` kèm số thứ tự 2 chữ số: `US01`, `US02`, `US03`... Mỗi User Story là một chức năng hoàn chỉnh từ góc nhìn người dùng.
+- **Cấu trúc User Story bắt buộc:**
+  ```text
+  [US-ID] Là [Tên Actor / Nhóm người dùng], tôi muốn [hành động / tính năng cần thực hiện] để [mục đích / giá trị nghiệp vụ mang lại].
+  ```
+  *Ví dụ:* `US01: Là nhân viên bán hàng, tôi muốn tìm kiếm điện thoại theo tên hoặc mã để nhanh chóng tìm được sản phẩm cần bán cho khách.`
 
 Mỗi story có:
-- ID ổn định, actor, nhu cầu và giá trị; link mục tiêu/rule nguồn.
+- ID ổn định (`USxx`), liên kết Epic (`EPxx`), actor, nhu cầu và giá trị; link mục tiêu/rule nguồn.
 - Scope và ngoài phạm vi; tiền/hậu điều kiện.
 - Acceptance criteria quan sát được, gồm biên, lỗi và quyền liên quan.
 - Dữ liệu cần, flow/screen references, câu hỏi chưa giải quyết.
 - Điều kiện demo/kiểm chứng; không điền implementation trước khi thiết kế giải pháp.
-
 Mẫu AC:
 
 ```text
@@ -48,14 +56,19 @@ And [không tạo tác dụng phụ trái rule, nếu đây là yêu cầu]
 Không để AC chỉ là “API trả 200”, “giao diện đẹp” hoặc “không có lỗi”. Không thêm tính năng retry/undo/offline mặc định; chỉ đặc tả khi rule hoặc flow cần.
 
 ### 2.1. Phân tách Tư duy Test Scenario (What to test) từ User Stories
-Mỗi User Story đại diện cho một giá trị người dùng. Để bảo đảm kiểm chứng toàn diện trước khi chuyển sang kỹ thuật, AI phải xây dựng **Danh mục Test Scenarios (Kịch bản kiểm thử cấp cao)** bao phủ các góc độ:
+Mỗi User Story cần Test Scenarios theo AC và rủi ro thực tế. Xem xét các góc độ dưới đây, chỉ ghi nhánh áp dụng; không tạo tình huống giả để đủ loại:
 1. **Happy Path Scenario:** Người dùng thực hiện luồng chính trong điều kiện lý tưởng.
 2. **Negative / Rejection Scenario:** Dữ liệu sai, nhập thiếu, trùng lặp hoặc vi phạm điều kiện nghiệp vụ.
 3. **Boundary / Edge Case Scenario:** Giá trị tại biên (0, min, max, độ dài chuỗi tối đa/tối thiểu).
 4. **Security / Permission Scenario:** Thao tác khi chưa đăng nhập, token hết hạn, hoặc truy cập ngoài quyền hạn.
 5. **Failure / Recovery Scenario:** Mất kết nối, timeout, thao tác lặp hoặc người dùng bấm hủy giữa chừng.
 
-Mỗi Test Scenario sẽ là đầu vào nghiệp vụ trực tiếp để Cổng G4 (`delivery-planning`) phân rã thành các **Test Cases chi tiết (How to test)** trong từng Task Card.
+Test Scenarios là đầu vào để G4 xác định kiểm chứng trong hồ sơ task (checklist hoặc card), không bắt một file test plan riêng.
+
+### 2.2. Ma trận Actor–Story
+
+Lập và lưu một lần theo mục `Bảng Ma trận User (Actor) và User Story` trong `skill://product-workflow/references/records.md`. Phân biệt actor thực hiện với bên hưởng lợi, dẫn chiếu rule quyền có nguồn. Kiểm tra story thiếu actor/trigger hoặc quyền bất thường; ma trận là đầu vào cho kiểm chứng quyền ở G3/G4. Backlog chính liên kết ma trận này, không chép thành bảng độc lập khác.
+
 
 ## 3. Thiết kế flow trước chi tiết trang trí
 
@@ -87,7 +100,7 @@ Tái sử dụng design system/component hiện có. Không chọn style, font h
 
 ## 5. Walkthrough và kiểm tra liên kết
 
-Đi thử trên sơ đồ/wireframe với dữ liệu mẫu được ghi nhãn:
+Đi thử trên bảng flow, sơ đồ hoặc wireframe hiện hữu với dữ liệu mẫu được ghi nhãn:
 - Happy path đạt mục tiêu và hậu điều kiện.
 - Một failure path quan trọng có phản hồi/phục hồi rõ.
 - Một denied path không lộ dữ liệu hoặc thao tác ngoài quyền.
@@ -97,21 +110,24 @@ So từng AC với flow và màn hình. Rule không được stories nào bao ph
 
 ## Đầu ra: Lưu file tài liệu User Stories & UX (Docs-First)
 
-AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO FILE THẬT** tại đường dẫn:
-`docs/workflow/specs/<tên-tính-năng>-stories.md`
+AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tại đường dẫn:
+`docs/workflow/specs/<tên-phân-hệ>-stories.md`
+
+*Lưu ý cập nhật:* Khi bổ sung hoặc tinh chỉnh stories của phân hệ đã có, cập nhật trực tiếp vào file stories hiện hữu của phân hệ đó, không tạo thêm file tài liệu mới rời rạc cho mỗi thay đổi nhỏ.
 
 Nội dung file bao gồm:
-- Story Map trực quan: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-story-map.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-story-map.html` và chèn liên kết vào tài liệu.
-- User Journey Diagram: dùng `skill://diagram-design` (`type-journey.md`) tạo file `docs/workflow/diagrams/<tên-tính-năng>-journey.html` nếu mô tả trải nghiệm đa giai đoạn.
+- Danh mục Epics (`EPxx`) và User Stories (`USxx`) chuẩn hóa theo mục `Quy ước tên Epic/Module` trong `skill://product-workflow/references/records.md`.
+- **Bảng Ma trận User (Actor) và User Story:** Ánh xạ 2 chiều chi tiết toàn bộ User Stories với các nhóm Actors theo mẫu `Bảng Ma trận User (Actor) và User Story` trong `skill://product-workflow/references/records.md`.
+- Story Map & User Journey Diagram: Sơ đồ trực quan chỉ bắt buộc khi hành trình người dùng có độ phức tạp cao, luồng đa bước mơ hồ hoặc khi người dùng yêu cầu rõ ràng; tái sử dụng sơ đồ hợp lệ đã có nếu trải nghiệm không đổi. Với phạm vi đơn giản, bảng story map và bảng mô tả luồng trong tài liệu là đủ. Khi tạo mới hoặc cập nhật sơ đồ: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-story-map.md`, `type-journey.md`, `type-flowchart.md`, `type-state.md`) tạo file HTML trong `docs/workflow/diagrams/`, chèn liên kết vào tài liệu và kiểm chứng hiển thị bằng browser-native.
 - Chi tiết các User Stories kèm Acceptance Criteria quan sát được (chuẩn Given-When-Then).
-- Luồng thao tác chi tiết (Flow catalogue, dùng `type-flowchart.md` hoặc `type-state.md` cho các máy trạng thái phức tạp).
-- Danh mục màn hình và ma trận trạng thái UI (Loading, Empty, Error, Success).
+- Test Scenarios cấp cao theo các nhánh Happy Path, Negative, Boundary, Security và Recovery áp dụng.
+- Luồng thao tác chi tiết (Flow catalogue) và ma trận trạng thái UI (Loading, Empty, Error, Success).
 ## Gate G2 và bàn giao (Hard-Stop)
 
 G2 hoàn thành khi người phụ trách sản phẩm hoặc UX duyệt phạm vi, tiêu chí nghiệm thu và luồng thao tác đúng phiên bản. Không cần chờ hoàn thiện toàn bộ giao diện của cả hệ thống mới bắt đầu làm phần tính năng đã đủ rõ ràng.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu file `docs/workflow/specs/<tên-tính-năng>-stories.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
-- Câu hỏi: *"Tôi đã hoàn thành User Stories và thiết kế UI States tại `docs/workflow/specs/<tên-tính-năng>-stories.md`. Bạn có duyệt tài liệu này (Cổng G2) để chuyển sang thiết kế Kiến trúc & API Contracts (Cổng G3) không?"*
+**Quy tắc dừng lượt bắt buộc:** Sau khi dùng công cụ `write` lưu hoặc cập nhật file `docs/workflow/specs/<tên-phân-hệ>-stories.md`, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+- Câu hỏi: *"Tôi đã hoàn thành User Stories và thiết kế UI States tại `docs/workflow/specs/<tên-phân-hệ>-stories.md`. Bạn có duyệt tài liệu này (Cổng G2) để chuyển sang thiết kế Kiến trúc & API Contracts (Cổng G3) không?"*
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh Stories/UX]`, `[Xem giải thích chi tiết]`.
 
 Bàn giao cho `solution-design` (G3): stories/flows đã duyệt, yêu cầu dữ liệu/quyền/NFR, câu hỏi chặn và những quyết định UX ảnh hưởng kỹ thuật. Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang `task-execution` để viết code ngay.

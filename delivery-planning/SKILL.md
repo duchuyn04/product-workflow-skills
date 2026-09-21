@@ -1,6 +1,6 @@
 ---
 name: delivery-planning
-description: "Tạo Product Backlog Markdown dạng ma trận tính năng với Story Points, AC đạt/tổng và checkbox; chia task cards độc lập, xác định dependency, việc song song và kế hoạch sprint theo năng lực đội."
+description: "Lập Product Backlog, dependency và sprint theo capacity; dùng checklist cho việc nhỏ, task cards cho việc lớn hoặc bàn giao độc lập, giữ AC và evidence."
 hide: true
 ---
 
@@ -12,26 +12,38 @@ hide: true
 
 Product Goal/scope được duyệt; stories/AC/flows; module map, contracts/revisions và quyết định giải pháp; backlog hiện có nếu đọc được; capacity/kỹ năng/reviewer và nhịp sprint do đội khai báo. Phần chưa biết ghi rõ, không tự gán người, story points hoặc số sprint.
 
-## 1. Chọn thứ tự dựa trên giá trị và dependency
+## 1. Chuỗi giá trị Backlog và Lựa chọn thứ tự theo Dependency
 
+### 1.0. Từ backlog đến thực thi
+
+Liên kết actors, Epic và stories trong backlog chính → Sprint Planning → scope sprint được chọn → tasks cần thiết → board theo workflow thực tế. Mẫu và quy ước tên Epic/Module nằm trong `skill://product-workflow/references/records.md`; không sao chép mẫu thành backlog thứ hai.
+
+### 1.1. Năm tiêu chí Sprint Planning
+
+Không lấy máy móc các dòng đầu backlog. Xem xét:
+1. **Priority:** Mức ưu tiên nghiệp vụ do PO xác nhận; Rank là thứ tự backlog, không phải Priority.
+2. **Sizing:** SP khi đội sử dụng và đã duyệt, hoặc cách ước lượng hiện hữu. Chưa ước lượng ghi rõ; không tự áp Fibonacci.
+3. **Dependencies:** Đầu ra cụ thể cần có. Có thể chọn prerequisite và downstream cùng sprint nếu có kế hoạch thực hiện/tích hợp khả thi; downstream chỉ được bắt đầu khi prerequisite thực sự thỏa.
+4. **Sprint Goal:** Kết quả có giá trị, tập trung và kiểm chứng được.
+5. **Capacity:** Năng lực, kỹ năng và thời gian thực tế của đội; không suy từ ví dụ bán hàng hoặc số AI agents. Vượt capacity thì đề xuất giảm/dời scope mà vẫn bảo vệ Goal, để đội quyết định.
+
+### 1.2. Chọn thứ tự dựa trên giá trị và dependency
 - Tìm walking skeleton: một đường hẹp end-to-end tạo giá trị cốt lõi và kiểm chứng được trên môi trường phù hợp.
 - Xác định enablers bắt buộc và rủi ro cần spike. Không làm toàn bộ “nền tảng dùng chung” trước mọi giá trị.
 - Ưu tiên đề xuất theo giá trị, rủi ro và việc được mở khóa; Product Owner quyết định thứ tự backlog.
 - Không đợi hoàn tất một module nếu task tiếp theo chỉ cần một đầu ra/hợp đồng cụ thể đã sẵn sàng.
 - Phạm vi xa chỉ cần đủ để nhìn dependency/rủi ro; chi tiết hóa sâu phần sắp làm, không tạo hàng trăm task giả chính xác.
-
 ## 2. Phân rã tính năng và chia task bàn giao được
 
 Mỗi story cần mang lại một luồng hoạt động hoàn chỉnh từ đầu đến cuối (end-to-end) để có thể kiểm chứng độc lập. Task kỹ thuật có thể chia theo chuyên môn để hỗ trợ story, nhưng việc hoàn thành riêng từng task kỹ thuật chưa đủ để kết luận story đã xong.
 
-Mẫu task:
-- ID/key hoặc ID nháp rõ nhãn chưa publish; story/epic và module liên quan.
-- Hành vi/giá trị giao được, ngoài phạm vi, AC.
-- Inputs: tài liệu/contracts đúng revision và tiền điều kiện.
-- Hard blockers: đầu ra cần, ID/key và lý do; external blockers có owner gỡ chặn.
-- Kỹ năng cần, khả năng nhận việc của người/AI theo chính sách; không tự assign.
-- Read/write areas đã biết, xung đột ngữ nghĩa, integration owner cần xác nhận.
-- Cách kiểm chứng và yêu cầu review; điều kiện Done liên quan.
+### 2.1. Checklist phạm vi, không chia tầng máy móc
+
+Đọc `Checklist phạm vi kỹ thuật` trong `skill://product-workflow/references/records.md`. Chỉ tạo tasks có đầu ra kiểm chứng hoặc bàn giao rõ; một task có thể bao trùm UI, logic và kiểm thử. Các phần không đổi chỉ liên kết tài liệu đã có.
+
+### 2.2. Chọn hồ sơ task
+
+Áp dụng mục `Hồ sơ task gọn và task card` trong cùng reference: checklist trong roadmap cho việc nhỏ, cùng người làm tuần tự; card riêng cho việc lớn hoặc bàn giao độc lập. Cả hai giữ ID, scope/AC, prerequisites, kiểm chứng và evidence. Khi giao nhiều workers, tách card cho vùng ghi độc lập; agent điều phối là người ghi roadmap/backlog.
 
 Task quá lớn để giao/kiểm chứng rõ thì chia; đừng chia mỗi thay đổi một dòng thành issue. Jira có thể dùng Sub-task hoặc linked issue; đọc hierarchy thật, không giả Story chứa Task mặc định.
 
@@ -65,22 +77,36 @@ Chung nguồn chỉ đọc không tự là xung đột. Branch/worktree riêng k
 
 ## 5. Chuẩn bị backlog và sprint theo Scrum
 
+### 5.1. Một backlog, nhiều góc nhìn
+
+Dùng `Product Backlog dạng ma trận` trong `skill://product-workflow/references/records.md`. Backlog chính giữ Rank, Epic/story, links actors, priority, SP và trạng thái; roadmap chỉ liên kết scope được chọn, không chứa bản sao bảng backlog. Giữ tên Epic/Module theo mục `Quy ước tên Epic/Module`.
+
+### 5.2. Kế hoạch sprint
+
+Lập sprint sắp làm đủ sâu để giao và kiểm chứng. Chỉ dùng mẫu `Bảng Lộ trình Multi-Sprint (Multi-Sprint Roadmap)` trong reference khi cần dự báo nhiều sprint; không tự lập ba sprint hay gán velocity từ ví dụ.
+
+*Quy tắc Scrum:*
 - Product Backlog: PO sắp thứ tự theo Product Goal; refinement diễn ra liên tục.
 - Sizing: Developers thực hiện; AI có thể nêu rủi ro/đề xuất, không cam kết thời lượng thay đội. Story points không bắt buộc.
-- Sprint Planning: vì sao có giá trị → chọn những gì phù hợp capacity → kế hoạch thực hiện/tích hợp. Đội thống nhất Sprint Goal.
-- Sprint có độ dài cố định không quá một tháng; dùng nhịp đội đã chọn, hỏi nếu chưa có. Không tự chia lịch theo tuần tùy ý.
-- Daily Scrum: Developers kiểm tra tiến độ hướng Sprint Goal và thích nghi kế hoạch; summary của AI chỉ là đầu vào.
-- Review: kiểm tra Increment đạt DoD và phản hồi stakeholders; không phải cổng bắt buộc để release.
-- Retrospective: chọn cải tiến có owner/tiêu chí theo dõi; Scrum Master hỗ trợ thực hành và gỡ trở ngại.
-- Chưa Done cuối sprint không tính hoàn thành; quay lại backlog để cân nhắc, không tự đưa sang sprint sau như cam kết mới.
-
-AI không thay PO/Developers/Scrum Master, không tính AI như một người để suy velocity. Scope thay đổi trong sprint phải phối hợp với PO và không làm nguy hại Sprint Goal.
+- Sprint Planning: Thống nhất Sprint Goal → chọn User Stories theo 5 tiêu chí (Priority, SP, Dependency, Goal, Capacity).
+- Sprint có độ dài cố định không quá một tháng; kế thừa nhịp đội đã chọn, hỏi khi chưa có và quyết định kế hoạch cần nó.
+- Daily Scrum: Developers kiểm tra tiến độ hướng Sprint Goal; summary của AI chỉ là đầu vào.
+- Review: Kiểm tra Increment đạt DoD và demo cho stakeholders.
+- Retrospective: Rút kinh nghiệm, cải tiến quy trình cho Sprint tiếp theo.
+- Chưa Done cuối sprint: Quay lại backlog để cân nhắc, không tự đưa sang sprint sau như cam kết mới.
 
 Mẫu sprint proposal: Goal → mục được chọn đề xuất → capacity/rủi ro → dependency/nhóm song song → kế hoạch review/tích hợp/demo → câu hỏi cần đội quyết định.
 
-## 6. Publish chỉ khi được phép
+AI không thay PO/Developers/Scrum Master. Scope thay đổi trong sprint phải phối hợp với PO và bảo vệ Sprint Goal; Review không là cổng bắt buộc để release.
 
-Ở chế độ local: tạo/cập nhật Product Backlog và task cards theo `skill://product-workflow/references/records.md`; dùng trạng thái nội bộ có nguồn, không bịa Jira key/assignee. Chỉ các mục đang chuẩn bị publish Jira mới cần nhãn nháp chưa publish. Có backlog Jira nhưng mất kết nối thì giữ chế độ Jira và ghi chưa xác minh, không tự chuyển sang local.
+## 6. Publish chỉ khi được phép và Cấu trúc Jira
+
+### 6.1. Hierarchy và trạng thái thực tế
+
+Đọc hierarchy project trước khi ánh xạ Epic, Story, Task/Sub-task; không mặc định Task là con của Story. Board có thể hiển thị To Do → In Progress → Testing → Done, nhưng phải ánh xạ vào workflow thật và giữ nghĩa vụ Review/Verification theo hợp đồng chung. Nằm trong To Do hoặc trong sprint chưa phải bằng chứng Ready; chỉ Done khi đủ AC/DoD và evidence.
+
+### 6.2. Nguyên tắc xuất bản và Đồng bộ hóa
+Ở chế độ local: tạo/cập nhật backlog và hồ sơ task theo `skill://product-workflow/references/records.md`; dùng trạng thái nội bộ có nguồn, không bịa Jira key/assignee. Chỉ mục chuẩn bị publish mới cần nhãn chưa publish. Mất kết nối Jira không tự chuyển sang local.
 
 Có Jira: đọc project/board/hierarchy/fields/link types/permissions thực tế; đối chiếu backlog để tránh trùng. Trình breakdown và ảnh hưởng; lấy phê duyệt publish khi chưa được ủy quyền. Tạo theo dependency để liên kết keys thật, chỉ báo thành công sau output xác nhận. Timeout sau ghi phải đối chiếu, không tạo lại mù.
 
@@ -90,84 +116,32 @@ Quyền publish issue không bao gồm start/close sprint, sửa schema hay assi
 
 Đọc mục `Product Backlog dạng ma trận` trong `skill://product-workflow/references/records.md`; dùng đúng cột, công thức và điều kiện `[x]` ở đó. Khi lập kế hoạch được phép lưu, bắt buộc tạo/cập nhật `docs/workflow/product-backlog.md` hoặc backlog tương đương đã có:
 - Đối chiếu scope/brief/stories đã duyệt; mỗi tính năng một ID ổn định và một hàng, không biến mỗi task kỹ thuật thành một tính năng để cộng điểm.
-- Liên kết AC và task cards bằng ID/đường dẫn thật. Scope chưa được đặc tả vẫn hiện thiếu dữ kiện, không bịa AC hoặc task.
+- Liên kết AC và hồ sơ task bằng ID/đường dẫn hoặc anchor thật. Scope chưa được đặc tả vẫn hiện thiếu dữ kiện, không bịa AC hoặc task.
 - Ghi ưu tiên và Story Points theo quyết định của đội. Chưa có SP được duyệt thì giữ `—`, không tự gán giờ hoặc Fibonacci. Chưa chạy kiểm chứng thì không ghi AC đạt.
 - Tổng hợp riêng tính năng Done, SP hoàn tất và AC đạt; chỉ rõ phần chưa ước lượng/chưa chốt AC. Không cộng SP của tasks lần nữa vào tính năng.
 - Chỉ định người điều phối cập nhật ma trận trong phạm vi đã được ủy quyền; workers ghi task cards, không cùng sửa file tổng.
 
-## Đầu ra: Cấu trúc Task Cards phân rã theo file độc lập (Docs-First)
+## Đầu ra: Lưu kế hoạch theo quy mô (Docs-First)
 
-**CẤM DỒN TẤT CẢ TASKS VÀO 1 FILE `.MD` DUY NHẤT.**
-Việc gom 30–50 tasks vào 1 file plan khổng lồ gây ra xung đột Git merge khi làm việc nhóm, làm phình to context window và khiến Subagents không thể nhận việc độc lập.
+Cập nhật roadmap của phân hệ/sprint đã có; chỉ tạo `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md` khi chưa có nơi phù hợp. Nội dung gồm Goal/scope, links backlog và đầu vào đã duyệt, tasks, dependencies, rủi ro/capacity và phương án kiểm chứng/tích hợp.
 
-AI **BẮT BUỘC TỔ CHỨC THEO CẤU TRÚC THƯ MỤC MODULAR**:
-```text
-docs/workflow/plans/<tên-phân-hệ-hoặc-sprint>/
-├── roadmap.md                                   # Bản đồ tổng quan, Kanban & Dependency
-└── tasks/
-    ├── task-01-<slug>.md                       # Task Card độc lập cho Subagent/Dev
-    ├── task-02-<slug>.md
-    └── task-03-<slug>.md
-```
+- Việc nhỏ cùng người làm tuần tự: checklist theo mẫu shared, evidence ghi ngay trong entry.
+- Việc lớn hoặc giao độc lập: `tasks/task-XX-<slug>.md` theo mẫu shared; roadmap chỉ link tới card, không giữ thêm trạng thái chỉnh tay của task đó.
+- Dependency đơn giản: bảng ID → prerequisite/đầu ra cần là đủ. Chỉ tạo sơ đồ khi nhiều nhánh/quan hệ khó đọc hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Khi cần tạo/sửa, đọc `skill://diagram-design`, lưu HTML/SVG trong `docs/workflow/diagrams/` và vượt Browser Native quality gate trước bàn giao; không dùng Mermaid.
+- Ghi đủ test cases cho các AC/rủi ro áp dụng trong hồ sơ task; không tạo báo cáo test/handoff riêng nếu links evidence và record hiện hữu đã đủ.
 
-### 1. File `roadmap.md` (Trung tâm điều phối)
-Liên kết tới Product Backlog và ghi mục tiêu/phạm vi của phân hệ hoặc sprint. Roadmap tổng hợp từ task cards, không là nguồn trạng thái thứ hai.
-- Sơ đồ quan hệ phụ thuộc (Dependency Graph): **CẤM DÙNG MERMAID**, dùng `skill://diagram-design` (`type-dependency.md`) tạo file `docs/workflow/diagrams/<tên-phân-hệ>-dependency.html` và chèn link vào `roadmap.md`.
-- Bảng Kanban liên kết tới từng task con:
-  - `[ ] [Task 01: Thiết lập Schema Database](tasks/task-01-setup-schema.md)`
-  - `[ ] [Task 02: Xây dựng REST API](tasks/task-02-rest-api.md)`
+Việc nhỏ vẫn phải có inputs, AC, quyền thực thi và cách kiểm chứng rõ; giảm số file không giảm điều kiện G4.
 
-### 2. Mỗi file `tasks/task-XX-<slug>.md` là một Task Card tự chứa (Self-contained)
-Chứa đầy đủ mọi thông tin cần thiết để 1 Developer hoặc 1 Subagent Worker có thể thực thi mà không cần nạp toàn bộ lịch sử chat:
-
-```markdown
-# [TASK-01]: Tiêu đề ngắn gọn của task
-
-- **Phân hệ:** [Tên module]
-- **Tính năng / Story / AC:** [ID ổn định và liên kết tới hàng backlog, story, các AC liên quan]
-- **Trạng thái:** Todo | In Progress | Review | Verification | Done; Blocked kèm lý do
-- **Ước lượng:** [Chỉ ghi khi đội đã xác nhận; không cộng trùng vào SP tính năng]
-- **Mục tiêu:** [1–2 câu mô tả giá trị kỹ thuật mang lại]
-
-## Phạm vi thay đổi (Files)
-- Tạo mới: `src/path/to/new-file.ts`
-- Sửa đổi: `src/path/to/existing.ts`
-- Kiểm thử: `tests/path/to/test.ts`
-
-## Tiền điều kiện & Hợp đồng (Inputs)
-- Tham chiếu Schema / API: `docs/workflow/architecture/<feature>-design.md`
-- Prerequisites: [ID task phải xong trước, hoặc "Không có"]
-
-## Kịch bản kiểm thử & Bảng Test Cases chi tiết (Áp dụng tư duy Scenario vs Test Case)
-
-### Test Scenario: [Tên kịch bản kiểm thử cấp cao kế thừa từ Cổng G2 - WHAT TO TEST]
-- **Mục tiêu:** [Mô tả luồng nghiệp vụ cần kiểm chứng từ góc nhìn người dùng]
-
-### Bảng Test Cases chi tiết (HOW TO TEST):
-| Test Case ID | Loại kiểm thử | Kịch bản kiểm thử | Tiền điều kiện & Dữ liệu (Given) | Các bước thực hiện (When) | Kết quả kỳ vọng (Then) | Công cụ thực thi | Trạng thái |
-|---|---|---|---|---|---|---|---|
-| `TC-XX-01` | Unit Test | [Happy Path] Thực hiện thành công với dữ liệu chuẩn | Dữ liệu hợp lệ | Gọi hàm / API endpoint | Trả về kết quả đúng, mã HTTP 200/201 | `node:test` | `[ ]` |
-| `TC-XX-02` | Unit Test | [Negative] Từ chối dữ liệu không hợp lệ | Dữ liệu thiếu hoặc sai format | Gọi hàm / API endpoint | Ném lỗi cụ thể, mã HTTP 400 | `node:test` | `[ ]` |
-| `TC-XX-03` | Unit Test | [Boundary] Xử lý giá trị tại biên | Giá trị min hoặc max | Gọi hàm kiểm tra biên | Xử lý đúng quy tắc, không tràn số | `node:test` | `[ ]` |
-| `TC-XX-04` | Browser Native | [Visual/Render] Hiển thị giao diện / Sơ đồ chuẩn | Render bằng Chromium | Mở trang web / sơ đồ HTML | Không vỡ layout, font load đủ, gap connector >= 6px | Engine Browser Native | `[ ]` |
-| `TC-XX-05` | Browser Native | [Interactive Flow] Người dùng thao tác và xử lý lỗi | Màn hình tương tác | Bấm nút submit khi có lỗi mạng | Hiển thị thông báo lỗi, nút bấm disabled | Engine Browser Native | `[ ]` |
-
-## Hướng dẫn kiểm chứng (Verification Steps)
-- Lệnh chạy Unit Test: `npm test tests/path/to/test.ts`
-- Thao tác Browser Native: Dùng Engine Browser Native kiểm tra giao diện thực tế và chụp ảnh screenshot
-- Tiêu chuẩn hoàn thành: 100% Test Cases trong bảng đạt trạng thái Pass (`[x]`), review bắt buộc đạt và vượt qua kiểm thử tích hợp theo DoD.
-- Bằng chứng nghiệm thu: [AC ID, revision/môi trường, kết quả test, screenshot link và reviewer sign-off]
-```
 ## Gate G4 và bàn giao (Hard-Stop)
 
 Ready về nội dung chưa đủ để claim: còn cần quyền, owner hiện tại, scope thực thi và cơ chế nhận việc an toàn.
 
-**Quy tắc dừng lượt bắt buộc:** Sau khi tạo/cập nhật Product Backlog, `roadmap.md` và các task cards, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
+**Quy tắc dừng lượt bắt buộc:** Sau khi lưu backlog và kế hoạch (checklist hoặc cards phù hợp), AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 
 ```text
 ask(questions=[{
   "id": "gate_g4_approval",
-  "question": "Tôi đã cập nhật Product Backlog, kế hoạch tại `docs/workflow/plans/<phân-hệ>/roadmap.md` và các task cards riêng. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
+  "question": "Tôi đã cập nhật Product Backlog và kế hoạch có checklist/task cards phù hợp. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị triển khai không?",
   "options": [
     {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline)."},
     {"label": "Cần chỉnh sửa danh sách task", "description": "Thêm, bớt hoặc điều chỉnh lại phạm vi các task."},

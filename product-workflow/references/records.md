@@ -4,6 +4,10 @@
 
 Dùng quy ước tài liệu đã có. Nếu chưa có, đề xuất `docs/workflow/project.md` và `docs/workflow/checkpoint.md`, chốt nơi lưu một lần. Tài liệu chi tiết ở nơi phù hợp, chỉ mục chứa links; không nhét toàn dự án vào một file. Bảng dưới mô tả trường cần điền, không phải dữ liệu thật.
 
+## Quy ước tên Epic/Module
+
+Tên hiển thị Epic/module bắt đầu bằng **Quản lý + [thực thể/nghiệp vụ]**, ví dụ `Quản lý sản phẩm`, `Quản lý hóa đơn`, `Quản lý báo cáo`. Story/task dùng hành động cụ thể như `Thêm sản phẩm`, không ép tiền tố này lên tên thao tác hay identifier trong code. Giữ ID hiện có khi đổi tên; Epic và module vẫn là hai khái niệm khác nhau.
+
 ## Chỉ mục dự án
 
 | Trường | Cách điền |
@@ -54,12 +58,14 @@ Khi mở lại, so sánh nguồn thật; không lấy trạng thái owner/Done t
 
 Khi workflow được phép lưu, agent tạo/cập nhật `docs/workflow/product-backlog.md` trong dự án đích, hoặc backlog tương đương đã có. Đây là mẫu cho agent sử dụng, không phải yêu cầu tạo backlog trong repo chứa skills.
 
-Phần đầu file ghi Product Goal, scope/release, nguồn trạng thái (`local` hoặc `Jira`), nguồn duyệt phạm vi và thời điểm đối chiếu. Dùng một hàng cho mỗi tính năng có thể nghiệm thu; ID ổn định xuyên suốt brief, stories và task cards. Một tính năng thuộc nhiều module vẫn chỉ được tính điểm một lần.
+Phần đầu file ghi Product Goal, scope/release, nguồn trạng thái (`local` hoặc `Jira`), nguồn duyệt phạm vi và thời điểm đối chiếu. Dùng một hàng cho mỗi tính năng có thể nghiệm thu; ID ổn định xuyên suốt brief, stories và hồ sơ task. Một tính năng thuộc nhiều module vẫn chỉ được tính điểm một lần.
 
-| ID | Phân hệ | Tính năng | Ưu tiên | Story Points | AC đạt/tổng | Trạng thái | Hoàn thành | Stories / Tasks / Bằng chứng |
-|---|---|---|---|---|---|---|---|---|
+| Rank | ID | Epic / Phân hệ | Tính năng | Actors / Story | Ưu tiên | Story Points | AC đạt/tổng | Trạng thái | Hoàn thành | Tasks / Bằng chứng |
+|---|---|---|---|---|---|---|---|---|---|---|
 
 Các ô chứa links thật tới stories, task cards và evidence; không chép toàn bộ chi tiết task vào ma trận. Để bảng đọc được trong Markdown thông thường, dùng chữ cho trạng thái và ký hiệu `[ ]` / `[x]` cho hoàn thành. Checkbox trong ô bảng có thể chỉ hiện văn bản; agent sửa nội dung file, không phụ thuộc widget bấm được.
+
+Đây là bảng backlog chính, bao gồm góc nhìn Epic–Story–Actor qua links tới stories/ma trận quyền. Rank là thứ tự do PO chốt, khác mức Priority; chưa chốt ghi `—`. Có thể nhóm theo Epic hoặc sắp theo Rank để xem cùng dữ liệu, không lưu thêm bảng chỉnh tay cạnh tranh. Epic là nhóm, không là hàng cộng điểm thứ hai. Roadmap chỉ liên kết ID được chọn, Goal và dependencies; không sao chép actors, priority, SP hoặc trạng thái từng story.
 
 ### Điểm và điều kiện đánh dấu
 
@@ -86,8 +92,8 @@ Ví dụ số liệu minh họa, không phải tiến độ thật: ba tính nă
 
 - G1 đã duyệt: ghi tính năng/phân hệ/phạm vi đã xác nhận; SP `—`, AC `Chưa xác định`, hoàn thành `[ ]`. Không tự bịa chi tiết phần chưa discovery.
 - G2 đã duyệt: liên kết stories và AC có ID; xác định tổng AC. Việc duyệt thiết kế không tạo điểm kiểm chứng.
-- G4: `delivery-planning` liên kết roadmap/task cards, dependencies, ưu tiên và SP được duyệt. Không cộng thêm SP của tasks vào SP của tính năng.
-- Thực thi: `task-execution` cập nhật task card và bằng chứng; agent điều phối đối chiếu lại hàng tính năng, tổng điểm và thời điểm sau mỗi kết quả. `delivery-inspection` kiểm tra điều kiện `[x]` và bất nhất.
+- G4: `delivery-planning` liên kết roadmap và hồ sơ task (checklist hoặc card), dependencies, ưu tiên và SP được duyệt. Không cộng thêm SP của tasks vào SP của tính năng.
+- Thực thi: `task-execution` cập nhật hồ sơ task và bằng chứng; agent điều phối đối chiếu lại hàng tính năng, tổng điểm và thời điểm sau mỗi kết quả. `delivery-inspection` kiểm tra điều kiện `[x]` và bất nhất.
 - Khi nhiều người/agent làm việc, chỉ người điều phối được chỉ định ghi ma trận chung trong đợt đó. Đọc phiên bản mới nhất trước khi ghi; nếu có thay đổi từ phiên khác, đối chiếu nguồn và giải quyết xung đột, không ghi đè mù. Xem ma trận chỉ là thao tác đọc.
 
 ## Bản nháp task chưa publish
@@ -115,3 +121,49 @@ Ghi cả failed/not-run/unknown, không chỉ pass. Test ở nhánh riêng khôn
 |---|---|---|---|---|---|---|---|
 
 Danh mục module và nghĩa vụ phải có nguồn trước khi tính tiến độ. Thiếu nghĩa vụ là chưa xác định, không phải 0/0 đạt. Ma trận giai đoạn tổng hợp từ nghĩa vụ và nguồn local/Jira/evidence; checkbox Product Backlog tuân theo mục `Product Backlog dạng ma trận`, không thay thế bằng chứng nghiệm thu.
+
+## Bảng Ma trận User (Actor) và User Story
+
+Lưu một lần trong tài liệu stories của phân hệ; backlog liên kết tới đây. Dùng actors và IDs của dự án, không sao chép vai trò từ ví dụ bán hàng.
+
+| Story ID / Epic | User Story | Actor A | Actor B | Rule/quyền nguồn |
+|---|---|---|---|---|
+| [ID/link] | [Hành động và giá trị] | [Quan hệ] | [Quan hệ] | [Link rule] |
+
+Ghi rõ quan hệ: thực hiện, hưởng lợi, hoặc chưa xác định. Chỉ đánh dấu quyền thực hiện khi có rule được xác nhận; nhu cầu/hưởng lợi không tự cấp quyền. Story tự động ghi trigger và bên hưởng lợi, không bắt tạo actor thao tác giả.
+
+## Bảng Lộ trình Multi-Sprint (Multi-Sprint Roadmap)
+
+Chỉ lập nhiều sprint khi người dùng cần dự báo và có capacity/nhịp sprint do đội xác nhận; sprint xa là dự báo, không cam kết. Dùng ngay roadmap hiện hữu:
+
+| Sprint | Sprint Goal | Story IDs liên kết backlog | Capacity/nguồn | Tổng SP đã duyệt / số mục chưa ước lượng | Dependency/rủi ro | Quyết định |
+|---|---|---|---|---|---|---|
+
+Tổng SP là số tổng hợp tại thời điểm đối chiếu, không nhập lại SP từng story. Chưa biết capacity thì ghi chưa xác định; không lấy 18–20 SP, hai tuần hay ba sprint từ ví dụ làm mặc định.
+
+## Checklist phạm vi kỹ thuật
+
+Xem xét UI, dữ liệu/DB, API, logic và kiểm chứng để tránh sót phần bị ảnh hưởng. Đây là checklist phạm vi, không phải năm task hoặc năm tầng bắt buộc. Chỉ mô tả phần áp dụng; có thể gộp UI/logic/test trong một task end-to-end. Không tạo schema/API/migration khi không có thay đổi tương ứng. Chọn kiểm chứng theo AC/rủi ro; không bắt Unit Test hoặc Browser Native cho mọi task.
+
+## Hồ sơ task gọn và task card
+
+Mỗi task có một nơi ghi chính thức. Việc nhỏ, cùng người thực hiện và tuần tự: dùng checklist có ID/anchor trong roadmap. Việc lớn, có đầu vào/đầu ra bàn giao riêng hoặc giao worker độc lập: dùng `tasks/task-XX-<slug>.md`; roadmap chỉ giữ link. Không tạo file cho mỗi thay đổi một dòng.
+
+Checklist gọn vẫn cần: ID, mục tiêu/phạm vi, links story/AC, prerequisites, cách kiểm chứng, trạng thái và evidence đúng revision. Ví dụ cấu trúc để điền trong roadmap:
+
+```markdown
+### TASK-XX — [Mục tiêu]
+- [ ] Trạng thái: Todo; owner chỉ ghi khi đã được xác nhận.
+- Phạm vi / ngoài phạm vi: [...]
+- Story / AC / contracts: [links và revision liên quan]
+- Prerequisites / blocker: [ID, đầu ra cần hoặc không có]
+- Kiểm chứng: [lệnh/thao tác, dữ liệu và kết quả mong đợi]
+- Evidence / review: [revision tích hợp, môi trường, output, kết quả; chưa chạy ghi not-run]
+```
+
+Card độc lập dùng cùng trường trên, thêm read/write areas, inputs, rủi ro tích hợp và handoff đủ để người khác làm không cần chat gốc. Nếu test scenarios có nhiều nhánh cần bàn giao, thêm bảng test cases ngay trong card:
+
+| Case / AC | Given | When | Then | Công cụ/lệnh | Kết quả / evidence |
+|---|---|---|---|---|---|
+
+Chỉ ghi cases có nghĩa với scope, không điền đủ mọi loại test cho đúng mẫu. Done vẫn theo AC/DoD, review và kiểm chứng tích hợp; checkbox không thay evidence. Ghi review/handoff/evidence trong hồ sơ này hoặc liên kết output có sẵn, không tạo thêm báo cáo riêng cho mỗi bước. Khi tách checklist thành card, chuyển nội dung và thay entry cũ bằng link để không giữ hai bản trạng thái.

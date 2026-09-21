@@ -27,7 +27,7 @@ Không bịa API, lệnh CLI, MCP tool hoặc khả năng claim. Nếu công c�
 
 | Nội dung | Nguồn chính thức |
 |---|---|
-| Backlog, owner, sprint, dependencies, trạng thái công việc | Chế độ local: `product-backlog.md` và task cards liên kết; chế độ Jira: Jira đã được chọn làm nguồn chính |
+| Backlog, owner, sprint, dependencies, trạng thái công việc | Local: backlog chính và hồ sơ task (checklist hoặc card); Jira: Jira đã được chọn làm nguồn chính |
 | Nghiệp vụ, glossary, stories/flows, ADR và contracts | Hồ sơ có phiên bản trong repo theo quy ước đã chọn |
 | Quyết định duyệt | Bản ghi người duyệt, phạm vi, revision và tham chiếu nguồn xác nhận; liên kết Jira khi được phép |
 | Kết quả kiểm chứng | Output thật của công cụ/CI/review/deployment, kèm revision và môi trường |
@@ -36,7 +36,7 @@ Không bịa API, lệnh CLI, MCP tool hoặc khả năng claim. Nếu công c�
 
 Khi bắt đầu workflow có lưu tài liệu, dùng `docs/workflow/product-backlog.md` làm Product Backlog local nếu dự án chưa có nguồn chính khác. Nếu đã có backlog tương đương, cập nhật tại chỗ và ghi đường dẫn trong chỉ mục, không tạo bản cạnh tranh. Mẫu ma trận và cách tính điểm nằm trong mục `Product Backlog dạng ma trận` của `skill://product-workflow/references/records.md`. Chỉ đọc skill hoặc hỏi hiện trạng không cấp quyền tạo/cập nhật backlog.
 
-Backlog ghi rõ nguồn trạng thái `local` hoặc `Jira`, scope/release và thời điểm đối chiếu. Local dùng ID ổn định và trạng thái nội bộ, không giả Jira key hay claim nguyên tử. Task cards giữ chi tiết thực thi/evidence; roadmap chỉ liên kết và tổng hợp, không quản lý một bộ trạng thái độc lập.
+Backlog ghi rõ nguồn trạng thái `local` hoặc `Jira`, scope/release và thời điểm đối chiếu. Local dùng ID ổn định và trạng thái nội bộ, không giả Jira key hay claim nguyên tử. Mỗi task có một hồ sơ chính: checklist có ID/anchor trong roadmap cho việc nhỏ tuần tự, hoặc card riêng cho việc lớn/bàn giao độc lập. Roadmap giữ Goal, scope, dependencies và links; không sao chép bảng backlog hay trạng thái của task đã có card. Chi tiết chọn hồ sơ nằm trong `Hồ sơ task gọn và task card` của records.md.
 
 Nếu dự án đã dùng Jira, mất kết nối không được tự chuyển về local: giữ snapshot, ghi `chưa xác minh`, không ghi đè trạng thái Jira. Chuyển từ local sang Jira cần người dùng duyệt mapping và đối chiếu ID/key thật sau publish; từ đó Markdown là bản tổng hợp có thời điểm, không phải nguồn trạng thái thứ hai.
 
@@ -46,9 +46,16 @@ Mặc định đề xuất `docs/workflow/project.md` làm chỉ mục và `docs
 
 Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã commit, hoặc hash nội dung), nguồn, trạng thái duyệt. Duyệt trong chat phải ghi đúng người, nội dung/phạm vi và bằng chứng tham chiếu; không tự gán người dùng làm PO hay tech lead. Chưa có tham chiếu bền vững thì ghi rõ giới hạn, không bịa message ID. Nội dung đổi sau duyệt phải đánh giá lại phạm vi approval, không giữ `approved` bằng thói quen.
 
+### Hồ sơ vừa đủ
+
+- Feature: cập nhật brief/stories/design/plan hiện hữu theo phân hệ và phần scope bị ảnh hưởng. Chỉ tạo file khi chưa có nơi phù hợp hoặc cần bàn giao độc lập; ghi approval theo scope/revision, không tạo bộ file mới cho mỗi chỉnh sửa nhỏ.
+- Bounded/Spike: đề xuất và duyệt theo nhánh trong chat; cập nhật record/evidence hiện hữu nếu có. Không ép tạo cây tài liệu G1–G4.
+- Một bảng backlog chính. Mẫu chi tiết nằm trong `records.md`; skills dẫn tới mẫu thay vì chép lại. Evidence/review/handoff lưu trong hồ sơ liên quan hoặc liên kết output, không sinh báo cáo riêng cho mỗi bước.
+- Sơ đồ chỉ cần khi bảng/chữ chưa diễn đạt rõ quan hệ/luồng phức tạp hoặc người dùng yêu cầu. Tái dùng sơ đồ còn đúng; không đổi DB thì không tạo ER/schema mới. Mọi sơ đồ thực sự tạo/sửa vẫn dùng `diagram-design`, không Mermaid, và phải qua Browser Native quality gate.
+
 ## 4. Câu hỏi và gates
 
-Đọc nguồn trước khi hỏi. Hỏi theo từng chủ đề có trọng tâm (mỗi lượt 3–5 câu qua công cụ `ask`). Với hệ thống lớn, bắt buộc phân rã phân hệ và phỏng vấn cuốn chiếu qua nhiều vòng, không giới hạn cơ học số lượng câu hỏi cần thiết để làm rõ toàn diện nghiệp vụ.
+Đọc nguồn trước khi hỏi; chỉ hỏi quyết định nghiệp vụ còn thiếu, gom theo chủ đề khi có nhiều câu. Với hệ thống lớn, phân rã phân hệ và hỏi cuốn chiếu theo rủi ro. Dừng khi mục tiêu, scope, actors/rules đủ rõ và không còn câu hỏi chặn phần sắp làm; không dùng quota câu hỏi hay thêm vòng hỏi tiếp tục sau mỗi đợt. Đủ dữ kiện vẫn phải xin duyệt G1.
 
 | Gate | Điều kiện | Người quyết định |
 |---|---|---|
@@ -61,9 +68,9 @@ Chưa chỉ định người quyết định thì hỏi, không tự tạo appro
 ### Vi phạm nghiêm trọng: Đốt cháy giai đoạn (Gate-skipping)
 Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
 1. Với Feature (kể cả repo có source), viết code khi chưa duyệt G1–G4; với Bounded/Spike, thực thi khi chưa duyệt phương án sửa/thử nghiệm. Đọc skill hoặc nhận yêu cầu ban đầu không thay cho duyệt.
-2. Tự suy đoán nghiệp vụ thay vì dùng công cụ `ask` phỏng vấn người dùng ở Cổng G1.
-3. Tự quyết định tech stack trong đầu thay vì đề xuất 2–3 phương án và dùng `ask` để người dùng chọn ở Cổng G3.
-4. Chỉ in tài liệu ra chat mà không dùng công cụ `write` lưu file vật lý vào thư mục `docs/workflow/`.
+2. Tự suy đoán quyết định nghiệp vụ còn thiếu thay vì dùng `ask`; nguồn đã xác nhận đủ thì tái dùng, không bắt phỏng vấn lại.
+3. Tự chọn/thay stack khi có quyết định công nghệ mới đáng kể mà chưa trình phương án và xin duyệt; stack hiện hữu đã chốt thì kế thừa, không hỏi chọn lại.
+4. Chỉ in tài liệu thiết kế của cổng ra chat mà không lưu phần cập nhật vào hồ sơ vật lý trong `docs/workflow/`.
 5. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
 
 Mỗi cổng là một điểm dừng bắt buộc. AI phải lưu file tài liệu vào `docs/workflow/`, trình bày tóm tắt và dùng công cụ `ask` để người dùng duyệt trước khi chuyển sang cổng kế tiếp.
