@@ -60,13 +60,14 @@ Mỗi story cần mang lại một luồng hoạt động hoàn chỉnh từ đ�
 
 ### 2.2. Tổ chức cấu trúc Task theo Folder dựa trên Team Size
 
-Căn cứ vào số lượng thành viên đã xác nhận ở bước 1.1, AI **BẮT BUỘC TỔ CHỨC CẤU TRÚC TASK THEO FOLDER RÕ RÀNG**:
-- **Nếu nhóm 1 người (Solo Dev):** Lưu task cards trong `tasks/sprint-X/` (hoặc `tasks/solo/task-XX-<slug>.md`), sắp xếp theo luồng tuần tự (phase/step), không chia vụn gây phân mảnh file.
+Căn cứ vào số lượng thành viên đã xác nhận ở bước 1.1, AI **BẮT BUỘC TUÂN THỦ QUY ƯỚC ĐẶT TÊN SPRINT VÀ CẤU TRÚC FOLDER**:
+- **Quy ước đặt tên Sprint:** Bắt buộc tuân theo công thức `[Tên Module] + Sprint [X]` (ví dụ: `Quản lý abc + sprint 1`). Thư mục kế hoạch trong `docs/workflow/plans/` bắt buộc đặt theo slug tương ứng: `docs/workflow/plans/<module-slug>-sprint-<X>/` (ví dụ: `docs/workflow/plans/quan-ly-abc-sprint-1/`). Tuyệt đối cấm đặt tên trơ trọi `sprint-1` hay `sprint-X`.
+- **Nếu nhóm 1 người (Solo Dev):** Lưu task cards trong `docs/workflow/plans/<module-slug>-sprint-<X>/tasks/task-XX-<slug>.md` (hoặc `tasks/solo/task-XX-<slug>.md`), sắp xếp theo luồng tuần tự (phase/step), không chia vụn gây phân mảnh file.
 - **Nếu nhóm ≥ 2 người (Nhóm nhỏ hoặc Squad):** **BẮT BUỘC PHÂN CHIA THÀNH CÁC FOLDER CON** theo vai trò chuyên môn hoặc phân công thành viên để tránh xung đột vùng ghi (write conflict) và phân định quyền sở hữu:
-  - `tasks/sprint-X/backend/task-XX-<slug>.md` (DB, Migration, API, Business Services)
-  - `tasks/sprint-X/frontend/task-XX-<slug>.md` (Components, Pages, State Management, Mock Integration)
-  - `tasks/sprint-X/qa/task-XX-<slug>.md` (Test Fixtures, Integration Tests, E2E Scenarios)
-  *(hoặc chia theo track độc lập: `tasks/track-1-core/`, `tasks/track-2-ui/`...)*
+  - `docs/workflow/plans/<module-slug>-sprint-<X>/backend/task-XX-<slug>.md` (DB, Migration, API, Business Services)
+  - `docs/workflow/plans/<module-slug>-sprint-<X>/frontend/task-XX-<slug>.md` (Components, Pages, State Management, Mock Integration)
+  - `docs/workflow/plans/<module-slug>-sprint-<X>/qa/task-XX-<slug>.md` (Test Fixtures, Integration Tests, E2E Scenarios)
+  *(hoặc chia theo track độc lập: `.../track-1-core/`, `.../track-2-ui/`...)*
 - **Cấu trúc nội dung mỗi task card:** Bắt buộc có Task ID chuẩn (`TASK-01`, `TASK-02`...), Tiêu đề, Folder & Role/Owner dự kiến, Prerequisites, Checklist hành động, Acceptance Criteria (Given-When-Then), và Lệnh kiểm chứng độc lập.
 
 ## 3. Xây dựng Ma trận Ràng buộc giữa các tasks (Task Dependency Matrix)
@@ -150,10 +151,10 @@ Quyền publish issue không bao gồm start/close sprint, sửa schema hay assi
 
 ## Đầu ra: Lưu kế hoạch theo quy mô (Docs-First)
 
-AI cập nhật roadmap của phân hệ/sprint tại `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md`. Nội dung bắt buộc bao gồm:
-1. **Goal & Scope của Sprint:** Mục tiêu nghiệp vụ ngắn hạn kiểm chứng được.
+AI cập nhật roadmap của sprint tại `docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md`. Nội dung bắt buộc bao gồm:
+1. **Goal & Scope của Sprint:** Mục tiêu nghiệp vụ ngắn hạn kiểm chứng được; tên Sprint bắt buộc ghi rõ `[Tên Module] + Sprint [X]` (ví dụ: `Quản lý abc + sprint 1`).
 2. **Quy mô nhóm đã khảo sát:** Số lượng thành viên thực tế và cách phân bổ vai trò.
-3. **Cấu trúc Task Cards theo Folder:** Đường dẫn cụ thể tới từng file task card đã phân bổ theo folder vai trò/thành viên (ví dụ: `tasks/sprint-X/backend/task-01-...md`, `tasks/sprint-X/frontend/task-02-...md`).
+3. **Cấu trúc Task Cards theo Folder:** Đường dẫn cụ thể tới từng file task card đã phân bổ theo folder vai trò/thành viên (ví dụ: `docs/workflow/plans/<module-slug>-sprint-<X>/backend/task-01-...md`, `docs/workflow/plans/<module-slug>-sprint-<X>/frontend/task-02-...md`).
 4. **Bảng Ma trận Ràng buộc (Task Dependency Matrix):** Hiển thị rõ ràng buộc hard prerequisite, task bị chặn, và vùng code chung (Shared-write areas).
 5. **Bảng Phân phối Luồng làm song song (Parallel Tracks):** Chỉ rõ các task làm song song tại T0, điều kiện mở khóa downstream, và điểm hội tụ (Sync Checkpoints).
 6. **Phương án kiểm chứng & DoD:** Tiêu chí nghiệm thu và lệnh test độc lập.
@@ -173,7 +174,7 @@ G4 chỉ đạt khi và chỉ khi:
 ```text
 ask(questions=[{
   "id": "gate_g4_approval",
-  "question": "Tôi đã phân rã tasks theo folder dựa trên quy mô nhóm, lập Ma trận ràng buộc (Dependencies) và Phân phối luồng làm song song tại `docs/workflow/plans/<phân-hệ>/roadmap.md`. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị thực thi không?",
+  "question": "Tôi đã phân rã tasks theo folder dựa trên quy mô nhóm, lập Ma trận ràng buộc (Dependencies) và Phân phối luồng làm song song tại `docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md` với tên sprint `[Tên Module] + Sprint [X]`. Bạn có duyệt kế hoạch này (Cổng G4) để chuẩn bị thực thi không?",
   "options": [
     {"label": "Duyệt và chọn phương thức thực thi", "description": "Chuyển sang bước chọn mô hình thực thi (Subagents hoặc Inline) dựa trên các luồng song song."},
     {"label": "Cần chỉnh sửa danh sách task / folder", "description": "Thêm, bớt, gộp hoặc phân bổ lại cấu trúc folder task."},

@@ -19,6 +19,7 @@ Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, �
 - **TÙY CHỌN PROTOTYPE MOCKUP (G2):** Sau khi chốt các luồng UX tại Cổng G2, bắt buộc dùng `ask` hỏi người dùng xem có muốn tạo bản Prototype Mockup tương tác (HTML/CSS/JS độc lập) để bấm thử trên Browser Native và hình dung cách hệ thống vận hành trước khi chuyển sang Cổng G3 hay không.
 - **ERD NATIVE BROWSER GATE (G3):** Khi thiết kế kỹ thuật có tạo hoặc thay đổi cơ sở dữ liệu, bắt buộc dùng `diagram-design` tạo sơ đồ ERD HTML/SVG và kiểm thử trực quan qua Engine Browser Native (font chữ, mũi tên liên kết, bố cục) trước khi trình duyệt Cổng G3.
 - **KHẢO SÁT TEAM SIZE & CHIA FOLDER TASKS (G4):** Trước khi phân rã task tại Cổng G4, bắt buộc dùng `ask` khảo sát số lượng người trong nhóm để chia tasks theo folder chuyên môn/vai trò, hiển thị rõ Ma trận Ràng buộc (Dependencies) và các luồng làm song song (Parallel Tracks).
+- **ĐẶT TÊN SPRINT THEO MODULE (G4):** Tên sprint bắt buộc tuân theo công thức `[Tên Module] + Sprint [X]` (ví dụ: `Quản lý abc + sprint 1`). Thư mục kế hoạch trong `docs/workflow/plans/` bắt buộc đặt theo slug tương ứng: `docs/workflow/plans/<module-slug>-sprint-<X>/` (ví dụ: `plans/quan-ly-abc-sprint-1/`). Nghiêm cấm đặt tên sprint hoặc tạo folder trơ trọi chỉ có số như `Sprint 1`, `plans/sprint-1/`.
 
 ---
 
@@ -46,6 +47,7 @@ Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy n
 | *"Tôi viết User Story không xác định ai thực hiện/hưởng lợi, hoặc tự bỏ qua bước hỏi tạo Prototype Mockup tại G2."* | **SAI.** Đọc `story-and-experience`: Liên kết Actor–Story với rule quyền; đồng thời bắt buộc dùng `ask` hỏi người dùng tùy chọn tạo bản Prototype Mockup tương tác để bấm thử trước khi chốt G2. |
 | *"Tôi chốt stack rồi nên tôi code luôn, hoặc thiết kế DB chỉ viết bảng text mà không vẽ sơ đồ ERD."* | **SAI.** Đọc `solution-design` & `diagram-design`: Kế thừa stack, thiết kế delta, bắt buộc tạo sơ đồ ERD HTML/SVG kiểm thử Browser Native (font, mũi tên) và duyệt G3 trước khi sang G4. |
 | *"Tôi tự phân chia task mà không hỏi số người trong nhóm hoặc không chia folder / không chỉ rõ việc song song."* | **SAI.** Đọc `delivery-planning`: Bắt buộc gọi `ask` hỏi team size trước, phân chia task theo folder chuyên môn và lập ma trận dependencies cùng bảng luồng làm song song rõ ràng. |
+|*"Tôi đặt tên sprint hoặc folder plans trơ trọi là Sprint 1 / sprint-1 mà không có tên module."*|**SAI.** Theo mục `Quy ước đặt tên Sprint` trong `product-workflow/references/records.md`: tên Sprint bắt buộc là `[Tên Module] + Sprint [X]` (ví dụ: `Quản lý abc + sprint 1`) và folder lưu trữ kế hoạch là `docs/workflow/plans/<module-slug>-sprint-<X>/`.|
 | *"Mỗi story phải có năm task và mỗi task phải có file riêng."* | **SAI.** Đọc `delivery-planning`: UI/DB/API/logic/test là checklist phạm vi; việc nhỏ tuần tự dùng checklist, việc lớn hoặc bàn giao độc lập dùng card riêng. |
 | *"Tôi vừa trình bày vừa tạo file code luôn."* | **SAI.** Vi phạm cổng. Phải lưu tài liệu vào `docs/`, dùng `ask` chờ người dùng duyệt. |
 | *"Người dùng nói 'OK' là tôi được code hết."* | **SAI.** 'OK' chỉ là duyệt cho cổng vừa xong. Tuần tự chuyển cổng tiếp theo. |
@@ -67,7 +69,7 @@ Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy n
 | Khảo sát thực tế, As-Is/To-Be, Epics & Phỏng vấn nghiệp vụ (Cổng G1) | `skill://product-discovery` | `docs/workflow/specs/<phân-hệ>-brief.md` (Epics, As-Is vs To-Be) |
 | User Stories, Ma trận Actor vs Story, UX flows & Test Scenarios (Cổng G2) | `skill://story-and-experience` | `docs/workflow/specs/<phân-hệ>-stories.md` (Ma trận Actor - Story) |
 | Tech Stack, Schema, API & ADR (Cổng G3) | `skill://solution-design` | `docs/workflow/architecture/<phân-hệ>-design.md` |
-| Backlog chính, sprint, checklist hoặc task cards (Cổng G4) | `skill://delivery-planning` | `roadmap.md`; `tasks/task-XX-<slug>.md` khi cần bàn giao độc lập |
+|Backlog chính, sprint, checklist hoặc task cards (Cổng G4)|`skill://delivery-planning`|`docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md`; task cards theo folder chuyên môn|
 | Sơ đồ cho quan hệ/luồng khó diễn đạt bằng bảng/chữ hoặc theo yêu cầu | `skill://diagram-design` | HTML/SVG trong `docs/workflow/diagrams/`, phải kiểm chứng browser khi tạo/sửa |
 | Nhận việc, viết code, chạy Unit Test & Browser Native | `skill://task-execution` | Code, Unit tests, Browser evidence & DoD |
 | Nghiệm thu, Sprint Review, Retrospective & Release | `skill://delivery-inspection` | Chấm điểm AC/SP, tick `[x]` Product Backlog, Review & Retro |

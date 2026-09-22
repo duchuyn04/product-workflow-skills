@@ -7,6 +7,16 @@ Dùng quy ước tài liệu đã có. Nếu chưa có, đề xuất `docs/workf
 ## Quy ước tên Epic/Module
 
 Tên hiển thị Epic/module bắt đầu bằng **Quản lý + [thực thể/nghiệp vụ]**, ví dụ `Quản lý sản phẩm`, `Quản lý hóa đơn`, `Quản lý báo cáo`. Story/task dùng hành động cụ thể như `Thêm sản phẩm`, không ép tiền tố này lên tên thao tác hay identifier trong code. Giữ ID hiện có khi đổi tên; Epic và module vẫn là hai khái niệm khác nhau.
+## Quy ước đặt tên Sprint
+
+Tên Sprint và cấu trúc thư mục kế hoạch bắt buộc gắn liền với Module / phân hệ:
+- **Tên hiển thị Sprint (Display Name):** Bắt buộc tuân theo công thức **`[Tên Module] + Sprint [X]`** (hoặc `[Tên Module] + sprint [X]`), ví dụ: `Quản lý abc + sprint 1`, `Quản lý sản phẩm + Sprint 1`, `Quản lý đơn hàng + Sprint 2`. Tuyệt đối cấm đặt tên Sprint trơ trọi chỉ có số như `Sprint 1`, `Sprint 2` mà không gắn tên module.
+- **Thư mục lưu trữ kế hoạch (`plans/`):** Tên thư mục kế hoạch sprint trong `docs/workflow/plans/` bắt buộc chuẩn hóa từ tên module và sprint thành slug (kebab-case): **`docs/workflow/plans/<module-slug>-sprint-<X>/`** (ví dụ: `docs/workflow/plans/quan-ly-abc-sprint-1/`, `docs/workflow/plans/quan-ly-san-pham-sprint-1/`). Tuyệt đối cấm tạo thư mục trơ trọi `plans/sprint-1/` hay `plans/sprint-X/`.
+- **Cấu trúc bên trong thư mục Sprint:**
+  - File lộ trình chính: `docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md`.
+  - Nhóm 1 người (Solo Dev): lưu task cards trong `docs/workflow/plans/<module-slug>-sprint-<X>/tasks/task-XX-<slug>.md`.
+  - Nhóm ≥ 2 người: phân chia folder theo vai trò/chuyên môn: `docs/workflow/plans/<module-slug>-sprint-<X>/backend/task-XX-<slug>.md`, `.../frontend/task-XX-<slug>.md`, `.../qa/task-XX-<slug>.md` (hoặc theo track: `.../track-1-core/`).
+
 
 ## Chỉ mục dự án
 
@@ -138,6 +148,7 @@ Chỉ lập nhiều sprint khi người dùng cần dự báo và có capacity/n
 
 | Sprint | Sprint Goal | Story IDs liên kết backlog | Capacity/nguồn | Tổng SP đã duyệt / số mục chưa ước lượng | Dependency/rủi ro | Quyết định |
 |---|---|---|---|---|---|---|
+| Quản lý abc + Sprint 1 | [Mục tiêu cốt lõi sprint] | [US01, US02] | [Capacity xác nhận] | [Tổng SP / chưa ước lượng] | [Rủi ro / Dependency] | [Quyết định] |
 
 Tổng SP là số tổng hợp tại thời điểm đối chiếu, không nhập lại SP từng story. Chưa biết capacity thì ghi chưa xác định; không lấy 18–20 SP, hai tuần hay ba sprint từ ví dụ làm mặc định.
 
@@ -147,7 +158,7 @@ Xem xét UI, dữ liệu/DB, API, logic và kiểm chứng để tránh sót ph�
 
 ## Hồ sơ task gọn và task card
 
-Mỗi task có một nơi ghi chính thức. Việc nhỏ, cùng người thực hiện và tuần tự: dùng checklist có ID/anchor trong roadmap. Việc lớn, có đầu vào/đầu ra bàn giao riêng hoặc giao worker độc lập: dùng `tasks/task-XX-<slug>.md`; roadmap chỉ giữ link. Không tạo file cho mỗi thay đổi một dòng.
+Mỗi task có một nơi ghi chính thức. Việc nhỏ, cùng người thực hiện và tuần tự: dùng checklist có ID/anchor trong roadmap. Việc lớn, có đầu vào/đầu ra bàn giao riêng hoặc giao worker độc lập: dùng task card riêng trong `docs/workflow/plans/<module-slug>-sprint-<X>/` (theo folder vai trò chuyên môn); roadmap chỉ giữ link. Không tạo file cho mỗi thay đổi một dòng.
 
 Checklist gọn vẫn cần: ID, mục tiêu/phạm vi, links story/AC, prerequisites, cách kiểm chứng, trạng thái và evidence đúng revision. Ví dụ cấu trúc để điền trong roadmap:
 

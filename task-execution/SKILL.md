@@ -63,7 +63,7 @@ ask(questions=[{
 
 Mỗi task có duy nhất một hồ sơ chuẩn tắc (canonical record) theo quy ước tại `skill://product-workflow/references/records.md` (mục `Hồ sơ task gọn và task card`), tuyệt đối không tạo bản sao trùng lặp:
 - **Task nhỏ, tuần tự (Inline):** Lưu trực tiếp dưới dạng mục checklist có ID ổn định trong `roadmap.md` (chứa scope, links AC, prerequisites, cách kiểm chứng, link evidence và trạng thái). Không bắt buộc tạo file task card hay báo cáo rời.
-- **Task độc lập hoặc phân công subagent (Delegated):** Tạo file task card riêng biệt `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` tự chứa đầy đủ ngữ cảnh (self-contained) để subagent thực thi độc lập mà không cần đọc lại lịch sử chat.
+- **Task độc lập hoặc phân công subagent (Delegated):** Tạo file task card riêng biệt `docs/workflow/plans/<module-slug>-sprint-<X>/<role>/task-XX-<slug>.md` (hoặc `tasks/task-XX-<slug>.md` nếu nhóm solo) tự chứa đầy đủ ngữ cảnh (self-contained) để subagent thực thi độc lập mà không cần đọc lại lịch sử chat.
 - **Không trùng lặp:** Nếu đã có task card thì roadmap chỉ dẫn link tới card; nếu là checklist entry gọn thì không tạo thêm file task card thừa.
 - **Cập nhật tại chỗ:** Handoff, kết quả review và links evidence được ghi trực tiếp vào canonical record hiện hữu, dùng links chứ không tạo file báo cáo mới cho từng bước.
 
@@ -73,7 +73,7 @@ Bounded/Spike chưa có hồ sơ task: dùng đề xuất/duyệt trong chat và
 
 #### Tầng 1: Task Worker (Subagent thực thi từng task)
 - Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task độc lập.
-- Truyền task card tự chứa đầy đủ ngữ cảnh `docs/workflow/plans/<phân-hệ>/tasks/task-XX-<slug>.md` cùng scope được giao (hoặc mục checklist cụ thể nếu thực thi inline). Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
+- Truyền task card tự chứa đầy đủ ngữ cảnh `docs/workflow/plans/<module-slug>-sprint-<X>/<role>/task-XX-<slug>.md` (hoặc checklist cụ thể nếu thực thi inline) cùng scope được giao. Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
 - Worker thực thi đúng phạm vi, ghi evidence theo AC vào task card được giao và bàn giao ở trạng thái Review. Không tự tích Done hoặc sửa `product-backlog.md`/`roadmap.md`. Khi chạy nhiều workers đồng thời, để agent điều phối chạy kiểm chứng sau khi tích hợp, tránh checks giữa các chỉnh sửa đang dở.
 
 #### Tầng 2: Task Reviewer (Subagent thẩm định từng task)

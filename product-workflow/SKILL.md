@@ -92,7 +92,7 @@ Cổng Feature phải có tài liệu vật lý để duyệt. Ưu tiên sửa �
 - Cổng G1: `docs/workflow/specs/<phân-hệ>-brief.md`
 - Cổng G2: `docs/workflow/specs/<phân-hệ>-stories.md`
 - Cổng G3: `docs/workflow/architecture/<phân-hệ>-design.md`
-- Cổng G4: `docs/workflow/plans/<phân-hệ-hoặc-sprint>/roadmap.md`; checklist có ID cho việc nhỏ tuần tự, `tasks/task-XX-<slug>.md` cho việc lớn/bàn giao độc lập theo `Hồ sơ task gọn và task card` trong records.md.
+- Cổng G4: `docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md` với tên sprint tuân theo `[Tên Module] + Sprint [X]`; checklist có ID cho việc nhỏ tuần tự, task cards theo folder vai trò/chuyên môn (`backend/`, `frontend/`, `qa/`) hoặc `tasks/task-XX-<slug>.md` cho việc lớn/bàn giao độc lập theo `Hồ sơ task gọn và task card` trong records.md.
 - Product Backlog xuyên suốt workflow: `docs/workflow/product-backlog.md`, theo mẫu và quy tắc điểm trong `skill://product-workflow/references/records.md`. Ghi tính năng khi scope G1 được duyệt, liên kết AC sau G2, tasks/SP sau G4; cập nhật điểm và checkbox từ evidence trong quá trình thực thi. Không dồn chi tiết tasks vào file này.
 - Sơ đồ chỉ tạo khi bảng/chữ chưa diễn đạt rõ hoặc người dùng yêu cầu; tái dùng sơ đồ còn đúng. Sơ đồ mới/sửa lưu `docs/workflow/diagrams/<tên-sơ-đồ>.html` qua `skill://diagram-design`, không Mermaid, vẫn phải vượt Browser Native quality gate.
 Thông báo đường dẫn và phần đã cập nhật trước khi gọi `ask` duyệt cổng. Bounded/Spike giữ đề xuất, duyệt và kiểm chứng theo nhánh; không tự sinh bộ tài liệu Feature. Bằng chứng/handoff ghi trong record hiện hữu hoặc liên kết output, không tạo báo cáo riêng cho mỗi bước.
