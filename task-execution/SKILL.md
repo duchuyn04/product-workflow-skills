@@ -2,11 +2,12 @@
 name: task-execution
 description: "Nhận và bàn giao task cho người/AI có kiểm soát, thực thi đúng scope, review và kiểm chứng bằng bằng chứng trước khi hoàn thành."
 hide: true
+disable-model-invocation: true
 ---
 
 # Nhận việc và thực thi
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`.
 
 ## 1. Kiểm tra yêu cầu và nguồn mới nhất
 
@@ -72,7 +73,7 @@ Bounded/Spike chưa có hồ sơ task: dùng đề xuất/duyệt trong chat và
 ### Quy trình Chế độ Subagents 3 tầng:
 
 #### Tầng 1: Task Worker (Subagent thực thi từng task)
-- Main Agent dispatch subagent qua công cụ `task` của OMP cho từng task độc lập.
+- Main Agent dispatch subagent qua công cụ `task` của OMP (Claude Code: `Agent` với `subagent_type: "general-purpose"`, xem `harness.md`) cho từng task độc lập.
 - Truyền task card tự chứa đầy đủ ngữ cảnh `docs/workflow/plans/<module-slug>-sprint-<X>/<role>/task-XX-<slug>.md` (hoặc checklist cụ thể nếu thực thi inline) cùng scope được giao. Worker đọc các nguồn stories/AC/contracts được liên kết đúng revision; không cần toàn bộ lịch sử chat.
 - Worker thực thi đúng phạm vi, ghi evidence theo AC vào task card được giao và bàn giao ở trạng thái Review. Không tự tích Done hoặc sửa `product-backlog.md`/`roadmap.md`. Khi chạy nhiều workers đồng thời, để agent điều phối chạy kiểm chứng sau khi tích hợp, tránh checks giữa các chỉnh sửa đang dở.
 
@@ -130,7 +131,7 @@ Mẫu evidence: AC/nghĩa vụ → revision → môi trường → cách kiểm 
 
 ### Review hai trục bắt buộc trước Done
 
-Feature và **Risky Bounded** phải đọc `skill://code-review`; nếu URI chưa khám phá, đọc `.agents/skills/code-review/SKILL.md`. Risky Bounded là thay đổi ảnh hưởng contract/interface, security/quyền, dữ liệu hoặc migration, hay nhiều module. Docs-only và Bounded cục bộ rủi ro thấp tiếp tục policy review hiện hữu.
+Feature và **Risky Bounded** phải đọc `skill://code-review`; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://`, đọc `<skills-dir>/code-review/SKILL.md`. Risky Bounded là thay đổi ảnh hưởng contract/interface, security/quyền, dữ liệu hoặc migration, hay nhiều module. Docs-only và Bounded cục bộ rủi ro thấp tiếp tục policy review hiện hữu.
 
 Với Feature, ghi baseline revision khi nhận task sau G4. Với Bounded, trước first write ghi baseline revision và pre-existing dirty paths. Sau triển khai, giới hạn review vào owned changed areas. Tạo Review Input Packet C-SI-05 gồm `baseline_revision`, `owned_changed_areas`, canonical task record (task card hoặc mục checklist), stories/AC, architecture contract, standards sources và required checks. Thiếu baseline hoặc spec bắt buộc là `blocked`, không phải pass.
 
@@ -142,7 +143,7 @@ Code review không thay Browser Native: task có thay đổi UI/diagram vẫn ph
 
 #### 1. File sơ đồ HTML/SVG: quality gate tự động
 Đối với mọi task tạo hoặc sửa `docs/workflow/diagrams/*.html`:
-- AI **bắt buộc tự động** dùng `browser.open({ url: "file://..." })` trước khi bàn giao. Không gọi `ask` để quyết định có chạy kiểm thử hay không.
+- AI **bắt buộc tự động** dùng `browser.open({ url: "file://..." })` (Claude Code: MCP browser theo `harness.md`) trước khi bàn giao. Không gọi `ask` để quyết định có chạy kiểm thử hay không.
 - Chờ `document.fonts.ready` và hai animation frames, sau đó dùng `tab.run`/DOM thật để kiểm tra:
   - `getBBox()`/`getComputedTextLength()` của text, font đã tải, không tràn node và padding mỗi bên tối thiểu 16px.
   - Connector bám đúng mép node, không đi xuyên node trung gian, label cách stroke 6–10px.
@@ -163,7 +164,7 @@ Với `ui_changed = true` và không phải diagram, checkpoint bắt buộc sau
 ```text
 ask(questions=[{
   "id": "browser_test_option",
-  "question": "Thay đổi giao diện web đã hoàn thành. Bạn muốn kiểm thử bằng OMP Browser Native theo cách nào?",
+  "question": "Thay đổi giao diện web đã hoàn thành. Bạn muốn kiểm thử bằng Browser Native theo cách nào?",
   "options": [
     {"label": "Mở Browser Native để kiểm thử", "description": "Tải trang, tương tác, kiểm tra console và chụp screenshot."},
     {"label": "Chạy kiểm thử ngầm", "description": "Tự động tải trang và lưu screenshot/evidence mà không cần preview tương tác."},

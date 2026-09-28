@@ -2,6 +2,7 @@
 name: code-review
 description: Review an owned change against repository standards and its approved specification as two independent axes before Feature or Risky Bounded completion.
 hide: true
+disable-model-invocation: true
 license: MIT
 metadata:
   adapted-from: .agents/skills/code-review/SKILL.md

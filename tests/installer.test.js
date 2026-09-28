@@ -139,6 +139,7 @@ for (const [name, content] of [
     const result = p.install();
     assert.equal(result.status, 1, result.error?.message || result.stderr);
     assert.equal(p.read(), content);
+    assert.ok(!existsSync(path.join(p.dir, '.agents')), 'invalid markers must stop before copying skills');
   });
 }
 
@@ -550,4 +551,234 @@ test('installed execution and completion gates wire two-axis review and independ
     /Browser Native/i,
     'Delivery inspection must maintain independent Browser Native verification',
   );
+});
+
+const allSkills = [
+  'product-workflow', 'project-guide', 'product-discovery', 'story-and-experience',
+  'solution-design', 'delivery-planning', 'task-execution', 'delivery-inspection',
+  'diagram-design', 'diagnosing-bugs', 'codebase-design', 'code-review',
+];
+const hiddenSkills = [
+  'product-discovery', 'story-and-experience', 'solution-design', 'delivery-planning',
+  'task-execution', 'delivery-inspection', 'diagnosing-bugs', 'codebase-design', 'code-review',
+];
+const claudeImport = `${start}\n@AGENTS.md\n${end}`;
+
+function tempDir(t, prefix) {
+  const dir = mkdtempSync(path.join(tmpdir(), prefix));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+function runCli(args, env = {}) {
+  return spawnSync(process.execPath, [cli, ...args], {
+    encoding: 'utf8', timeout: 30000, env: { ...process.env, ...env },
+  });
+}
+
+function assertOk(result) {
+  assert.equal(result.status, 0, result.error?.message || result.stderr);
+}
+
+test('claude project install places every skill in .claude/skills and wires AGENTS.md and CLAUDE.md', t => {
+  const dir = tempDir(t, 'workflow-claude-');
+  assertOk(runCli(['--claude', '--project', dir]));
+
+  for (const skillName of allSkills) {
+    assert.ok(existsSync(path.join(dir, '.claude', 'skills', skillName, 'SKILL.md')), `missing ${skillName}`);
+  }
+  assert.ok(existsSync(path.join(dir, '.claude', 'skills', 'product-workflow', 'references', 'harness.md')));
+  assert.ok(!existsSync(path.join(dir, '.agents')), 'claude-only install must not create .agents');
+
+  const agents = readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
+  const pointer = agents.match(/`([^`]+\/product-workflow\/SKILL\.md)`/);
+  assert.equal(pointer?.[1], '.claude/skills/product-workflow/SKILL.md');
+  assert.match(agents, /AskUserQuestion/);
+
+  assert.equal(readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8'), claudeImport + '\n');
+});
+
+test('claude install appends the import to an existing CLAUDE.md and stays idempotent', t => {
+  const dir = tempDir(t, 'workflow-claude-md-');
+  const original = '# Team rules\r\nUse pnpm.\r\n';
+  writeFileSync(path.join(dir, 'CLAUDE.md'), original);
+
+  assertOk(runCli(['--claude', '--project', dir]));
+  const installed = readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8');
+  assert.ok(installed.startsWith(original));
+  assert.ok(installed.includes(claudeImport));
+
+  assertOk(runCli(['--claude', '--project', dir]));
+  assert.equal(readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8'), installed);
+});
+
+test('claude install leaves a CLAUDE.md that already imports AGENTS.md untouched', t => {
+  const dir = tempDir(t, 'workflow-claude-import-');
+  const original = '# Rules\n@AGENTS.md\n';
+  writeFileSync(path.join(dir, 'CLAUDE.md'), original);
+
+  assertOk(runCli(['--claude', '--project', dir]));
+  assert.equal(readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8'), original);
+});
+
+test('invalid CLAUDE.md markers fail before writing skills or AGENTS.md', t => {
+  const dir = tempDir(t, 'workflow-claude-bad-');
+  const content = `${start}\nUser content`;
+  writeFileSync(path.join(dir, 'CLAUDE.md'), content);
+
+  const result = runCli(['--claude', '--project', dir]);
+  assert.equal(result.status, 1, result.stderr);
+  assert.match(result.stderr, /CLAUDE\.md có marker Product Workflow không hợp lệ/);
+  assert.equal(readFileSync(path.join(dir, 'CLAUDE.md'), 'utf8'), content);
+  assert.ok(!existsSync(path.join(dir, '.claude')));
+  assert.ok(!existsSync(path.join(dir, 'AGENTS.md')));
+});
+
+test('--all installs both harnesses and AGENTS.md points to both routers', t => {
+  const dir = tempDir(t, 'workflow-all-');
+  assertOk(runCli(['--all', '--project', dir]));
+
+  for (const root of ['.claude', '.agents']) {
+    assert.ok(existsSync(path.join(dir, root, 'skills', 'product-workflow', 'SKILL.md')));
+  }
+  const agents = readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
+  assert.match(agents, /`\.claude\/skills\/product-workflow\/SKILL\.md` \(Claude Code\) hoặc `\.agents\/skills\/product-workflow\/SKILL\.md` \(Oh My Pi\)/);
+  assert.ok(existsSync(path.join(dir, 'CLAUDE.md')));
+});
+
+test('installing omp after claude keeps AGENTS.md pointing to both installed routers', t => {
+  const dir = tempDir(t, 'workflow-sequential-');
+  assertOk(runCli(['--claude', '--project', dir]));
+  assertOk(runCli(['--omp', '--project', dir]));
+
+  const agents = readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
+  assert.ok(agents.includes('`.claude/skills/product-workflow/SKILL.md`'));
+  assert.ok(agents.includes('`.agents/skills/product-workflow/SKILL.md`'));
+  assert.equal(agents.split(start).length, 2);
+});
+
+test('claude global install uses ~/.claude/skills without writing instruction files', t => {
+  const homeDir = tempDir(t, 'workflow-claude-home-');
+  assertOk(runCli(['--claude', '--global'], { HOME: homeDir, USERPROFILE: homeDir, HOMEPATH: homeDir }));
+
+  for (const skillName of allSkills) {
+    assert.ok(existsSync(path.join(homeDir, '.claude', 'skills', skillName, 'SKILL.md')), `missing ${skillName}`);
+  }
+  assert.ok(!existsSync(path.join(homeDir, '.omp')));
+  assert.ok(!existsSync(path.join(homeDir, 'AGENTS.md')));
+  assert.ok(!existsSync(path.join(homeDir, 'CLAUDE.md')));
+});
+
+test('hidden specialists also disable model invocation while entry skills stay visible', () => {
+  const packageRoot = fileURLToPath(new URL('..', import.meta.url));
+  for (const skillName of allSkills) {
+    const frontmatter = readFileSync(path.join(packageRoot, skillName, 'SKILL.md'), 'utf8').split('---')[1];
+    const hidden = hiddenSkills.includes(skillName);
+    assert.equal(/^hide:\s*true$/m.test(frontmatter), hidden, `${skillName} hide flag`);
+    assert.equal(/^disable-model-invocation:\s*true$/m.test(frontmatter), hidden, `${skillName} disable-model-invocation flag`);
+  }
+});
+
+test('workflow skills resolve fallbacks through <skills-dir> instead of a hardcoded .agents path', () => {
+  const packageRoot = fileURLToPath(new URL('..', import.meta.url));
+  const files = [
+    ...allSkills.map((skillName) => path.join(skillName, 'SKILL.md')),
+    path.join('product-workflow', 'references', 'contract.md'),
+    path.join('product-workflow', 'references', 'records.md'),
+  ];
+  for (const file of files) {
+    const content = readFileSync(path.join(packageRoot, file), 'utf8');
+    assert.doesNotMatch(content, /(?:đọc|fallback) `\.agents\/skills\//, `${file} must not hardcode an .agents fallback`);
+  }
+  const harness = readFileSync(path.join(packageRoot, 'product-workflow', 'references', 'harness.md'), 'utf8');
+  for (const mapping of ['AskUserQuestion', '`Agent`', 'disable-model-invocation', '.claude/skills/']) {
+    assert.ok(harness.includes(mapping), `harness.md must map ${mapping}`);
+  }
+});
+
+// Home tạm để một câu trả lời lệch dòng không thể cài vào thư mục home thật của người chạy test.
+function runCliAsTty(t, args, { cwd, input = '' } = {}) {
+  const sandbox = tempDir(t, 'workflow-tty-');
+  const preload = path.join(sandbox, 'force-tty.cjs');
+  writeFileSync(preload, 'process.stdin.isTTY = true;\nprocess.stdout.isTTY = true;\n');
+  const result = spawnSync(process.execPath, ['--require', preload, cli, ...args], {
+    cwd, input, encoding: 'utf8', timeout: 30000,
+    env: { ...process.env, HOME: sandbox, USERPROFILE: sandbox, HOMEPATH: sandbox },
+  });
+  assert.ok(!existsSync(path.join(sandbox, '.omp')) && !existsSync(path.join(sandbox, '.claude')),
+    'interactive test must not fall through to a global install');
+  return result;
+}
+
+test('interactive terminal with an explicit scope keeps the old Oh My Pi install without prompting', t => {
+  const dir = tempDir(t, 'workflow-tty-scope-');
+  const result = runCliAsTty(t, ['--project', dir]);
+  assertOk(result);
+  assert.doesNotMatch(result.stdout, /Chọn harness/);
+  assert.ok(existsSync(path.join(dir, '.agents', 'skills', 'product-workflow', 'SKILL.md')));
+  assert.ok(!existsSync(path.join(dir, '.claude')));
+});
+
+test('fully interactive install reads both answers even when they arrive together', t => {
+  const dir = tempDir(t, 'workflow-tty-menu-');
+  const result = runCliAsTty(t, [], { cwd: dir, input: '2\n1\n' });
+  assertOk(result);
+  assert.match(result.stdout, /Chọn harness/);
+  assert.match(result.stdout, /Chọn phạm vi cài đặt/);
+  assert.ok(existsSync(path.join(dir, '.claude', 'skills', 'product-workflow', 'SKILL.md')));
+  assert.ok(!existsSync(path.join(dir, '.agents')));
+});
+
+test('AGENTS.md block points to an existing harness mapping file', t => {
+  const dir = tempDir(t, 'workflow-harness-ref-');
+  assertOk(runCli(['--claude', '--project', dir]));
+  const agents = readFileSync(path.join(dir, 'AGENTS.md'), 'utf8');
+  const ref = agents.match(/`([^`]+\/references\/harness\.md)`/);
+  assert.ok(ref, 'AGENTS.md must reference harness.md');
+  assert.ok(existsSync(path.join(dir, ref[1])), `${ref[1]} must exist in the project`);
+});
+
+test('installed discovery requires scale-aware requirement coverage R1–R8 and audits it at G1', t => {
+  const dir = tempDir(t, 'workflow-coverage-');
+  assertOk(runCli(['--project', dir]));
+  const skills = path.join(dir, '.agents', 'skills');
+  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
+
+  const section = discovery.indexOf('Danh sách phủ yêu cầu nghiệp vụ');
+  assert.ok(section >= 0, 'discovery must define the requirement coverage checklist');
+  for (const id of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8']) {
+    assert.ok(discovery.indexOf(`**${id}`, section) > section, `checklist must define ${id}`);
+  }
+  assert.match(discovery, /MVP[^\n]*bắt buộc R1, R2, R8/, 'MVP must only require R1, R2 and R8');
+  assert.match(discovery, /\*\*5\. Phủ yêu cầu nghiệp vụ/, 'G1 rubric must score requirement coverage');
+  assert.match(discovery, /Bảng phủ yêu cầu R1–R8/, 'brief template must record coverage');
+
+  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
+  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*R1–R8/, 'G1 gate condition must include coverage');
+});
+
+test('G1 auditor advises instead of vetoing: decision point after 3 REVISE rounds with recorded accepted risks', t => {
+  const dir = tempDir(t, 'workflow-g1-override-');
+  assertOk(runCli(['--project', dir]));
+  const skills = path.join(dir, '.agents', 'skills');
+  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
+
+  assert.match(discovery, /sau \*\*3 vòng kiểm định\*\*/, 'REVISE loop must surface a decision after 3 rounds');
+  assert.match(discovery, /Duyệt G1, chấp nhận rủi ro/, 'user must be able to approve G1 with accepted risks');
+  assert.match(discovery, /Rủi ro đã chấp nhận tại G1/, 'accepted risks must be recorded in the brief');
+  assert.match(discovery, /cấm trình duyệt G1 khi Subagent Reviewer chưa chạy/i, 'audit must still run before G1');
+  assert.doesNotMatch(discovery, /cho đến khi đạt `PASS`/, 'no unbounded REVISE loop');
+
+  for (const file of [
+    path.join(skills, 'product-workflow', 'references', 'contract.md'),
+    path.join(skills, 'product-workflow', 'SKILL.md'),
+    path.join(dir, 'AGENTS.md'),
+  ]) {
+    const content = readFileSync(file, 'utf8');
+    if (content.includes('Subagent')) {
+      assert.doesNotMatch(content, /chưa có kết luận PASS\.?$/m, `${path.basename(file)} must not keep the absolute PASS veto`);
+    }
+  }
+  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
+  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*chấp nhận rủi ro/, 'G1 gate must allow approval with accepted risks');
 });

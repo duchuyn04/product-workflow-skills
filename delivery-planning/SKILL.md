@@ -2,11 +2,12 @@
 name: delivery-planning
 description: "Lập Product Backlog, dependency và sprint theo capacity; dùng checklist cho việc nhỏ, task cards cho việc lớn hoặc bàn giao độc lập, giữ AC và evidence."
 hide: true
+disable-model-invocation: true
 ---
 
 # Lập kế hoạch giao hàng
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`.
 
 ## Đầu vào
 

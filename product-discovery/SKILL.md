@@ -2,11 +2,12 @@
 name: product-discovery
 description: "Phỏng vấn nghiệp vụ chuyên sâu, xác định mục tiêu, actors, quy tắc domain, dữ liệu, ngoại lệ và phạm vi trước khi chốt stories hoặc thay đổi yêu cầu."
 hide: true
+disable-model-invocation: true
 ---
 
 # Product discovery
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa được khám phá, đọc `.agents/skills/product-workflow/references/contract.md`. Đây là bước chuyên gia, không tự mở một workflow bao trùm khác.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa được khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`. Đây là bước chuyên gia, không tự mở một workflow bao trùm khác.
 
 ## Đầu vào
 
@@ -100,6 +101,8 @@ Thay vì để dự án rơi vào cảnh mù mịt hoặc hỏi tràn lan, AI ch
 #### B. Tự tra cứu sự thật (Finding facts is AI's job, never the user's)
 - AI tự động khai thác codebase, schema cơ sở dữ liệu hiện có, tài liệu API công khai của bên thứ ba (Stripe, VNPay, OAuth, Firebase...) hoặc thư viện kỹ thuật.
 - **TUYỆT ĐỐI KHÔNG HỎI NGƯỜI DÙNG** những thông tin kỹ thuật mà AI có thể tự tra cứu được. Chỉ hỏi người dùng những **Quyết định nghiệp vụ (Decisions & Tradeoffs)** qua các Case Study thực tế.
+- **Xin tài liệu thật ngay đợt hỏi đầu:** Đề nghị người dùng cung cấp những gì đang dùng để vận hành: file Excel/sổ theo dõi, mẫu phiếu/biểu mẫu, hóa đơn/chứng từ, báo cáo hiện có, văn bản quy trình hoặc quy định nội bộ. Đọc kỹ trước khi hỏi tiếp; một tài liệu thật thường trả lời được nhiều câu hỏi về dữ liệu, trạng thái và quy tắc. Không có tài liệu thì ghi nhận và tiếp tục phỏng vấn, không chặn discovery.
+- **Ghi nguồn xác nhận cho từng quy tắc:** Mỗi rule trong brief ghi `Tình trạng xác nhận` là một trong: `người dùng xác nhận`, `tài liệu <tên tài liệu>`, `AI suy luận – cần xác nhận`, hoặc `cần <vai trò> xác nhận` khi người đang trả lời không phải người có thẩm quyền về nghiệp vụ đó (ví dụ kế toán, quản lý kho). Rule `AI suy luận – cần xác nhận` là giả định mở, không được tính là đã rõ.
 
 #### C. Đưa Case Study thực tế tập trung vào Hệ thống Cốt lõi (System Core)
 - **Bắt buộc tự sinh câu hỏi Case Study:** AI chủ động đóng vai trò chuyên gia phân tích nghiệp vụ, tự tạo các câu hỏi kịch bản va chạm thực tế (concrete scenarios) bám sát độ lớn nhỏ và đặc thù domain của dự án.
@@ -113,6 +116,25 @@ Thay vì để dự án rơi vào cảnh mù mịt hoặc hỏi tràn lan, AI ch
     4. **Ranh giới Phân quyền & Cô lập dữ liệu (Permission Boundaries & Access Control):** Ma trận quyền chi tiết theo vai trò (Actor nào được xem, tạo, sửa, xóa, duyệt những trường dữ liệu nào); dữ liệu có bị cô lập theo chi nhánh, phòng ban, tenant hay không; cơ chế phê duyệt nhiều cấp.
     5. **Ngoại lệ, Sự cố & Luồng lỗi (Edge Cases, Failure Modes & Compensation):** Kịch bản khi có sự cố phát sinh: Thanh toán cổng bên thứ ba thành công nhưng webhook mất kết nối; đối tác vận chuyển hủy đơn giữa chừng; giao dịch đang ghi thì đứt quãng — cách bù trừ dữ liệu (compensation flow) như thế nào.
     6. **Ràng buộc Tích hợp & Nguồn sự thật (Integration Boundaries & Source of Truth):** Khi kết nối bên thứ ba hoặc hệ thống hiện hữu, hệ thống nào nắm quyền quyết định (Single Source of Truth), đồng bộ thời gian thực hay định kỳ, xử lý sai lệch số liệu ra sao.
+
+#### C.1. Danh sách phủ yêu cầu nghiệp vụ (Requirement Coverage Checklist)
+
+6 trụ cột kiểm tra cơ chế vận hành của hệ thống, nhưng chưa phủ hết các loại yêu cầu nghiệp vụ. Song song với 6 trụ cột, AI phủ thêm 8 mục dưới đây, cũng bằng câu hỏi tình huống cụ thể (không hỏi chung chung kiểu *"Bạn có cần báo cáo không?"*, mà hỏi *"Cuối tháng quản lý cần xem những con số nào, lọc theo gì, có cần xuất Excel không?"*):
+
+- **R1. Mục tiêu và chỉ số thành công:** Vấn đề kinh doanh cần giải quyết, ai hưởng lợi, và kết quả đo được sau khi dùng hệ thống (ví dụ: giảm sai lệch tồn kho, rút thời gian chốt sổ từ 3 ngày xuống 1 ngày).
+- **R2. Ưu tiên phạm vi:** Xếp từng nhóm tính năng vào Bắt buộc / Nên có / Để sau; nhóm nào cắt được nếu thiếu thời gian.
+- **R3. Báo cáo và thống kê:** Ai xem báo cáo gì, chỉ số và công thức, kỳ báo cáo, bộ lọc, định dạng xuất (Excel/PDF/in).
+- **R4. Pháp lý và tuân thủ:** Chứng từ bắt buộc (hóa đơn, phiếu thu chi...), dữ liệu cá nhân và quyền riêng tư, thời hạn lưu trữ, quy định riêng của ngành.
+- **R5. Lịch sử thay đổi:** Thao tác nào cần ghi vết ai làm, lúc nào, giá trị trước/sau; ai được xem lịch sử; lưu trong bao lâu.
+- **R6. Dữ liệu hiện có và chuyển đổi:** Dữ liệu cũ đang nằm ở đâu (Excel, sổ sách, phần mềm cũ), có chuyển sang hệ thống mới không, khối lượng, ai làm sạch và đối chiếu sau khi chuyển.
+- **R7. Thông báo:** Sự kiện nào cần báo cho ai, qua kênh nào (trong ứng dụng, email, SMS, Zalo...), có cần nhắc lại hoặc leo thang khi quá hạn không.
+- **R8. Ràng buộc dự án và vận hành:** Hạn chót và ngân sách; giờ hoạt động và mức chấp nhận khi hệ thống ngừng; đào tạo người dùng; có chạy song song với cách làm cũ trong giai đoạn chuyển tiếp không.
+
+**Co giãn theo quy mô đã chọn ở bước 0:**
+- **MVP Tinh gọn:** bắt buộc R1, R2, R8. Với R3–R7, chỉ hỏi nhanh một câu xác nhận có cần hay không; không cần thì ghi `N/A` kèm lý do, không đào sâu.
+- **Hệ thống Vừa và Nền tảng Lớn:** cả R1–R8 phải có câu trả lời, hoặc `N/A` kèm lý do đã được người dùng xác nhận.
+
+Mục nào lộ ra quyết định kỹ thuật (hạ tầng, công nghệ gửi thông báo, cách lưu trữ) thì chỉ chốt yêu cầu nghiệp vụ ở G1, phần giải pháp để G3.
 
 #### D. Làm sắc bén ngôn ngữ Domain (Sharpen Fuzzy Language)
 Khi người dùng dùng từ ngữ mơ hồ, AI làm rõ và đề xuất thuật ngữ chuẩn xác (ví dụ: phân biệt Guest vs Member, Abandon vs Cancel vs Return, hệ thống tự duyệt vs Admin duyệt thủ công).
@@ -131,16 +153,17 @@ Khi người dùng dùng từ ngữ mơ hồ, AI làm rõ và đề xuất thu�
 - **Quy trình hỏi cuốn chiếu theo từng đợt qua `ask` (Iterative Multi-Turn Grilling):**
   - Để tránh làm người dùng quá tải, không dồn hàng chục câu hỏi vào một tin nhắn chat.
   - Chia phỏng vấn thành từng đợt cuốn chiếu qua công cụ `ask`: Mỗi đợt gồm 2–4 câu hỏi Case Study trọng tâm có phương án lựa chọn và phân tích tradeoff rõ ràng.
-  - Khi người dùng trả lời một đợt: AI lập tức cập nhật vào *Decisions So Far*, phân tích tiếp các điểm còn mờ nhạt (Fog of War) theo 6 Trụ cột Cốt lõi, và **tiếp tục mở đợt câu hỏi Case Study tiếp theo**.
+  - Khi người dùng trả lời một đợt: AI lập tức cập nhật vào *Decisions So Far*, phân tích tiếp các điểm còn mờ nhạt (Fog of War) theo 6 Trụ cột Cốt lõi và danh sách phủ R1–R8, và **tiếp tục mở đợt câu hỏi Case Study tiếp theo**.
   - Kiên trì lặp lại các đợt hỏi qua nhiều lượt trao đổi (có thể kéo dài 10, 20, 30+ đợt, tương ứng hơn 100 câu hỏi) cho đến khi không còn bất kỳ góc khuất nghiệp vụ nào.
 
 - **Điều kiện dừng phỏng vấn & chuyển Cổng G1:**
   - AI chỉ được dừng phỏng vấn khi VÀ CHỈ KHI:
     1. Số lượng và độ sâu case study đã tương xứng với độ lớn nhỏ của dự án mà người dùng đã chọn.
-    2. Cả 6 Trụ cột Cốt lõi của hệ thống đều đã được định nghĩa chi tiết đến từng trường hợp biên (edge cases).
-    3. Không còn bất kỳ câu hỏi chặn (blocking questions) hoặc giả định mù mờ nào chưa được người dùng xác nhận.
+    2. Cả 6 Trụ cột Cốt lõi của hệ thống đều đã được định nghĩa chi tiết đến từng trường hợp biên (edge cases), hoặc được ghi `N/A` kèm lý do nếu phân hệ không có.
+    3. Danh sách phủ R1–R8 đã được trả lời theo đúng mức của quy mô đã chọn (mục C.1).
+    4. Không còn bất kỳ câu hỏi chặn (blocking questions) hoặc giả định mù mờ nào chưa được người dùng xác nhận.
   - Khi đã thực sự thỏa mãn các điều kiện trên, AI mới dừng hỏi, tổng hợp Business Brief hoàn chỉnh, dùng `write` lưu vào file vật lý `docs/workflow/specs/<tên-phân-hệ>-brief.md`, và gọi `ask` xin duyệt Cổng G1.
-- **Dừng sớm không phải là Ready:** Nếu người dùng chủ động yêu cầu dừng sớm khi các case study cốt lõi vẫn chưa được làm rõ, AI ghi rõ các câu hỏi mở và blocker vào brief, đánh dấu trạng thái `draft` hoặc `awaiting-resolution`. Việc dừng sớm khi còn blocker KHÔNG được coi là approved readiness để chuyển sang G2.
+- **Dừng sớm không phải là Ready:** Nếu người dùng chủ động yêu cầu dừng sớm khi các case study cốt lõi vẫn chưa được làm rõ, AI ghi rõ các câu hỏi mở và blocker vào brief, đánh dấu trạng thái `draft` hoặc `awaiting-resolution`. Việc dừng sớm khi còn blocker KHÔNG được coi là approved readiness để chuyển sang G2. Muốn đi tiếp khi còn lỗ hổng, người phụ trách nghiệp vụ phải duyệt G1 kèm rủi ro theo điểm quyết định ở mục 3.C; dừng mà không duyệt thì brief vẫn là `draft`.
 ## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
 AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tại đường dẫn:
@@ -156,13 +179,21 @@ Nội dung file bao gồm:
 - As-is/to-be: luồng, trigger, tiền/hậu điều kiện, handoff và ngoại lệ. Sơ đồ quy trình nghiệp vụ: Chỉ bắt buộc khi quy trình có độ phức tạp cao, nhiều luồng rẽ nhánh/ngoại lệ hoặc khi người dùng yêu cầu rõ ràng; tái sử dụng sơ đồ hợp lệ đã có nếu quy trình không đổi. Với luồng nghiệp vụ đơn giản hoặc tuần tự, mô tả bảng luồng nghiệp vụ trong tài liệu là đủ. Khi tạo mới hoặc cập nhật sơ đồ: **CẤM DÙNG MERMAID**, bắt buộc dùng `skill://diagram-design` (`type-process.md` hoặc `type-flowchart.md`) tạo file `docs/workflow/diagrams/<tên-phân-hệ>-process.html`, chèn liên kết vào tài liệu và kiểm chứng hiển thị bằng browser-native.
 - Business rules có ID, phạm vi áp dụng, nguồn xác nhận, ví dụ và phản ví dụ.
 - Dữ liệu/lifecycle và yêu cầu phi chức năng có điều kiện kiểm chứng.
+- Bảng phủ yêu cầu R1–R8 theo mẫu bên dưới.
+- Danh mục tài liệu đã nhận từ người dùng (tên, nội dung chính, rule nào dựa vào), hoặc ghi rõ chưa nhận tài liệu nào.
 - In-scope/out-of-scope và giả thuyết cần kiểm chứng.
 - Câu hỏi mở: owner, ảnh hưởng, quyết định/gate đang bị chặn.
+- Rủi ro đã chấp nhận tại G1 (chỉ khi người dùng duyệt G1 dù kiểm định còn `REVISE`, xem mục 3.C).
 
 Mẫu rule:
 
 | ID | Quy tắc | Điều kiện áp dụng | Kết quả quan sát | Ngoại lệ | Nguồn/revision | Tình trạng xác nhận |
 |---|---|---|---|---|---|---|
+
+Mẫu Bảng phủ yêu cầu R1–R8:
+
+| Mục | Trạng thái (Đã rõ / N/A / Câu hỏi mở) | Tóm tắt quyết định hoặc lý do N/A | Rule / câu hỏi mở liên quan |
+|---|---|---|---|
 
 Mẫu luồng nghiệp vụ:
 
@@ -178,33 +209,44 @@ Sau khi AI hoàn thành soạn thảo hoặc cập nhật Business Brief tại `
 - AI bắt buộc gọi công cụ `task` để kích hoạt Subagent kiểm định (ưu tiên agent `reviewer`):
   ```json
   {
-    "context": "# Goal\nThẩm định độc lập chất lượng Business Brief Cổng G1, ngăn chặn tình trạng hỏi case study hời hợt hoặc nhảy cóc sang G2.\n# Constraints\nĐóng vai Strict Domain Auditor / Devil's Advocate, đánh giá không khoan nhượng theo Rubric 4 tiêu chí và 6 Trụ cột Cốt lõi (System Core). Không chấp nhận câu trả lời chung chung hoặc brief thiếu case study thực chiến.",
+    "context": "# Goal\nThẩm định độc lập chất lượng Business Brief Cổng G1, ngăn chặn tình trạng hỏi case study hời hợt hoặc nhảy cóc sang G2.\n# Constraints\nĐóng vai Strict Domain Auditor / Devil's Advocate, đánh giá không khoan nhượng theo Rubric 5 tiêu chí, 6 Trụ cột Cốt lõi (System Core) và danh sách phủ yêu cầu R1–R8. Không chấp nhận câu trả lời chung chung hoặc brief thiếu case study thực chiến.",
     "tasks": [{
       "name": "AuditG1Discovery",
       "agent": "reviewer",
-      "task": "# Target\nFile tài liệu: docs/workflow/specs/<tên-phân-hệ>-brief.md\nĐộ lớn nhỏ dự án: [MVP | Vừa | Lớn / Enterprise] (theo lựa chọn của người dùng).\n\n# Change\nĐọc file brief và rà soát toàn bộ chuỗi phỏng vấn case study, đối chiếu với Rubric Thẩm định G1:\n1. Scale Fit: Số lượng và độ sâu case study có tương xứng với quy mô đã chọn không? Có dấu hiệu hỏi lướt qua 2–3 câu không?\n2. 6 Trụ cột Core: State Machine, Money/Math Invariants, Concurrency, Permissions, Edge Cases & Compensations, Integration Source of Truth có được giải quyết chi tiết tới từng trường hợp biên không?\n3. Concreteness: Các quy tắc có xuất phát từ kịch bản va chạm thực tế (số liệu, actors, xung đột) hay là lý thuyết trừu tượng?\n4. Zero Blind Spots: Còn góc khuất, giả định ngầm hay blocker nào chưa được xác nhận không?\n\n# Acceptance\nTrả về báo cáo thẩm định chuẩn với Verdict: PASS hoặc REVISE kèm bảng điểm và danh sách case study bắt buộc phải hỏi tiếp nếu REVISE."
+      "task": "# Target\nFile tài liệu: docs/workflow/specs/<tên-phân-hệ>-brief.md\nĐộ lớn nhỏ dự án: [MVP | Vừa | Lớn / Enterprise] (theo lựa chọn của người dùng).\n\n# Change\nĐọc file brief và rà soát toàn bộ chuỗi phỏng vấn case study, đối chiếu với Rubric Thẩm định G1:\n1. Scale Fit: Số lượng và độ sâu case study có tương xứng với quy mô đã chọn không? Có dấu hiệu hỏi lướt qua 2–3 câu không?\n2. 6 Trụ cột Core: State Machine, Money/Math Invariants, Concurrency, Permissions, Edge Cases & Compensations, Integration Source of Truth có được giải quyết chi tiết tới từng trường hợp biên không?\n3. Concreteness: Các quy tắc có xuất phát từ kịch bản va chạm thực tế (số liệu, actors, xung đột) hay là lý thuyết trừu tượng?\n4. Zero Blind Spots: Còn góc khuất, giả định ngầm hay blocker nào chưa được xác nhận không? Rule ghi `AI suy luận – cần xác nhận` có bị tính như đã rõ không?\n5. Requirement Coverage: Bảng phủ R1–R8 có đủ theo quy mô không (MVP bắt buộc R1, R2, R8; Vừa/Lớn đủ cả 8)? Mỗi N/A có lý do được người dùng xác nhận không?\n\n# Acceptance\nTrả về báo cáo thẩm định chuẩn với Verdict: PASS hoặc REVISE kèm bảng điểm và danh sách case study bắt buộc phải hỏi tiếp nếu REVISE."
     }]
   }
   ```
 - *Fallback khi môi trường không hỗ trợ spawn subagent:* AI tự chạy một vòng cô lập (Isolated Auditor Pass) đóng vai kiểm toán viên độc lập, áp dụng 100% tiêu chí Rubric bên dưới và in rõ báo cáo kiểm định trước khi xem xét G1.
 
 ### B. Rubric Thẩm định G1 (Discovery Audit Rubric)
-Subagent đánh giá theo 4 tiêu chí bắt buộc:
+Subagent đánh giá theo 5 tiêu chí bắt buộc:
 
 | Tiêu chí | Trọng số | Điều kiện ĐẠT (PASS) | Dấu hiệu KHÔNG ĐẠT (FAIL / REVISE) |
 |---|---|---|---|
 | **1. Độ tương xứng quy mô (Scale Fit)** | Bắt buộc | Số lượng và độ sâu case study khớp với quy mô đã chọn. MVP có tối thiểu 10–15 tình huống cốt lõi; Dự án Vừa/Lớn có chuỗi case study sâu (hàng chục đến hơn 100 câu hỏi cuốn chiếu) bao quát toàn bộ phân hệ. | Hỏi lướt qua 2–3 câu; dự án lớn nhưng chỉ hỏi vài câu đơn giản rồi vội vã chốt brief. |
 | **2. Độ phủ 6 Trụ cột Core** | Bắt buộc | Cả 6 trụ cột (State machine, Money/Math, Concurrency, Permissions, Failure modes, Integration) đều có quy tắc rõ ràng kèm điều kiện biên (hoặc giải trình rõ lý do N/A nếu phân hệ không có). | Bỏ qua xử lý đồng thời, không có kịch bản khi webhook/bên thứ ba lỗi, thiếu ma trận phân quyền chi tiết, trạng thái entity mập mờ. |
 | **3. Tính thực chiến (Concreteness)** | Bắt buộc | Quy tắc nghiệp vụ bắt nguồn từ kịch bản va chạm thực tế (có số liệu giả định, bối cảnh, xung đột và tradeoffs cụ thể). | Quy tắc viết chung chung, sáo rỗng (*"hệ thống sẽ tự động xử lý hợp lý"*, *"admin có toàn quyền"*). |
-| **4. Điểm mù & Blocker (Zero Blind Spots)** | Bắt buộc | Không còn giả định ngầm; các câu hỏi mở được ghi nhận rõ owner và không làm tắc nghẽn luồng chính. | Còn nhiều giả định do AI tự suy diễn mà chưa có xác nhận của người dùng. |
+| **4. Điểm mù & Blocker (Zero Blind Spots)** | Bắt buộc | Không còn giả định ngầm; các câu hỏi mở được ghi nhận rõ owner và không làm tắc nghẽn luồng chính. | Còn nhiều giả định do AI tự suy diễn mà chưa có xác nhận của người dùng; rule `AI suy luận – cần xác nhận` bị tính như đã rõ. |
+| **5. Phủ yêu cầu nghiệp vụ (Requirement Coverage)** | Bắt buộc | Bảng phủ R1–R8 đủ theo quy mô: MVP có R1, R2, R8 rõ ràng và R3–R7 đã xác nhận cần/không cần; Vừa/Lớn có đủ R1–R8. Mỗi `N/A` có lý do được người dùng xác nhận. | Thiếu bảng phủ; không có mục tiêu đo được; bỏ trống báo cáo, pháp lý hoặc dữ liệu cũ ở dự án Vừa/Lớn; `N/A` không có lý do hoặc do AI tự quyết. |
 
 ### C. Xử lý kết luận của Subagent (Verdict Handling)
 
+Subagent là người kiểm định để khuyến nghị, không phải người phê duyệt. Quyết định G1 thuộc người phụ trách nghiệp vụ.
+
 - **Trường hợp kết luận là `REVISE` (Chưa đạt / Cần đào sâu thêm):**
-  - **LỆNH CẤM:** AI **TUYỆT ĐỐI CẤM GỌI `ask` TRÌNH DUYỆT G1** và CẤM chuyển sang G2.
+  - Mặc định chưa gọi `ask` trình duyệt G1 và chưa chuyển sang G2.
   - AI đọc kỹ danh sách "Lỗ hổng nghiệp vụ" (Domain Holes) và các kịch bản Case Study bổ sung do Subagent chỉ định.
   - AI quay lại phỏng vấn người dùng: Lập tức tạo đợt `ask` tiếp theo mang các Case Study đó ra hỏi người dùng để làm rõ.
-  - Khi người dùng trả lời, AI cập nhật lại brief và kích hoạt Subagent thẩm định lại cho đến khi đạt `PASS`.
+  - Khi người dùng trả lời, AI cập nhật lại brief và kích hoạt Subagent thẩm định lại.
+  - AI không tự gợi ý duyệt vượt kết luận `REVISE` trước vòng kiểm định thứ 3, trừ khi người dùng hỏi.
+
+- **Điểm quyết định của người dùng:** Khi vẫn là `REVISE` sau **3 vòng kiểm định**, hoặc bất cứ lúc nào người dùng chủ động muốn duyệt dù còn `REVISE`:
+  1. Trình bày trong chat danh sách lỗ hổng còn lại: nội dung, ảnh hưởng nếu để nguyên, và lỗ hổng nào chặn luồng nghiệp vụ chính.
+  2. Sau đó mới gọi `ask` với các lựa chọn: `[Tiếp tục phỏng vấn]` (Recommended), `[Duyệt G1, chấp nhận rủi ro]`, `[Dừng, giữ brief ở draft]`.
+  3. Chọn tiếp tục thì quay lại vòng phỏng vấn và kiểm định; sau mỗi 3 vòng `REVISE` tiếp theo lại đưa điểm quyết định này.
+  4. Chọn dừng thì brief giữ trạng thái `draft`, ghi lỗ hổng vào câu hỏi mở; không chuyển sang G2.
+  5. Chọn `Duyệt G1, chấp nhận rủi ro` thì ghi vào brief mục **"Rủi ro đã chấp nhận tại G1"**: từng lỗ hổng, ảnh hưởng, người chấp nhận (người đã chọn trong chat), revision của brief, và cổng phải giải quyết trước đó (ví dụ `trước G3`, `trước story US05`). Mỗi lỗ hổng đồng thời vào danh sách câu hỏi mở có owner để G2/G3 xử lý. Trạng thái G1 là `approved`; báo cáo kiểm định cuối cùng vẫn được lưu nguyên kết luận `REVISE`.
 
 - **Trường hợp kết luận là `PASS` (Đạt chuẩn chất lượng):**
   - AI ghi nhận bảng tóm tắt kết quả audit vào cuối file brief `docs/workflow/specs/<tên-phân-hệ>-brief.md` (mục `Discovery Quality Audit`).
@@ -213,16 +255,19 @@ Subagent đánh giá theo 4 tiêu chí bắt buộc:
 ## Gate G1 và điều kiện dừng (Hard-Stop)
 
 G1 đạt khi và chỉ khi thỏa mãn đồng thời 2 điều kiện:
-1. **Subagent Audit đạt `PASS`:** Báo cáo kiểm định độc lập của Subagent xác nhận bộ case study không bị hời hợt, tương xứng với quy mô dự án và bao phủ trọn vẹn 6 Trụ cột Cốt lõi.
-2. **Người dùng phê duyệt rõ ràng:** Người phụ trách nghiệp vụ bấm chọn `[Duyệt và tiếp tục]` qua công cụ `ask`.
+1. **Subagent Audit đã chạy và có kết luận:** Hoặc `PASS` (bộ case study không bị hời hợt, tương xứng với quy mô dự án và bao phủ trọn vẹn 6 Trụ cột Cốt lõi và danh sách phủ yêu cầu R1–R8 theo quy mô), hoặc `REVISE` đã đi qua điểm quyết định ở mục C và người dùng chọn `[Duyệt G1, chấp nhận rủi ro]` với mục "Rủi ro đã chấp nhận tại G1" đã ghi vào brief.
+2. **Người dùng phê duyệt rõ ràng:** Người phụ trách nghiệp vụ bấm chọn duyệt qua công cụ `ask`.
 
 **Lệnh cấm duyệt vội (Anti-Bypass Hard-Stop):**
-- Tuyệt đối cấm tự ý gọi `ask` xin duyệt G1 khi Subagent Reviewer chưa chạy hoặc có kết luận `REVISE`.
-- Brief không có bằng chứng audit đạt `PASS` bị coi là vi phạm kỷ luật cổng, không có giá trị bàn giao cho Cổng G2 (`story-and-experience`).
+- Tuyệt đối cấm trình duyệt G1 khi Subagent Reviewer chưa chạy.
+- Cấm trình duyệt G1 khi kết luận mới nhất là `REVISE`, trừ khi đi qua điểm quyết định ở mục C. Không được giấu, rút gọn hoặc diễn giải nhẹ đi danh sách lỗ hổng khi trình bày.
+- Brief không có báo cáo kiểm định, hoặc duyệt kèm rủi ro mà không có mục "Rủi ro đã chấp nhận tại G1", bị coi là vi phạm kỷ luật cổng, không có giá trị bàn giao cho Cổng G2 (`story-and-experience`).
 
 **Quy tắc dừng lượt bắt buộc:** Sau khi Subagent xác nhận `PASS` và file `docs/workflow/specs/<tên-phân-hệ>-brief.md` đã được lưu, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 - Câu hỏi: *"Subagent Audit đã xác nhận brief đạt chuẩn PASS. Tôi đã hoàn thành Business Brief tại `docs/workflow/specs/<tên-phân-hệ>-brief.md`. Bạn có duyệt tài liệu này (Cổng G1) để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh quy tắc]`, `[Xem giải thích chi tiết]`.
+
+Trường hợp duyệt kèm rủi ro, lựa chọn `[Duyệt G1, chấp nhận rủi ro]` ở điểm quyết định chính là câu trả lời duyệt G1; không hỏi lại lần thứ hai. Trước khi gọi `ask` ở điểm quyết định, brief phải được lưu với báo cáo kiểm định mới nhất; sau khi người dùng chọn, ghi mục "Rủi ro đã chấp nhận tại G1" rồi mới chuyển sang G2.
 
 Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.
 

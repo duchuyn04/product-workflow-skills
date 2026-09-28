@@ -2,11 +2,12 @@
 name: solution-design
 description: "Chọn tech stack theo ràng buộc thật, thiết kế kiến trúc, ranh giới module, quyền sở hữu dữ liệu, contracts và ADR đủ để triển khai an toàn."
 hide: true
+disable-model-invocation: true
 ---
 
 # Thiết kế giải pháp
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`.
 
 ## Đầu vào
 
@@ -74,7 +75,7 @@ Xác định shared-write areas: schema/migration, auth, shared components, buil
 
 ### Design lens theo ảnh hưởng kiến trúc
 
-Khi scope thay đổi module, interface/invariants, seam, adapter, dependency direction hoặc testability, đọc `skill://codebase-design`; nếu URI chưa khám phá, đọc `.agents/skills/codebase-design/SKILL.md`. Thiếu cả hai nguồn thì nêu đúng skill/path và dừng phần thiết kế phụ thuộc, không tự bịa Design Delta.
+Khi scope thay đổi module, interface/invariants, seam, adapter, dependency direction hoặc testability, đọc `skill://codebase-design`; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://`, đọc `<skills-dir>/codebase-design/SKILL.md`. Thiếu cả hai nguồn thì nêu đúng skill/path và dừng phần thiết kế phụ thuộc, không tự bịa Design Delta.
 
 Tiêu thụ Design Delta gồm status, module, interface, seam, adapters, invariants, caller impact, test surface và rejected abstractions. `not-needed` hợp lệ khi trigger kiến trúc đã thỏa nhưng lens không tìm thấy delta hữu ích; thay đổi đã xác nhận là cục bộ thì bỏ qua specialist. Giữ `drafted` và `needs-revalidation` là chưa sẵn sàng, không xử lý như `approved-input`. Lens này không tạo gate mới và không tự duyệt G3. Không tạo seam/adapter giả khi chỉ có một implementation và không có variation thật.
 

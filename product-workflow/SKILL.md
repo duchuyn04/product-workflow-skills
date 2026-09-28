@@ -9,7 +9,7 @@ Một đầu vào cho người dùng; chỉ nạp chuyên gia cần thiết. Gia
 
 ## Khởi động
 
-1. Đọc `skill://product-workflow/references/contract.md`. Nếu skills vừa được thêm và URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md` trong repo. Dùng quy tắc fallback tương tự cho các skills con; không lặp lỗi URI liên tục.
+1. Đọc `skill://product-workflow/references/contract.md` và `skill://product-workflow/references/harness.md`. Nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc cùng file dưới `<skills-dir>/product-workflow/references/`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục). Dùng quy tắc fallback tương tự cho các skills con; không lặp lỗi URI liên tục. Tên công cụ trong skills theo Oh My Pi; harness khác dùng công cụ tương đương trong `harness.md`.
 2. Xác định intent hiện tại và chế độ: trao đổi (`discuss`), thiết kế (`plan`), hoặc thực thi (`execute`). Yêu cầu “xem/thiết kế” không cấp quyền ghi Jira hoặc code.
 3. Đọc chỉ dẫn repo, chỉ mục/checkpoint nếu có, và đúng tài liệu liên quan. Nếu chưa có chỉ mục, dò tài liệu hiện hữu trước khi hỏi; không giả định repo rỗng.
 4. Nếu nhiều dự án/scope phù hợp mà không suy ra được từ nguồn, hỏi người dùng chọn. Nếu chưa có nơi lưu, đọc `skill://product-workflow/references/records.md`, đề xuất vị trí và chốt khi cần tạo hồ sơ.
@@ -30,7 +30,7 @@ Ví dụ: đổi các mức tốc độ giọng đọc thành 0.5x, 1x, 1.2x, 1.
 
 ## Chọn chuyên gia
 
-Đọc skill bằng `read` trước khi làm. Không giả định harness có một tool tên `Skill`.
+Đọc skill bằng công cụ đọc file (`read`; Claude Code: `Read`) trước khi làm. Không dùng tool `Skill` để nạp chuyên gia ẩn; harness có thể chặn model tự gọi chúng.
 
 | Intent | Skill phải đọc | Đầu ra mong đợi |
 |---|---|---|
@@ -48,11 +48,11 @@ Thay đổi nghiệp vụ đã chốt: dùng discovery để xác định delta,
 
 ### Chuyên gia nội bộ theo trigger
 
-- Trước khi trình duyệt Cổng G1 (Nghiệp vụ): `product-discovery` bắt buộc kích hoạt subagent `reviewer` (hoặc isolated auditor pass) để thực hiện **G1 Discovery Quality Audit**. Subagent kiểm định độc lập xem bộ case study có bị hời hợt không, có tương xứng với quy mô dự án và bao quát đủ 6 Trụ cột Cốt lõi (State Machine, Money/Math Invariants, Concurrency, Permissions, Edge Cases, Integration) hay không. Chỉ khi Subagent xác nhận `PASS` mới được gọi `ask` xin người dùng duyệt Cổng G1. Nếu nhận kết luận `REVISE`, AI buộc phải phỏng vấn người dùng tiếp bằng các case study còn thiếu.
+- Trước khi trình duyệt Cổng G1 (Nghiệp vụ): `product-discovery` bắt buộc kích hoạt subagent `reviewer` (hoặc isolated auditor pass) để thực hiện **G1 Discovery Quality Audit**. Subagent kiểm định độc lập xem bộ case study có bị hời hợt không, có tương xứng với quy mô dự án và bao quát đủ 6 Trụ cột Cốt lõi (State Machine, Money/Math Invariants, Concurrency, Permissions, Edge Cases, Integration) cùng danh sách phủ yêu cầu R1–R8 theo quy mô (mục tiêu, ưu tiên, báo cáo, pháp lý, lịch sử thay đổi, dữ liệu cũ, thông báo, ràng buộc) hay không. Subagent xác nhận `PASS` thì gọi `ask` xin người dùng duyệt Cổng G1. Nếu nhận kết luận `REVISE`, AI phỏng vấn tiếp bằng các case study còn thiếu rồi kiểm định lại; sau 3 vòng vẫn `REVISE` (hoặc khi người dùng yêu cầu), trình bày lỗ hổng còn lại và để người dùng chọn tiếp tục phỏng vấn, duyệt G1 kèm chấp nhận rủi ro, hoặc giữ brief ở draft. Subagent chỉ khuyến nghị; quyết định G1 thuộc người phụ trách nghiệp vụ.
 
-- Bug/regression/performance chưa có root cause chắc chắn: đọc `skill://diagnosing-bugs` trước khi lập Đề xuất sửa lỗi Bounded. Nếu URI chưa khám phá, đọc `.agents/skills/diagnosing-bugs/SKILL.md`. Root cause và evidence đã rõ thì bỏ qua specialist. Thiếu cả URI và fallback: nêu đúng nguồn thiếu và dừng phần chẩn đoán, không bịa root cause.
-- Thay đổi module/interface/seam/adapter/dependency direction/testability: đọc `skill://codebase-design`; fallback `.agents/skills/codebase-design/SKILL.md`. Khi đã xác nhận thay đổi cục bộ không ảnh hưởng kiến trúc, bắt buộc bỏ qua specialist; `not-needed` chỉ dùng khi trigger hợp lệ nhưng lens không tìm thấy Design Delta hữu ích. Parent G3/Bounded approval vẫn là gate duy nhất. Thiếu cả URI và fallback: nêu đúng skill/path đã kiểm tra và dừng phần thiết kế phụ thuộc.
-- Sau implementation của Feature hoặc Risky Bounded: `task-execution` gọi `skill://code-review`; fallback `.agents/skills/code-review/SKILL.md`. Docs-only và Bounded rủi ro thấp theo policy hiện hữu không bị ép review hai trục. Thiếu specialist thì không được bỏ checkpoint: báo nguồn thiếu và dừng phần phụ thuộc.
+- Bug/regression/performance chưa có root cause chắc chắn: đọc `skill://diagnosing-bugs` trước khi lập Đề xuất sửa lỗi Bounded. Nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://`, đọc `<skills-dir>/diagnosing-bugs/SKILL.md`. Root cause và evidence đã rõ thì bỏ qua specialist. Thiếu cả URI và fallback: nêu đúng nguồn thiếu và dừng phần chẩn đoán, không bịa root cause.
+- Thay đổi module/interface/seam/adapter/dependency direction/testability: đọc `skill://codebase-design`; fallback `<skills-dir>/codebase-design/SKILL.md`. Khi đã xác nhận thay đổi cục bộ không ảnh hưởng kiến trúc, bắt buộc bỏ qua specialist; `not-needed` chỉ dùng khi trigger hợp lệ nhưng lens không tìm thấy Design Delta hữu ích. Parent G3/Bounded approval vẫn là gate duy nhất. Thiếu cả URI và fallback: nêu đúng skill/path đã kiểm tra và dừng phần thiết kế phụ thuộc.
+- Sau implementation của Feature hoặc Risky Bounded: `task-execution` gọi `skill://code-review`; fallback `<skills-dir>/code-review/SKILL.md`. Docs-only và Bounded rủi ro thấp theo policy hiện hữu không bị ép review hai trục. Thiếu specialist thì không được bỏ checkpoint: báo nguồn thiếu và dừng phần phụ thuộc.
 
 Router chỉ giữ trigger, fallback và cách tiêu thụ Diagnosis Packet/Design Delta/Review reports; implementation thuộc specialist tương ứng. Không thêm specialist thành entry point mà người dùng phải nhớ.
 
@@ -76,6 +76,8 @@ Mỗi cổng chỉ có DUY NHẤT một kỹ năng kế tiếp hợp lệ:
 - Hoàn thành G4 (`delivery-planning`) sau khi khảo sát team size, chia tasks theo folder vai trò và lập ma trận dependencies & song song ──► Bàn giao từng task cụ thể cho `task-execution`.
 
 ### 3. Quy tắc dừng lượt (Hard-Stop Policy) và công cụ `ask` trong Oh My Pi
+Harness khác dùng công cụ hỏi tương đương theo `harness.md` (Claude Code: `AskUserQuestion`); quy tắc dừng lượt giữ nguyên.
+
 Mỗi lượt trao đổi chỉ hoàn thành một cổng. Trình bày xong kết quả của cổng đó thì **BẮT BUỘC DỪNG TIN NHẮN** để người dùng phản hồi/duyệt. Tuyệt đối không vừa trình bày thiết kế vừa gọi công cụ tạo file mã nguồn trong cùng một turn.
 
 Với Bounded, thứ tự bắt buộc trong cùng lượt là: **trình bày Đề xuất sửa lỗi trong chat → gọi `ask` → chờ quyết định**. Thẻ `ask` chỉ ghi nhận quyết định; giữ câu hỏi và mô tả lựa chọn ngắn, không giấu kế hoạch trong `options[].description`. Chưa có phần chat chứa đủ phạm vi, nguyên nhân có bằng chứng, thay đổi dự kiến, rủi ro/ngoài phạm vi và cách kiểm chứng thì chưa được gọi `ask`.
@@ -129,6 +131,6 @@ Nếu người dùng nói “OK”, gắn với đề xuất cụ thể ngay tr�
 
 Người dùng có thể nói “Tôi mới vào team nên làm gì tiếp”, “Bắt đầu phân tích dự án này”, “Tiếp tục từ checkpoint”, “Chia việc sprint tới”, “Tôi nhận task này”, hoặc “Xem ma trận tiến độ”.
 
-Trong Oh My Pi, có thể gọi rõ `/skill:project-guide` khi cần định hướng, hoặc `/skill:product-workflow` khi cần điều phối công việc. Skills được khám phá lúc khởi động; sau khi mới thêm folder, mở phiên Oh My Pi mới nếu phiên hiện tại chưa thấy URI. Sáu chuyên gia chuyên sâu có `hide: true`: ẩn metadata khỏi model nhưng vẫn đọc được bằng URI; router và guide được hiển thị để người dùng dễ tiếp cận.
+Trong Oh My Pi, có thể gọi rõ `/skill:project-guide` khi cần định hướng, hoặc `/skill:product-workflow` khi cần điều phối công việc. Trong Claude Code, gọi `/project-guide` hoặc `/product-workflow`. Skills được khám phá lúc khởi động; sau khi mới thêm folder, mở phiên mới nếu phiên hiện tại chưa thấy skill. Chín chuyên gia có `hide: true` (Claude Code: `disable-model-invocation: true`): model không tự gọi nhưng vẫn đọc được bằng URI hoặc đường dẫn file; router, guide và `diagram-design` được hiển thị để người dùng dễ tiếp cận.
 
-Không dùng `/skill:product-workflow` hay `/skill:project-guide` như tên lệnh shell. Nếu `.agents` source bị tắt hoặc skill bị filter, giải thích cấu hình đang chặn; không tự thay settings của người dùng.
+Không dùng `/skill:product-workflow`, `/product-workflow` hay `/skill:project-guide` như tên lệnh shell. Nếu nguồn skills (`.agents`, `.claude`) bị tắt hoặc skill bị filter, giải thích cấu hình đang chặn; không tự thay settings của người dùng.

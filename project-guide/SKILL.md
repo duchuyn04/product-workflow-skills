@@ -7,7 +7,7 @@ description: "Hướng dẫn người mới vào team hoặc người chưa bi�
 
 Giúp người chưa có bối cảnh trả lời: sản phẩm làm gì, hiện đang ở đâu, điều gì chưa biết và tôi nên làm gì tiếp. Không bắt họ biết tên skill hoặc tự báo giai đoạn dự án.
 
-Đọc `skill://product-workflow/references/contract.md` trước. Nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`. Skill này là hướng dẫn **chỉ đọc**, không phải bộ điều phối thực thi thứ hai. Không tự tạo hồ sơ/checkpoint, chạy setup/build/migration, sửa code, claim/assign task, cập nhật Jira hay deploy.
+Đọc `skill://product-workflow/references/contract.md` trước. Nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`. Skill này là hướng dẫn **chỉ đọc**, không phải bộ điều phối thực thi thứ hai. Không tự tạo hồ sơ/checkpoint, chạy setup/build/migration, sửa code, claim/assign task, cập nhật Jira hay deploy.
 
 ## 1. Xác định nhu cầu mà không phỏng vấn lại dự án
 
@@ -23,7 +23,7 @@ Không hỏi “dự án đang ở giai đoạn nào?” hoặc “đã làm xon
 4. Nếu cần xác định mức triển khai: cấu trúc code, manifest/scripts, checks và evidence CI/review/deployment đã có. Đọc đủ để phân biệt thiết kế với implementation; không chạy cài đặt hoặc test chỉ để giới thiệu dự án.
 5. Nếu đã có công cụ Jira và quyền đọc: đọc scope/board/sprint, issue liên quan, blockers và owner mới nhất; xử lý phân trang/giới hạn quyền. Không yêu cầu credentials trong chat hoặc tự thiết lập kết nối.
 
-Không có chỉ mục vẫn tận dụng tài liệu hiện hữu; không tự sinh chỉ mục cho đủ mẫu. File trong `.agents/skills/`, templates hoặc nội dung README giới thiệu không phải bằng chứng sản phẩm đã đạt gate hay hoàn thành module.
+Không có chỉ mục vẫn tận dụng tài liệu hiện hữu; không tự sinh chỉ mục cho đủ mẫu. File trong `.agents/skills/`, `.claude/skills/`, templates hoặc nội dung README giới thiệu không phải bằng chứng sản phẩm đã đạt gate hay hoàn thành module.
 
 Mỗi kết luận quan trọng có đường dẫn/link và revision/thời điểm nếu lấy được. Nguồn không có timestamp đáng tin thì nói chưa xác minh độ mới, không tự điền ngày. Không mở `.env`, auth stores hoặc dữ liệu nhạy cảm để phục vụ onboarding.
 
@@ -62,7 +62,7 @@ Nếu chưa biết vai trò, đưa bước định hướng chung trước rồi
 
 ## 5. Chọn đường đi, không tự chạy
 
-Khi cần chọn skill đích, đọc bảng `Chọn chuyên gia` trong `skill://product-workflow` (fallback `.agents/skills/product-workflow/SKILL.md`). Đó là nguồn định tuyến duy nhất; không chép lại một danh sách flow dễ lỗi thời.
+Khi cần chọn skill đích, đọc bảng `Chọn chuyên gia` trong `skill://product-workflow` (fallback `<skills-dir>/product-workflow/SKILL.md`). Đó là nguồn định tuyến duy nhất; không chép lại một danh sách flow dễ lỗi thời.
 
 Chỉ đọc bảng để đề xuất. Không khởi động router rồi lại quay về guide theo trigger onboarding. Nếu router đã gọi guide, trả bản định hướng về router và dừng trước mọi bước thực thi. Người dùng phải chọn hoặc yêu cầu tiếp tục hành động cụ thể; lời gọi guide không tự là ủy quyền hành động đó.
 
@@ -74,7 +74,7 @@ Dùng [nguồn/revision]. Kết quả cần: [đầu ra].
 Chưa thực hiện [những thao tác chưa được cấp quyền].
 ```
 
-Chỉ điền thông tin đã có; không trả placeholder như một task thật. Nếu thiếu dữ kiện, dùng câu yêu cầu giải quyết đúng điểm thiếu trước. Người dùng có thể trả lời tự nhiên thay vì sao chép lệnh.
+Trên Claude Code, đổi `/skill:product-workflow` thành `/product-workflow`. Chỉ điền thông tin đã có; không trả placeholder như một task thật. Nếu thiếu dữ kiện, dùng câu yêu cầu giải quyết đúng điểm thiếu trước. Người dùng có thể trả lời tự nhiên thay vì sao chép lệnh.
 
 ## 6. Định dạng trả lời cho người mới
 
@@ -88,4 +88,4 @@ Nếu bằng chứng ít, trả lời ngắn hơn và nói rõ giới hạn. Bá
 
 ## Cách gọi
 
-`/skill:project-guide` hoặc “Tôi mới vào team, cho biết dự án đang ở đâu và tôi nên bắt đầu từ đâu”. Có thể thêm vai trò/module quan tâm. Nếu skill mới chưa xuất hiện, mở phiên Oh My Pi mới; không thay settings toàn cục để ép nạp.
+`/skill:project-guide` (Claude Code: `/project-guide`) hoặc “Tôi mới vào team, cho biết dự án đang ở đâu và tôi nên bắt đầu từ đâu”. Có thể thêm vai trò/module quan tâm. Nếu skill mới chưa xuất hiện, mở phiên mới của harness; không thay settings toàn cục để ép nạp.

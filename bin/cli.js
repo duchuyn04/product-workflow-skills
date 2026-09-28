@@ -28,6 +28,22 @@ const SKILLS = [
   'code-review',
 ];
 
+// Thư mục skills của từng harness; `project` tính từ gốc dự án, `global` tính từ thư mục home.
+const HARNESSES = {
+  claude: {
+    label: 'Claude Code',
+    project: ['.claude', 'skills'],
+    global: ['.claude', 'skills'],
+    command: (skill) => `/${skill}`,
+  },
+  omp: {
+    label: 'Oh My Pi',
+    project: ['.agents', 'skills'],
+    global: ['.omp', 'agent', 'skills'],
+    command: (skill) => `/skill:${skill}`,
+  },
+};
+
 function printHelp() {
   console.log(`
 Product Workflow Skills Installer
@@ -36,21 +52,30 @@ Cách dùng:
   npx github:duchuyn04/product-workflow-skills [tùy-chọn] [đường-dẫn-dự-án]
   npx product-workflow-skills [tùy-chọn] [đường-dẫn-dự-án] (sau khi publish npm)
 
-Không có tùy chọn: chọn Project hoặc Global trong terminal tương tác.
-Trong script/CI: chỉ định --project, đường dẫn dự án hoặc --global.
+Không có tùy chọn: chọn harness và Project/Global trong terminal tương tác.
+Trong script/CI: chỉ định --project, đường dẫn dự án hoặc --global; không chọn harness thì mặc định Oh My Pi.
 
-Tùy chọn:
-  -p, --project    Cài cho dự án (mặc định thư mục hiện tại: .agents/skills/)
-  -g, --global     Cài toàn cục cho Oh My Pi (~/.omp/agent/skills/)
-  -f, --force      Cài lại skills; vẫn giữ quy tắc riêng trong AGENTS.md
+Phạm vi:
+  -p, --project    Cài cho dự án (mặc định thư mục hiện tại)
+  -g, --global     Cài toàn cục cho người dùng hiện tại
+
+Harness:
+  --omp            Oh My Pi: .agents/skills/ (dự án) hoặc ~/.omp/agent/skills/ (toàn cục)
+  --claude         Claude Code: .claude/skills/ (dự án) hoặc ~/.claude/skills/ (toàn cục);
+                   cài dự án sẽ thêm khối import @AGENTS.md vào CLAUDE.md
+  --all            Cài cho cả Oh My Pi và Claude Code
+
+Khác:
+  -f, --force      Cài lại skills; vẫn giữ quy tắc riêng trong AGENTS.md/CLAUDE.md
   -h, --help       Hiển thị hướng dẫn sử dụng
   -v, --version    Xem phiên bản
 
 Ví dụ:
   npx github:duchuyn04/product-workflow-skills
   npx github:duchuyn04/product-workflow-skills --project
-  npx github:duchuyn04/product-workflow-skills --project ./my-project
-  npx github:duchuyn04/product-workflow-skills --global
+  npx github:duchuyn04/product-workflow-skills --claude --project ./my-project
+  npx github:duchuyn04/product-workflow-skills --all --project
+  npx github:duchuyn04/product-workflow-skills --claude --global
 `);
 }
 
@@ -83,68 +108,145 @@ function copyDirectorySync(src, dest) {
 const MARKER_START = '<!-- BEGIN: product-workflow-skills -->';
 const MARKER_END = '<!-- END: product-workflow-skills -->';
 
+// Chặn trước khi ghi bất kỳ file nào nếu marker của file chỉ dẫn bị hỏng.
+function assertValidMarkers(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+  const starts = content.split(MARKER_START).length - 1;
+  const ends = content.split(MARKER_END).length - 1;
+  if (starts !== ends || starts > 1 ||
+      (starts === 1 && content.indexOf(MARKER_END) < content.indexOf(MARKER_START))) {
+    throw new Error(`${path.basename(filePath)} có marker Product Workflow không hợp lệ; giữ nguyên file, cần sửa marker trước khi cài lại.`);
+  }
+}
+
+// Tạo file, thay đúng khối có marker, hoặc nối khối vào cuối; không đụng nội dung ngoài khối.
+function upsertMarkedBlock(filePath, block) {
+  const fileName = path.basename(filePath);
+
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, block + '\n', 'utf8');
+    console.log(`✓ Đã tạo mới file ${fileName} tại thư mục gốc dự án.`);
+    return;
+  }
+
+  assertValidMarkers(filePath);
+  const existingContent = fs.readFileSync(filePath, 'utf8');
+
+  if (existingContent.includes(MARKER_START)) {
+    const regex = new RegExp(`${MARKER_START}[\\s\\S]*?${MARKER_END}`, 'g');
+    fs.writeFileSync(filePath, existingContent.replace(regex, block), 'utf8');
+    console.log(`✓ Đã cập nhật chỉ dẫn product-workflow-skills trong file ${fileName} hiện có.`);
+  } else {
+    const separator = existingContent.endsWith('\n') ? '\n' : '\n\n';
+    fs.writeFileSync(filePath, existingContent + separator + block + '\n', 'utf8');
+    console.log(`✓ Đã tích hợp chỉ dẫn product-workflow-skills vào file ${fileName} hiện có (bảo toàn toàn bộ quy tắc riêng trước đó của bạn).`);
+  }
+}
+
 function syncAgentsMd(targetProjectRoot) {
-  const destAgentsPath = path.join(targetProjectRoot, 'AGENTS.md');
-  const blockToInsert = `${MARKER_START}
+  // Trỏ tới mọi router đang được cài trong dự án, kể cả bản của lần cài trước cho harness khác.
+  const routers = Object.values(HARNESSES)
+    .map((harness) => ({
+      label: harness.label,
+      path: [...harness.project, 'product-workflow', 'SKILL.md'].join('/'),
+    }))
+    .filter((router) => fs.existsSync(path.join(targetProjectRoot, router.path)));
+  const refs = (file) => routers.length === 1
+    ? `\`${routers[0].path.replace(/SKILL\.md$/, file)}\``
+    : routers.map((router) => `\`${router.path.replace(/SKILL\.md$/, file)}\` (${router.label})`).join(' hoặc ');
+  const routerRefs = refs('SKILL.md');
+  const harnessRefs = refs('references/harness.md');
+
+  const block = `${MARKER_START}
 ## Product Workflow
-- Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc \`.agents/skills/product-workflow/SKILL.md\`. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
+- Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc ${routerRefs}. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
 - Trước duyệt chỉ đọc và phân tích source; soạn tài liệu theo cổng. Chờ người dùng duyệt đúng nhánh trước mọi thao tác ghi mã nguồn, kể cả qua shell hoặc subagent.
 - Bounded: trong chat, trình bày Đề xuất sửa lỗi (hoặc cải tiến nhỏ cục bộ) gồm phạm vi, nguyên nhân/mục đích, thay đổi theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó mới gọi ask và chờ duyệt. Thẻ ask chỉ ghi nhận quyết định, không thay thế kế hoạch hiển thị trước đó. Chỉ yêu cầu duyệt G1–G4 với Feature (module mới, luồng nghiệp vụ cốt lõi, DB mới); Spike cần duyệt thử nghiệm.
-- Thay đổi giao diện web người dùng nhìn thấy/tương tác: sau khi thực thi và trước khi báo hoàn thành, gọi ask để người dùng chọn cách kiểm thử bằng OMP Browser Native. Chỉ không hỏi khi người dùng đã chọn rõ cho đúng scope; nếu bỏ qua thì ghi not-run, không claim đã kiểm chứng trực quan. Diagram HTML/SVG dùng quality gate tự động riêng.
+- Thay đổi giao diện web người dùng nhìn thấy/tương tác: sau khi thực thi và trước khi báo hoàn thành, gọi ask để người dùng chọn cách kiểm thử bằng Browser Native. Chỉ không hỏi khi người dùng đã chọn rõ cho đúng scope; nếu bỏ qua thì ghi not-run, không claim đã kiểm chứng trực quan. Diagram HTML/SVG dùng quality gate tự động riêng.
+- Tên công cụ trong skills theo Oh My Pi (ask, task, browser, skill://). Harness khác dùng công cụ tương đương trong ${harnessRefs}; Claude Code: ask → AskUserQuestion, task → Agent, browser → MCP browser (Playwright/Chrome DevTools).
 - Duyệt chỉ có hiệu lực với đề xuất và phạm vi vừa chốt; đã đọc skill hoặc yêu cầu ban đầu không phải bằng chứng duyệt.
 - Không đọc được skill: báo thiếu cấu hình và dừng sửa source. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
 ${MARKER_END}`;
 
-  if (!fs.existsSync(destAgentsPath)) {
-    // Dự án chưa có AGENTS.md -> tạo mới hoàn toàn
-    fs.writeFileSync(destAgentsPath, blockToInsert + '\n', 'utf8');
-    console.log(`\n✓ Đã tạo mới file AGENTS.md tại thư mục gốc dự án.`);
-    return;
-  }
-
-  // Dự án đã có AGENTS.md sẵn
-  const existingContent = fs.readFileSync(destAgentsPath, 'utf8');
-  const starts = existingContent.split(MARKER_START).length - 1;
-  const ends = existingContent.split(MARKER_END).length - 1;
-  if (starts !== ends || starts > 1 ||
-      (starts === 1 && existingContent.indexOf(MARKER_END) < existingContent.indexOf(MARKER_START))) {
-    throw new Error('AGENTS.md có marker Product Workflow không hợp lệ; giữ nguyên file, cần sửa marker trước khi cài lại.');
-  }
-
-  if (existingContent.includes(MARKER_START) && existingContent.includes(MARKER_END)) {
-    // Đã có block của product-workflow-skills -> cập nhật đúng block đó, giữ nguyên phần còn lại
-    const regex = new RegExp(`${MARKER_START}[\\s\\S]*?${MARKER_END}`, 'g');
-    const updatedContent = existingContent.replace(regex, blockToInsert);
-    fs.writeFileSync(destAgentsPath, updatedContent, 'utf8');
-    console.log(`\n✓ Đã cập nhật chỉ dẫn product-workflow-skills trong file AGENTS.md hiện có.`);
-  } else {
-    // AGENTS.md là của dự án người dùng viết từ trước -> Nối thêm vào cuối, giữ nguyên 100% nội dung của họ
-    const separator = existingContent.endsWith('\n') ? '\n' : '\n\n';
-    const updatedContent = existingContent + separator + blockToInsert + '\n';
-    fs.writeFileSync(destAgentsPath, updatedContent, 'utf8');
-    console.log(`\n✓ Đã tích hợp chỉ dẫn product-workflow-skills vào file AGENTS.md hiện có (bảo toàn toàn bộ quy tắc riêng trước đó của bạn).`);
-  }
+  upsertMarkedBlock(path.join(targetProjectRoot, 'AGENTS.md'), block);
 }
 
-async function chooseInstallMode() {
-  const prompt = createInterface({ input: process.stdin, output: process.stdout });
-  try {
-    console.log('Chọn phạm vi cài đặt:');
-    console.log('  1. Project: .agents/skills/ và AGENTS.md trong dự án hiện tại');
-    console.log('  2. Global: ~/.omp/agent/skills/ cho Oh My Pi');
-    process.stdout.write('Lựa chọn [1/2] (Enter = Project, Ctrl+C = hủy): ');
-    for await (const answer of prompt) {
-      const choice = answer.trim();
-      if (choice === '' || choice === '1') return 'project';
-      if (choice === '2') return 'global';
-      process.stdout.write('Nhập 1 cho Project hoặc 2 cho Global: ');
+// Claude Code bỏ qua AGENTS.md khi dự án có CLAUDE.md, nên CLAUDE.md phải import AGENTS.md.
+function syncClaudeMd(targetProjectRoot) {
+  const claudePath = path.join(targetProjectRoot, 'CLAUDE.md');
+  const agentsPath = path.join(targetProjectRoot, 'AGENTS.md');
+
+  if (fs.existsSync(claudePath)) {
+    if (fs.realpathSync(claudePath) === fs.realpathSync(agentsPath)) {
+      console.log('✓ CLAUDE.md trỏ tới AGENTS.md; không cần thêm import.');
+      return;
     }
-    return null;
-  } finally {
-    prompt.close();
+    const content = fs.readFileSync(claudePath, 'utf8');
+    if (!content.includes(MARKER_START) && /^\s*@(\.\/)?AGENTS\.md\s*$/m.test(content)) {
+      console.log('✓ CLAUDE.md đã import @AGENTS.md; giữ nguyên.');
+      return;
+    }
+  }
+
+  upsertMarkedBlock(claudePath, `${MARKER_START}\n@AGENTS.md\n${MARKER_END}`);
+}
+
+// Một readline dùng chung cho mọi câu hỏi để không mất các dòng người dùng đã gõ hoặc dán sẵn.
+let promptReader = null;
+
+function closePrompt() {
+  promptReader?.rl.close();
+  promptReader = null;
+}
+
+async function promptChoice(lines, question, retry, choices) {
+  if (!promptReader) {
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    promptReader = { rl, lines: rl[Symbol.asyncIterator]() };
+  }
+  for (const line of lines) console.log(line);
+  process.stdout.write(question);
+  for (;;) {
+    const { value, done } = await promptReader.lines.next();
+    if (done) return null;
+    const choice = value.trim();
+    if (choice in choices) return choices[choice];
+    process.stdout.write(retry);
   }
 }
 
+function chooseHarnesses() {
+  return promptChoice(
+    [
+      'Chọn harness:',
+      '  1. Oh My Pi',
+      '  2. Claude Code',
+      '  3. Cả hai',
+    ],
+    'Lựa chọn [1/2/3] (Enter = Oh My Pi, Ctrl+C = hủy): ',
+    'Nhập 1, 2 hoặc 3: ',
+    { '': ['omp'], '1': ['omp'], '2': ['claude'], '3': ['claude', 'omp'] },
+  );
+}
+
+function chooseInstallMode() {
+  return promptChoice(
+    [
+      'Chọn phạm vi cài đặt:',
+      '  1. Project: thư mục skills và file chỉ dẫn trong dự án hiện tại',
+      '  2. Global: thư mục skills toàn cục của người dùng',
+    ],
+    'Lựa chọn [1/2] (Enter = Project, Ctrl+C = hủy): ',
+    'Nhập 1 cho Project hoặc 2 cho Global: ',
+    { '': 'project', '1': 'project', '2': 'global' },
+  );
+}
+
+function cancelInstall() {
+  console.log('\nĐã hủy cài đặt; chưa ghi file.');
+  process.exitCode = 130;
+}
 
 async function run() {
   const args = process.argv.slice(2);
@@ -152,6 +254,7 @@ async function run() {
   let targetDir = null;
   let installMode = null;
   let isForce = false;
+  let harnesses = new Set();
 
   for (const arg of args) {
     if (arg === '-h' || arg === '--help') {
@@ -170,6 +273,14 @@ async function run() {
       installMode = requestedMode;
       continue;
     }
+    if (arg === '--claude' || arg === '--omp') {
+      harnesses.add(arg.slice(2));
+      continue;
+    }
+    if (arg === '--all') {
+      harnesses = new Set(['claude', 'omp']);
+      continue;
+    }
     if (arg === '-f' || arg === '--force') {
       isForce = true;
       continue;
@@ -182,21 +293,34 @@ async function run() {
   if (targetDir && installMode === 'global') {
     throw new Error('Đường dẫn dự án không áp dụng cho --global.');
   }
-  if (!installMode) {
-    if (targetDir) {
-      installMode = 'project';
-    } else if (process.stdin.isTTY && process.stdout.isTTY) {
-      installMode = await chooseInstallMode();
-      if (!installMode) {
-        console.log('\nĐã hủy cài đặt; chưa ghi file.');
-        process.exitCode = 130;
-        return;
+  const interactive = process.stdin.isTTY && process.stdout.isTTY;
+  // Chỉ hỏi harness khi chạy không tham số; lệnh có sẵn phạm vi giữ hành vi cũ (mặc định Oh My Pi).
+  const fullyInteractive = interactive && !installMode && !targetDir;
+  try {
+    if (harnesses.size === 0) {
+      if (fullyInteractive) {
+        const chosen = await chooseHarnesses();
+        if (!chosen) return cancelInstall();
+        harnesses = new Set(chosen);
+      } else {
+        harnesses.add('omp');
       }
-    } else {
-      throw new Error('Không có terminal tương tác. Dùng --project [đường-dẫn] hoặc --global.');
     }
+    if (!installMode) {
+      if (targetDir) {
+        installMode = 'project';
+      } else if (interactive) {
+        installMode = await chooseInstallMode();
+        if (!installMode) return cancelInstall();
+      } else {
+        throw new Error('Không có terminal tương tác. Dùng --project [đường-dẫn] hoặc --global.');
+      }
+    }
+  } finally {
+    closePrompt();
   }
   const isGlobal = installMode === 'global';
+  const selected = Object.keys(HARNESSES).filter((key) => harnesses.has(key));
 
   // Preflight: mọi thư mục nguồn đã đăng ký bắt buộc phải tồn tại trước khi ghi bất kỳ file/thư mục đích nào
   const missingSkills = SKILLS.filter((skillName) => {
@@ -207,50 +331,50 @@ async function run() {
     throw new Error(`Không tìm thấy thư mục nguồn skill: ${missingSkills.join(', ')}`);
   }
 
-  console.log('Đang cài đặt Product Workflow Skills...\n');
-
-  let destSkillsDir = '';
-  let targetProjectRoot = '';
-
-  if (isGlobal) {
-    destSkillsDir = path.join(os.homedir(), '.omp', 'agent', 'skills');
-    console.log(`Chế độ: Cài đặt toàn cục`);
-    console.log(`Thư mục đích: ${destSkillsDir}\n`);
-  } else {
-    targetProjectRoot = path.resolve(process.cwd(), targetDir || '.');
-    destSkillsDir = path.join(targetProjectRoot, '.agents', 'skills');
-    console.log(`Chế độ: Cài đặt theo dự án`);
-    console.log(`Thư mục dự án: ${targetProjectRoot}`);
-    console.log(`Thư mục skills: ${destSkillsDir}\n`);
-  }
-
-  // Sao chép từng skill
-  let installedCount = 0;
-  for (const skillName of SKILLS) {
-    const srcSkillPath = path.join(packageRoot, skillName);
-    const destSkillPath = path.join(destSkillsDir, skillName);
-
-    if (fs.existsSync(destSkillPath) && !isForce) {
-      // Ghi đè cập nhật nội dung thư mục skill
-      copyDirectorySync(srcSkillPath, destSkillPath);
-      console.log(`✓ Đã cập nhật: ${skillName}`);
-    } else {
-      copyDirectorySync(srcSkillPath, destSkillPath);
-      console.log(`✓ Đã cài đặt: ${skillName}`);
+  const targetProjectRoot = isGlobal ? '' : path.resolve(process.cwd(), targetDir || '.');
+  if (!isGlobal) {
+    assertValidMarkers(path.join(targetProjectRoot, 'AGENTS.md'));
+    if (harnesses.has('claude')) {
+      assertValidMarkers(path.join(targetProjectRoot, 'CLAUDE.md'));
     }
-    installedCount++;
   }
 
-  // Với cài đặt dự án, tích hợp an toàn vào file AGENTS.md (không ghi đè mất quy tắc cũ của người dùng)
-  if (!isGlobal && targetProjectRoot) {
+  console.log('Đang cài đặt Product Workflow Skills...\n');
+  console.log(`Chế độ: ${isGlobal ? 'Cài đặt toàn cục' : 'Cài đặt theo dự án'}`);
+  if (!isGlobal) console.log(`Thư mục dự án: ${targetProjectRoot}`);
+
+  for (const key of selected) {
+    const harness = HARNESSES[key];
+    const destSkillsDir = isGlobal
+      ? path.join(os.homedir(), ...harness.global)
+      : path.join(targetProjectRoot, ...harness.project);
+    console.log(`\n[${harness.label}] Thư mục skills: ${destSkillsDir}`);
+
+    for (const skillName of SKILLS) {
+      const destSkillPath = path.join(destSkillsDir, skillName);
+      const existed = fs.existsSync(destSkillPath) && !isForce;
+      copyDirectorySync(path.join(packageRoot, skillName), destSkillPath);
+      console.log(`✓ ${existed ? 'Đã cập nhật' : 'Đã cài đặt'}: ${skillName}`);
+    }
+  }
+
+  // Với cài đặt dự án, tích hợp an toàn vào file chỉ dẫn (không ghi đè mất quy tắc cũ của người dùng)
+  if (!isGlobal) {
+    console.log('');
     syncAgentsMd(targetProjectRoot);
+    if (harnesses.has('claude')) {
+      syncClaudeMd(targetProjectRoot);
+    }
   }
 
-  console.log(`\nHoàn tất! Đã cài ${installedCount}/${SKILLS.length} skills.`);
+  const labels = selected.map((key) => HARNESSES[key].label).join(' và ');
+  console.log(`\nHoàn tất! Đã cài ${SKILLS.length}/${SKILLS.length} skills cho ${labels}.`);
   console.log('\nCách bắt đầu sử dụng:');
-  console.log('1. Mở AI coding assistant (Oh My Pi, Claude Code, Cursor) trong dự án.');
-  console.log('2. Nhập: "Tôi mới vào team, dự án đang ở đâu và nên làm gì tiếp?" hoặc gọi skill: /skill:project-guide');
-  console.log('3. Hoặc điều phối công việc với: /skill:product-workflow\n');
+  for (const key of selected) {
+    const harness = HARNESSES[key];
+    console.log(`- ${harness.label}: mở phiên mới trong dự án, gọi ${harness.command('project-guide')} để định hướng hoặc ${harness.command('product-workflow')} để điều phối công việc.`);
+  }
+  console.log('- Hoặc nói tự nhiên: "Tôi mới vào team, dự án đang ở đâu và nên làm gì tiếp?"\n');
 }
 
 run().catch((error) => {

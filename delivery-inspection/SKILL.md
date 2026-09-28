@@ -2,11 +2,12 @@
 name: delivery-inspection
 description: "Đối chiếu Product Backlog Markdown, Roadmap và ma trận tiến độ local/Jira; kiểm chứng AC, Story Points hoàn tất, checkbox Done và điều kiện release theo bằng chứng áp dụng."
 hide: true
+disable-model-invocation: true
 ---
 
 # Theo dõi, nghiệm thu và cải tiến
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`.
 
 ## 1. Xác định câu hỏi và độ phủ nguồn
 
@@ -146,7 +147,7 @@ Khi một Sprint kết thúc, quy trình chuyển dịch tuần tự qua các b�
 ```
 
 ### 7.2. Sprint Review (Nghiệm thu Increment và Đánh giá Sprint Goal)
-1. **Demo Increment đạt DoD:** Đội ngũ trình bày sản phẩm hoạt động thực tế (working software) thỏa mãn Definition of Done, có đầy đủ bằng chứng kiểm thử tự động và visual evidence từ OMP Browser Native (chỉ áp dụng cho các phần có thay đổi UI/diagram; non-UI chứng minh bằng log kiểm thử/API thực tế).
+1. **Demo Increment đạt DoD:** Đội ngũ trình bày sản phẩm hoạt động thực tế (working software) thỏa mãn Definition of Done, có đầy đủ bằng chứng kiểm thử tự động và visual evidence từ Browser Native (OMP browser hoặc MCP browser, xem `harness.md`) (chỉ áp dụng cho các phần có thay đổi UI/diagram; non-UI chứng minh bằng log kiểm thử/API thực tế).
 2. **Đối chiếu Sprint Goal:** Dùng kế hoạch sprint hiện hữu đã chốt theo định dạng `[Tên Module] + Sprint [X]` tại `docs/workflow/plans/<module-slug>-sprint-<X>/roadmap.md`; không yêu cầu tạo lộ trình nhiều sprint để nghiệm thu một sprint.
 3. **Thu thập phản hồi:** Tiếp nhận feedback từ Product Owner và Stakeholders để tạo các cải tiến hoặc stories mới đưa vào Product Backlog.
 4. **Xử lý User Story chưa Done:** Những User Story chưa hoàn thành, chưa đủ DoD hoặc test thất bại **tuyệt đối không được tính điểm Story Point hoàn tất**. Chúng bắt buộc phải quay trở lại Product Backlog để PO tái đánh giá, sắp xếp lại Rank và cân nhắc đưa vào Sprint tiếp theo.
