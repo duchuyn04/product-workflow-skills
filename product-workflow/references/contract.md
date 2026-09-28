@@ -55,11 +55,11 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 
 ## 4. Câu hỏi và gates
 
-Đọc nguồn trước khi hỏi; chỉ hỏi quyết định nghiệp vụ còn thiếu, gom theo chủ đề thành từng đợt case study trọng tâm. Với hệ thống lớn, phân rã phân hệ và hỏi cuốn chiếu theo rủi ro. Không áp đặt trần số câu cứng nhắc (như 50 câu); tùy theo độ lớn nhỏ của dự án, AI có thể và buộc phải hỏi hơn 100 câu cuốn chiếu qua các case study thực tế cho đến khi làm rõ mọi chi tiết cốt lõi (core). Nghiêm cấm hỏi qua loa 2–3 câu rồi vội vã chốt cổng, đồng thời cấm hỏi lan man ngoài lề. Dừng khi mục tiêu, scope, actors/rules và 6 trụ cột cốt lõi đã hoàn toàn sáng tỏ, không còn câu hỏi chặn phần sắp làm. Đủ dữ kiện vẫn phải xin duyệt G1.
+Đọc nguồn trước khi hỏi; chỉ hỏi quyết định nghiệp vụ còn thiếu, gom theo chủ đề thành từng đợt case study trọng tâm. Với hệ thống lớn, phân rã phân hệ và hỏi cuốn chiếu theo rủi ro. Không áp đặt trần số câu cứng nhắc (như 50 câu); tùy theo độ lớn nhỏ của dự án, AI có thể và buộc phải hỏi hơn 100 câu cuốn chiếu qua các case study thực tế cho đến khi làm rõ mọi chi tiết cốt lõi (core). Nghiêm cấm hỏi qua loa 2–3 câu rồi vội vã chốt cổng, đồng thời cấm hỏi lan man ngoài lề. Dừng khi mục tiêu, scope, actors/rules, 6 trụ cột cốt lõi và danh sách phủ yêu cầu R1–R8 (theo quy mô) đã hoàn toàn sáng tỏ, không còn câu hỏi chặn phần sắp làm. Đủ dữ kiện vẫn phải xin duyệt G1.
 
 | Gate | Điều kiện | Người quyết định |
 |---|---|---|
-| G1 Nghiệp vụ | Subagent Reviewer xác nhận PASS (độ sâu case study khớp quy mô, phủ 6 trụ cột core, không hỏi qua loa); mục tiêu và phạm vi rõ ràng, không còn câu hỏi chặn | Người phụ trách nghiệp vụ được chỉ định |
+| G1 Nghiệp vụ | Subagent Reviewer xác nhận PASS (độ sâu case study khớp quy mô, phủ 6 trụ cột core và danh sách phủ yêu cầu R1–R8 theo quy mô, không hỏi qua loa); mục tiêu và phạm vi rõ ràng, không còn câu hỏi chặn | Người phụ trách nghiệp vụ được chỉ định |
 | G2 Stories/UX | AC và flow thống nhất, quyền/lỗi quan trọng được xét | Người phụ trách sản phẩm/UX được chỉ định |
 | G3 Giải pháp | Ràng buộc đáp ứng, contracts đủ rõ; khi có DB bắt buộc có sơ đồ ERD HTML/SVG kiểm thử Browser Native (font, mũi tên) | Người phụ trách kỹ thuật được chỉ định |
 | G4 Thực thi | Scope công việc đã duyệt, đã khảo sát team size qua ask, tasks phân chia theo folder vai trò, có ma trận dependencies & song song | Người/đội có trách nhiệm theo quy định dự án |

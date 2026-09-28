@@ -737,3 +737,22 @@ test('AGENTS.md block points to an existing harness mapping file', t => {
   assert.ok(ref, 'AGENTS.md must reference harness.md');
   assert.ok(existsSync(path.join(dir, ref[1])), `${ref[1]} must exist in the project`);
 });
+
+test('installed discovery requires scale-aware requirement coverage R1–R8 and audits it at G1', t => {
+  const dir = tempDir(t, 'workflow-coverage-');
+  assertOk(runCli(['--project', dir]));
+  const skills = path.join(dir, '.agents', 'skills');
+  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
+
+  const section = discovery.indexOf('Danh sách phủ yêu cầu nghiệp vụ');
+  assert.ok(section >= 0, 'discovery must define the requirement coverage checklist');
+  for (const id of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8']) {
+    assert.ok(discovery.indexOf(`**${id}`, section) > section, `checklist must define ${id}`);
+  }
+  assert.match(discovery, /MVP[^\n]*bắt buộc R1, R2, R8/, 'MVP must only require R1, R2 and R8');
+  assert.match(discovery, /\*\*5\. Phủ yêu cầu nghiệp vụ/, 'G1 rubric must score requirement coverage');
+  assert.match(discovery, /Bảng phủ yêu cầu R1–R8/, 'brief template must record coverage');
+
+  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
+  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*R1–R8/, 'G1 gate condition must include coverage');
+});
