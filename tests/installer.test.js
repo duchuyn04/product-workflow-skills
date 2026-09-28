@@ -756,3 +756,29 @@ test('installed discovery requires scale-aware requirement coverage R1–R8 and 
   const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
   assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*R1–R8/, 'G1 gate condition must include coverage');
 });
+
+test('G1 auditor advises instead of vetoing: decision point after 3 REVISE rounds with recorded accepted risks', t => {
+  const dir = tempDir(t, 'workflow-g1-override-');
+  assertOk(runCli(['--project', dir]));
+  const skills = path.join(dir, '.agents', 'skills');
+  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
+
+  assert.match(discovery, /sau \*\*3 vòng kiểm định\*\*/, 'REVISE loop must surface a decision after 3 rounds');
+  assert.match(discovery, /Duyệt G1, chấp nhận rủi ro/, 'user must be able to approve G1 with accepted risks');
+  assert.match(discovery, /Rủi ro đã chấp nhận tại G1/, 'accepted risks must be recorded in the brief');
+  assert.match(discovery, /cấm trình duyệt G1 khi Subagent Reviewer chưa chạy/i, 'audit must still run before G1');
+  assert.doesNotMatch(discovery, /cho đến khi đạt `PASS`/, 'no unbounded REVISE loop');
+
+  for (const file of [
+    path.join(skills, 'product-workflow', 'references', 'contract.md'),
+    path.join(skills, 'product-workflow', 'SKILL.md'),
+    path.join(dir, 'AGENTS.md'),
+  ]) {
+    const content = readFileSync(file, 'utf8');
+    if (content.includes('Subagent')) {
+      assert.doesNotMatch(content, /chưa có kết luận PASS\.?$/m, `${path.basename(file)} must not keep the absolute PASS veto`);
+    }
+  }
+  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
+  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*chấp nhận rủi ro/, 'G1 gate must allow approval with accepted risks');
+});

@@ -59,7 +59,7 @@ Mỗi artifact có ID ổn định, scope, revision thực (commit khi đã comm
 
 | Gate | Điều kiện | Người quyết định |
 |---|---|---|
-| G1 Nghiệp vụ | Subagent Reviewer xác nhận PASS (độ sâu case study khớp quy mô, phủ 6 trụ cột core và danh sách phủ yêu cầu R1–R8 theo quy mô, không hỏi qua loa); mục tiêu và phạm vi rõ ràng, không còn câu hỏi chặn | Người phụ trách nghiệp vụ được chỉ định |
+| G1 Nghiệp vụ | Subagent Reviewer đã chạy và xác nhận PASS (độ sâu case study khớp quy mô, phủ 6 trụ cột core và danh sách phủ yêu cầu R1–R8 theo quy mô, không hỏi qua loa), hoặc sau 3 vòng REVISE người phụ trách nghiệp vụ duyệt kèm chấp nhận rủi ro đã ghi trong brief; mục tiêu và phạm vi rõ ràng, câu hỏi chặn đã giải quyết hoặc nằm trong danh sách rủi ro đã chấp nhận | Người phụ trách nghiệp vụ được chỉ định |
 | G2 Stories/UX | AC và flow thống nhất, quyền/lỗi quan trọng được xét | Người phụ trách sản phẩm/UX được chỉ định |
 | G3 Giải pháp | Ràng buộc đáp ứng, contracts đủ rõ; khi có DB bắt buộc có sơ đồ ERD HTML/SVG kiểm thử Browser Native (font, mũi tên) | Người phụ trách kỹ thuật được chỉ định |
 | G4 Thực thi | Scope công việc đã duyệt, đã khảo sát team size qua ask, tasks phân chia theo folder vai trò, có ma trận dependencies & song song | Người/đội có trách nhiệm theo quy định dự án |
@@ -72,7 +72,7 @@ Các hành vi sau bị coi là vi phạm nghiêm trọng quy trình:
 3. Tự chọn/thay stack khi có quyết định công nghệ mới đáng kể mà chưa trình phương án và xin duyệt; stack hiện hữu đã chốt thì kế thừa, không hỏi chọn lại.
 4. Chỉ in tài liệu thiết kế của cổng ra chat mà không lưu phần cập nhật vào hồ sơ vật lý trong `docs/workflow/`.
 5. Gộp nhiều cổng trong một lượt trả lời rồi tự ý suy diễn là đã được duyệt.
-6. Tự ý trình duyệt Cổng G1 hoặc nhảy sang Cổng G2 khi Subagent Reviewer chưa chạy hoặc chưa có kết luận PASS.
+6. Tự ý trình duyệt Cổng G1 hoặc nhảy sang Cổng G2 khi Subagent Reviewer chưa chạy; hoặc khi kết luận mới nhất là REVISE mà chưa đi qua điểm quyết định của người dùng và chưa ghi rủi ro đã chấp nhận vào brief.
 7. Thiết kế hoặc thay đổi DB tại Cổng G3 mà không tạo sơ đồ ERD HTML/SVG và không kiểm thử Browser Native (font chữ, mũi tên liên kết).
 8. Tự ý chia tasks tại Cổng G4 mà không gọi ask hỏi số lượng người trong nhóm, không tổ chức tasks theo folder hoặc không hiển thị rõ ma trận ràng buộc và luồng làm song song.
 

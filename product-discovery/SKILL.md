@@ -163,7 +163,7 @@ Khi người dùng dùng từ ngữ mơ hồ, AI làm rõ và đề xuất thu�
     3. Danh sách phủ R1–R8 đã được trả lời theo đúng mức của quy mô đã chọn (mục C.1).
     4. Không còn bất kỳ câu hỏi chặn (blocking questions) hoặc giả định mù mờ nào chưa được người dùng xác nhận.
   - Khi đã thực sự thỏa mãn các điều kiện trên, AI mới dừng hỏi, tổng hợp Business Brief hoàn chỉnh, dùng `write` lưu vào file vật lý `docs/workflow/specs/<tên-phân-hệ>-brief.md`, và gọi `ask` xin duyệt Cổng G1.
-- **Dừng sớm không phải là Ready:** Nếu người dùng chủ động yêu cầu dừng sớm khi các case study cốt lõi vẫn chưa được làm rõ, AI ghi rõ các câu hỏi mở và blocker vào brief, đánh dấu trạng thái `draft` hoặc `awaiting-resolution`. Việc dừng sớm khi còn blocker KHÔNG được coi là approved readiness để chuyển sang G2.
+- **Dừng sớm không phải là Ready:** Nếu người dùng chủ động yêu cầu dừng sớm khi các case study cốt lõi vẫn chưa được làm rõ, AI ghi rõ các câu hỏi mở và blocker vào brief, đánh dấu trạng thái `draft` hoặc `awaiting-resolution`. Việc dừng sớm khi còn blocker KHÔNG được coi là approved readiness để chuyển sang G2. Muốn đi tiếp khi còn lỗ hổng, người phụ trách nghiệp vụ phải duyệt G1 kèm rủi ro theo điểm quyết định ở mục 3.C; dừng mà không duyệt thì brief vẫn là `draft`.
 ## Đầu ra: Lưu file tài liệu vật lý (Docs-First)
 
 AI **BẮT BUỘC DÙNG CÔNG CỤ `write` TẠO HOẶC CẬP NHẬT FILE** tại đường dẫn:
@@ -183,6 +183,7 @@ Nội dung file bao gồm:
 - Danh mục tài liệu đã nhận từ người dùng (tên, nội dung chính, rule nào dựa vào), hoặc ghi rõ chưa nhận tài liệu nào.
 - In-scope/out-of-scope và giả thuyết cần kiểm chứng.
 - Câu hỏi mở: owner, ảnh hưởng, quyết định/gate đang bị chặn.
+- Rủi ro đã chấp nhận tại G1 (chỉ khi người dùng duyệt G1 dù kiểm định còn `REVISE`, xem mục 3.C).
 
 Mẫu rule:
 
@@ -231,11 +232,21 @@ Subagent đánh giá theo 5 tiêu chí bắt buộc:
 
 ### C. Xử lý kết luận của Subagent (Verdict Handling)
 
+Subagent là người kiểm định để khuyến nghị, không phải người phê duyệt. Quyết định G1 thuộc người phụ trách nghiệp vụ.
+
 - **Trường hợp kết luận là `REVISE` (Chưa đạt / Cần đào sâu thêm):**
-  - **LỆNH CẤM:** AI **TUYỆT ĐỐI CẤM GỌI `ask` TRÌNH DUYỆT G1** và CẤM chuyển sang G2.
+  - Mặc định chưa gọi `ask` trình duyệt G1 và chưa chuyển sang G2.
   - AI đọc kỹ danh sách "Lỗ hổng nghiệp vụ" (Domain Holes) và các kịch bản Case Study bổ sung do Subagent chỉ định.
   - AI quay lại phỏng vấn người dùng: Lập tức tạo đợt `ask` tiếp theo mang các Case Study đó ra hỏi người dùng để làm rõ.
-  - Khi người dùng trả lời, AI cập nhật lại brief và kích hoạt Subagent thẩm định lại cho đến khi đạt `PASS`.
+  - Khi người dùng trả lời, AI cập nhật lại brief và kích hoạt Subagent thẩm định lại.
+  - AI không tự gợi ý duyệt vượt kết luận `REVISE` trước vòng kiểm định thứ 3, trừ khi người dùng hỏi.
+
+- **Điểm quyết định của người dùng:** Khi vẫn là `REVISE` sau **3 vòng kiểm định**, hoặc bất cứ lúc nào người dùng chủ động muốn duyệt dù còn `REVISE`:
+  1. Trình bày trong chat danh sách lỗ hổng còn lại: nội dung, ảnh hưởng nếu để nguyên, và lỗ hổng nào chặn luồng nghiệp vụ chính.
+  2. Sau đó mới gọi `ask` với các lựa chọn: `[Tiếp tục phỏng vấn]` (Recommended), `[Duyệt G1, chấp nhận rủi ro]`, `[Dừng, giữ brief ở draft]`.
+  3. Chọn tiếp tục thì quay lại vòng phỏng vấn và kiểm định; sau mỗi 3 vòng `REVISE` tiếp theo lại đưa điểm quyết định này.
+  4. Chọn dừng thì brief giữ trạng thái `draft`, ghi lỗ hổng vào câu hỏi mở; không chuyển sang G2.
+  5. Chọn `Duyệt G1, chấp nhận rủi ro` thì ghi vào brief mục **"Rủi ro đã chấp nhận tại G1"**: từng lỗ hổng, ảnh hưởng, người chấp nhận (người đã chọn trong chat), revision của brief, và cổng phải giải quyết trước đó (ví dụ `trước G3`, `trước story US05`). Mỗi lỗ hổng đồng thời vào danh sách câu hỏi mở có owner để G2/G3 xử lý. Trạng thái G1 là `approved`; báo cáo kiểm định cuối cùng vẫn được lưu nguyên kết luận `REVISE`.
 
 - **Trường hợp kết luận là `PASS` (Đạt chuẩn chất lượng):**
   - AI ghi nhận bảng tóm tắt kết quả audit vào cuối file brief `docs/workflow/specs/<tên-phân-hệ>-brief.md` (mục `Discovery Quality Audit`).
@@ -244,16 +255,19 @@ Subagent đánh giá theo 5 tiêu chí bắt buộc:
 ## Gate G1 và điều kiện dừng (Hard-Stop)
 
 G1 đạt khi và chỉ khi thỏa mãn đồng thời 2 điều kiện:
-1. **Subagent Audit đạt `PASS`:** Báo cáo kiểm định độc lập của Subagent xác nhận bộ case study không bị hời hợt, tương xứng với quy mô dự án và bao phủ trọn vẹn 6 Trụ cột Cốt lõi và danh sách phủ yêu cầu R1–R8 theo quy mô.
-2. **Người dùng phê duyệt rõ ràng:** Người phụ trách nghiệp vụ bấm chọn `[Duyệt và tiếp tục]` qua công cụ `ask`.
+1. **Subagent Audit đã chạy và có kết luận:** Hoặc `PASS` (bộ case study không bị hời hợt, tương xứng với quy mô dự án và bao phủ trọn vẹn 6 Trụ cột Cốt lõi và danh sách phủ yêu cầu R1–R8 theo quy mô), hoặc `REVISE` đã đi qua điểm quyết định ở mục C và người dùng chọn `[Duyệt G1, chấp nhận rủi ro]` với mục "Rủi ro đã chấp nhận tại G1" đã ghi vào brief.
+2. **Người dùng phê duyệt rõ ràng:** Người phụ trách nghiệp vụ bấm chọn duyệt qua công cụ `ask`.
 
 **Lệnh cấm duyệt vội (Anti-Bypass Hard-Stop):**
-- Tuyệt đối cấm tự ý gọi `ask` xin duyệt G1 khi Subagent Reviewer chưa chạy hoặc có kết luận `REVISE`.
-- Brief không có bằng chứng audit đạt `PASS` bị coi là vi phạm kỷ luật cổng, không có giá trị bàn giao cho Cổng G2 (`story-and-experience`).
+- Tuyệt đối cấm trình duyệt G1 khi Subagent Reviewer chưa chạy.
+- Cấm trình duyệt G1 khi kết luận mới nhất là `REVISE`, trừ khi đi qua điểm quyết định ở mục C. Không được giấu, rút gọn hoặc diễn giải nhẹ đi danh sách lỗ hổng khi trình bày.
+- Brief không có báo cáo kiểm định, hoặc duyệt kèm rủi ro mà không có mục "Rủi ro đã chấp nhận tại G1", bị coi là vi phạm kỷ luật cổng, không có giá trị bàn giao cho Cổng G2 (`story-and-experience`).
 
 **Quy tắc dừng lượt bắt buộc:** Sau khi Subagent xác nhận `PASS` và file `docs/workflow/specs/<tên-phân-hệ>-brief.md` đã được lưu, AI phải **DỪNG TIN NHẮN** và gọi công cụ `ask` của Oh My Pi:
 - Câu hỏi: *"Subagent Audit đã xác nhận brief đạt chuẩn PASS. Tôi đã hoàn thành Business Brief tại `docs/workflow/specs/<tên-phân-hệ>-brief.md`. Bạn có duyệt tài liệu này (Cổng G1) để chuyển sang thiết kế User Stories & UX (Cổng G2) không?"*
 - Tùy chọn: `[Duyệt và tiếp tục]` (Recommended), `[Cần điều chỉnh quy tắc]`, `[Xem giải thích chi tiết]`.
+
+Trường hợp duyệt kèm rủi ro, lựa chọn `[Duyệt G1, chấp nhận rủi ro]` ở điểm quyết định chính là câu trả lời duyệt G1; không hỏi lại lần thứ hai. Trước khi gọi `ask` ở điểm quyết định, brief phải được lưu với báo cáo kiểm định mới nhất; sau khi người dùng chọn, ghi mục "Rủi ro đã chấp nhận tại G1" rồi mới chuyển sang G2.
 
 Đủ G1 thì chuyển đề xuất sang `story-and-experience` (G2). Đây là bước tiếp theo DUY NHẤT; tuyệt đối không nhảy cóc sang kiến trúc (G3) hay viết code (`task-execution`). Không tự chọn giải pháp kỹ thuật trong discovery.
 
