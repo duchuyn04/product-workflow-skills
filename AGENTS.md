@@ -4,7 +4,7 @@
 
 **Phạm vi:** Phân loại nhánh và duyệt cổng khi yêu cầu có triển khai hoặc thay đổi hành vi sản phẩm. Hỏi đáp, giải thích, review chỉ đọc và chỉnh tài liệu thuần túy không cần G1–G4; vẫn đọc skill liên quan. Tài liệu đặc tả một tính năng mới vẫn thuộc quy trình Feature. Yêu cầu hỗn hợp: chỉ áp dụng cổng cho phần triển khai.
 
-Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, đọc nội dung `skill://product-workflow` (fallback `.agents/skills/product-workflow/SKILL.md`); Glob không thay cho đọc skill. Thiếu skill hoặc chưa có duyệt đúng nhánh thì dừng trước thao tác ghi, kể cả shell/subagent.
+Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, đọc nội dung `skill://product-workflow` (fallback `product-workflow/SKILL.md` trong thư mục skills đã cài: `.claude/skills/` cho Claude Code, `.agents/skills/` cho Oh My Pi; trong repo này ở gốc repo); Glob không thay cho đọc skill. Thiếu skill hoặc chưa có duyệt đúng nhánh thì dừng trước thao tác ghi, kể cả shell/subagent.
 
 ---
 
@@ -14,7 +14,7 @@ Trước khi sửa source, tests, cấu hình, dependencies hoặc migrations, �
 - **DOCS-FIRST:** Mọi tài liệu thiết kế phải lưu thành file vật lý trong `docs/workflow/` (specs, architecture, plans, diagrams), cấm chỉ in ra chat.
 - **BẢO VỆ CODE CŨ (BROWNFIELD):** Không tự ý refactor lan man, không xóa code cũ ngoài phạm vi task, luôn bảo đảm regression tests.
 - **SƠ ĐỒ & GIAO DIỆN:** Đọc `diagram-design` để vẽ sơ đồ, không dùng Mermaid code blocks. Kiểm thử mọi diagram HTML/SVG qua Engine Browser Native hoặc công cụ browser tương đương trước khi bàn giao. Nếu không có browser, báo rõ phần chưa kiểm chứng và khả năng còn thiếu; không đánh dấu nghiệm thu hoàn tất.
-- **CHECKPOINT GIAO DIỆN WEB:** Sau khi thêm hoặc sửa chức năng làm thay đổi giao diện web người dùng nhìn thấy/tương tác, phải gọi `ask` để người dùng chọn cách kiểm thử bằng OMP Browser Native trước khi báo hoàn thành. Chỉ bỏ qua câu hỏi khi người dùng đã chọn rõ cách kiểm thử cho đúng scope; chọn bỏ qua phải ghi `not-run`, không được tuyên bố đã kiểm chứng trực quan. Diagram HTML/SVG vẫn tự động kiểm thử theo quy tắc riêng.
+- **CHECKPOINT GIAO DIỆN WEB:** Sau khi thêm hoặc sửa chức năng làm thay đổi giao diện web người dùng nhìn thấy/tương tác, phải gọi `ask` (Claude Code: `AskUserQuestion`) để người dùng chọn cách kiểm thử bằng Browser Native (OMP browser hoặc MCP browser trên Claude Code) trước khi báo hoàn thành. Chỉ bỏ qua câu hỏi khi người dùng đã chọn rõ cách kiểm thử cho đúng scope; chọn bỏ qua phải ghi `not-run`, không được tuyên bố đã kiểm chứng trực quan. Diagram HTML/SVG vẫn tự động kiểm thử theo quy tắc riêng.
 - **SUBAGENT AUDIT CỔNG G1:** Trước khi trình duyệt Cổng G1, bắt buộc kích hoạt Subagent Reviewer độc lập thẩm định chất lượng Business Brief và chuỗi case study theo 6 Trụ cột Core; cấm trình duyệt G1 hoặc chuyển sang G2 khi chưa có kết luận `PASS` từ Subagent Reviewer.
 - **TÙY CHỌN PROTOTYPE MOCKUP (G2):** Sau khi chốt các luồng UX tại Cổng G2, bắt buộc dùng `ask` hỏi người dùng xem có muốn tạo bản Prototype Mockup tương tác (HTML/CSS/JS độc lập) để bấm thử trên Browser Native và hình dung cách hệ thống vận hành trước khi chuyển sang Cổng G3 hay không.
 - **ERD NATIVE BROWSER GATE (G3):** Khi thiết kế kỹ thuật có tạo hoặc thay đổi cơ sở dữ liệu, bắt buộc dùng `diagram-design` tạo sơ đồ ERD HTML/SVG và kiểm thử trực quan qua Engine Browser Native (font chữ, mũi tên liên kết, bố cục) trước khi trình duyệt Cổng G3.
@@ -58,6 +58,7 @@ Trong nhánh Feature, dừng và quay về bước tương ứng nếu có suy n
 
 **Cách đọc theo môi trường:**
 - Nếu hỗ trợ `skill://`, dùng công cụ đọc file để mở URI trong bảng.
+- Tên công cụ trong skills theo Oh My Pi (`ask`, `task`, `browser`); harness khác (như Claude Code) dùng công cụ tương đương trong `product-workflow/references/harness.md`.
 - Nếu không hỗ trợ, tra danh sách skills hoặc cấu hình cài đặt của công cụ để tìm và đọc `SKILL.md` tương ứng. Trong repo này, đường dẫn là `<tên-skill>/SKILL.md`, tính từ thư mục gốc repo; không giả định đường dẫn này đúng ở dự án khác.
 - Nếu không tìm thấy skill bắt buộc, báo rõ tên skill và vị trí đã kiểm tra; chỉ dừng phần phụ thuộc vào skill đó, không tự bịa nội dung thay thế.
 - Bảng dưới là chỉ mục điều hướng. Quy trình chi tiết nằm trong từng skill; các quy tắc duyệt chung nằm ở mục 1–2.

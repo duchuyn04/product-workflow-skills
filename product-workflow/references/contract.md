@@ -21,7 +21,7 @@ Một đầu vào là `product-workflow`; các skills còn lại là chuyên gia
 
 Chỉ xử lý phạm vi được yêu cầu. Đừng chạy toàn bộ lifecycle để trả lời một câu hỏi hoặc sửa một lỗi nhỏ. Discovery của scope tương lai có thể chạy cùng delivery của scope đã duyệt. Không biến gates thành waterfall toàn dự án.
 
-Không bịa API, lệnh CLI, MCP tool hoặc khả năng claim. Nếu công cụ cần thiết không có, trả rõ khả năng thiếu và hoàn thành phần phân tích không cần công cụ. Không đổi một kết quả proposal thành lời tuyên bố đã cập nhật hệ thống thật.
+Tên công cụ trong skills (`ask`, `task`, `browser`, `skill://`) theo Oh My Pi; harness khác dùng công cụ tương đương trong `harness.md` cùng thư mục với hợp đồng này. Không bịa API, lệnh CLI, MCP tool hoặc khả năng claim. Nếu công cụ cần thiết không có, trả rõ khả năng thiếu và hoàn thành phần phân tích không cần công cụ. Không đổi một kết quả proposal thành lời tuyên bố đã cập nhật hệ thống thật.
 
 ## 3. Nguồn dữ liệu và quyền sở hữu
 

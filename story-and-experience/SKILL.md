@@ -2,11 +2,12 @@
 name: story-and-experience
 description: "Chuyển nghiệp vụ thành story map, acceptance criteria, user journeys, UI/UX flows và trạng thái màn hình có thể kiểm chứng."
 hide: true
+disable-model-invocation: true
 ---
 
 # Stories và trải nghiệm
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`.
 
 ## Đầu vào và phạm vi
 

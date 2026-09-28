@@ -511,6 +511,7 @@ Khi tạo hoặc sửa bất kỳ file sơ đồ HTML/SVG nào, AI **bắt buộ
 
 1. **Mở và ổn định trang:**
    - Dùng `browser.open({ url: "file://..." })` với file sơ đồ.
+   - Claude Code không có browser tích hợp: dùng MCP browser đã cấu hình, như Playwright MCP (`browser_navigate`, `browser_evaluate`, `browser_take_screenshot`) hoặc Chrome DevTools MCP (`navigate_page`, `evaluate_script`, `take_screenshot`). Playwright MCP chặn `file://` theo mặc định: phục vụ thư mục sơ đồ qua server tĩnh cục bộ (ví dụ `python -m http.server`) rồi mở `http://127.0.0.1:<port>/...`; MCP cho phép `file:///` thì mở trực tiếp. Các bước đo bên dưới chạy qua tool evaluate thay cho `tab.run`. Không có MCP browser thì trạng thái là `not-run`.
    - Chờ `document.fonts.ready`, sau đó chờ thêm hai `requestAnimationFrame` để layout ổn định trước khi đo.
    - Nếu file dùng font remote và font chưa tải được, ghi nhận lỗi; không dùng fallback để claim Pass.
 

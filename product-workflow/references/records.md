@@ -1,6 +1,6 @@
 # Mẫu hồ sơ dùng chung
 
-Đây là mẫu để agent điền khi người dùng yêu cầu tạo/lưu hồ sơ. Không tạo sẵn hồ sơ dự án chỉ vì đọc file này. Đọc `skill://product-workflow/references/contract.md` trước. Nếu URI chưa được khám phá, đọc `.agents/skills/product-workflow/references/contract.md`.
+Đây là mẫu để agent điền khi người dùng yêu cầu tạo/lưu hồ sơ. Không tạo sẵn hồ sơ dự án chỉ vì đọc file này. Đọc `skill://product-workflow/references/contract.md` trước. Nếu URI chưa được khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục).
 
 Dùng quy ước tài liệu đã có. Nếu chưa có, đề xuất `docs/workflow/project.md` và `docs/workflow/checkpoint.md`, chốt nơi lưu một lần. Tài liệu chi tiết ở nơi phù hợp, chỉ mục chứa links; không nhét toàn dự án vào một file. Bảng dưới mô tả trường cần điền, không phải dữ liệu thật.
 

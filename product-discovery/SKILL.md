@@ -2,11 +2,12 @@
 name: product-discovery
 description: "Phỏng vấn nghiệp vụ chuyên sâu, xác định mục tiêu, actors, quy tắc domain, dữ liệu, ngoại lệ và phạm vi trước khi chốt stories hoặc thay đổi yêu cầu."
 hide: true
+disable-model-invocation: true
 ---
 
 # Product discovery
 
-Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa được khám phá, đọc `.agents/skills/product-workflow/references/contract.md`. Đây là bước chuyên gia, không tự mở một workflow bao trùm khác.
+Đọc `skill://product-workflow/references/contract.md` trước; nếu URI chưa được khám phá hoặc harness không hỗ trợ `skill://` (như Claude Code), đọc `<skills-dir>/product-workflow/references/contract.md`; `<skills-dir>` là thư mục cha của skill này (`.claude/skills/`, `.agents/skills/` hoặc bản toàn cục); tên công cụ quy đổi theo `<skills-dir>/product-workflow/references/harness.md`. Đây là bước chuyên gia, không tự mở một workflow bao trùm khác.
 
 ## Đầu vào
 

@@ -2,6 +2,7 @@
 name: diagnosing-bugs
 description: Diagnose bugs and performance regressions whose root cause is not yet supported by evidence; return a structured Diagnosis Packet before a Bounded proposal.
 hide: true
+disable-model-invocation: true
 license: MIT
 metadata:
   adapted-from: .agents/skills/diagnosing-bugs/SKILL.md

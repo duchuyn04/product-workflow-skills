@@ -2,6 +2,7 @@
 name: codebase-design
 description: Apply deep-module vocabulary when a change affects a module, interface, seam, adapter, dependency direction, or testability; return a Design Delta for the parent workflow.
 hide: true
+disable-model-invocation: true
 license: MIT
 metadata:
   adapted-from: .agents/skills/codebase-design/SKILL.md

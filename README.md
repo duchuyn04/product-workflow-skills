@@ -32,11 +32,11 @@ Hệ thống gồm một kỹ năng điều phối chung, một kỹ năng đị
 
 ### Chuyên gia nội bộ kích hoạt theo ngữ cảnh
 
-Ba kỹ năng này được cấu hình ẩn (`hide: true`), chỉ tự động kích hoạt khi có tình huống kỹ thuật tương ứng:
+Ba kỹ năng này được cấu hình ẩn (`hide: true`; trên Claude Code là `disable-model-invocation: true`): model không tự gọi chúng, mà router hoặc skill cha đọc chúng khi có tình huống kỹ thuật tương ứng. Sáu kỹ năng chuyên môn từ `product-discovery` đến `delivery-inspection` cũng được ẩn theo cách này và do router gọi; chỉ `product-workflow`, `project-guide` và `diagram-design` hiển thị trực tiếp.
 
-- `diagnosing-bugs`: Tự động kích hoạt khi gặp lỗi, lỗi tái xuất hiện hoặc suy giảm hiệu năng chưa rõ nguyên nhân để tìm gốc rễ vấn đề trước khi sửa.
-- `codebase-design`: Tự động kích hoạt khi thay đổi chạm vào ranh giới module, cấu trúc interface hoặc khả năng kiểm thử của mã nguồn.
-- `code-review`: Tự động kích hoạt sau khi hoàn thành tính năng để rà soát chất lượng code theo tiêu chuẩn dự án và độ khớp với yêu cầu.
+- `diagnosing-bugs`: Được router đọc khi gặp lỗi, lỗi tái xuất hiện hoặc suy giảm hiệu năng chưa rõ nguyên nhân để tìm gốc rễ vấn đề trước khi sửa.
+- `codebase-design`: Được router hoặc `solution-design` đọc khi thay đổi chạm vào ranh giới module, cấu trúc interface hoặc khả năng kiểm thử của mã nguồn.
+- `code-review`: Được `task-execution` đọc sau khi hoàn thành tính năng để rà soát chất lượng code theo tiêu chuẩn dự án và độ khớp với yêu cầu.
 
 ## Các cổng kiểm soát chất lượng
 
@@ -122,11 +122,16 @@ Chạy trực tiếp trình cài đặt:
 npx github:duchuyn04/product-workflow-skills
 ```
 
-Menu hiển thị hai tùy chọn:
-1. `Project`: Cài vào `.agents/skills/` và đồng bộ `AGENTS.md` trong dự án hiện tại.
-2. `Global`: Cài vào thư mục toàn cục `~/.omp/agent/skills/`.
+Menu hỏi lần lượt:
+1. Harness: `Oh My Pi`, `Claude Code` hoặc cả hai.
+2. Phạm vi: `Project` (cài vào dự án hiện tại và đồng bộ file chỉ dẫn) hoặc `Global` (cài vào thư mục toàn cục của người dùng).
 
-Chỉ định trực tiếp qua tham số dòng lệnh:
+| Harness | Project | Global | File chỉ dẫn (Project) |
+|---|---|---|---|
+| Oh My Pi (`--omp`, mặc định) | `.agents/skills/` | `~/.omp/agent/skills/` | `AGENTS.md` |
+| Claude Code (`--claude`) | `.claude/skills/` | `~/.claude/skills/` | `AGENTS.md` và khối `@AGENTS.md` trong `CLAUDE.md` |
+
+Chỉ định trực tiếp qua tham số dòng lệnh (không chọn harness thì mặc định Oh My Pi):
 
 ```bash
 # Cài vào dự án hiện tại
@@ -137,7 +142,23 @@ npx github:duchuyn04/product-workflow-skills --project ./my-project
 
 # Cài toàn cục cho Oh My Pi
 npx github:duchuyn04/product-workflow-skills --global
+
+# Cài cho Claude Code trong dự án hiện tại
+npx github:duchuyn04/product-workflow-skills --claude --project
+
+# Cài toàn cục cho Claude Code
+npx github:duchuyn04/product-workflow-skills --claude --global
+
+# Cài cho cả Oh My Pi và Claude Code
+npx github:duchuyn04/product-workflow-skills --all --project
 ```
+
+### Dùng với Claude Code
+
+- Skills được cài vào `.claude/skills/`. Gọi `/project-guide` để định hướng hoặc `/product-workflow` để điều phối công việc; mở phiên Claude Code mới sau khi cài.
+- Claude Code bỏ qua `AGENTS.md` khi dự án đã có `CLAUDE.md`, nên installer thêm khối có marker chứa `@AGENTS.md` vào `CLAUDE.md` (tạo file nếu chưa có, giữ nguyên nội dung sẵn có, bỏ qua nếu `CLAUDE.md` đã import `AGENTS.md`).
+- Skills viết theo tên công cụ Oh My Pi; bảng ánh xạ `product-workflow/references/harness.md` quy đổi sang công cụ của Claude Code: `ask` thành `AskUserQuestion`, `task`/subagent thành `Agent`, `skill://` thành đọc file trong `.claude/skills/`.
+- Claude Code không có browser tích hợp. Các bước kiểm thử Browser Native (sơ đồ, prototype, giao diện web) cần một MCP browser như Playwright MCP hoặc Chrome DevTools MCP; nếu chưa cấu hình, kết quả được ghi `not-run` thay vì coi là đạt.
 
 ### Đóng gói và chạy bản cục bộ
 
@@ -155,7 +176,7 @@ npx --yes --package ./product-workflow-skills-1.0.0.tgz product-workflow-skills
 
 ### Sao chép thủ công
 
-Sao chép các thư mục kỹ năng vào `.agents/skills/` trong dự án và bổ sung chỉ dẫn từ `AGENTS.md`. Đối với cấu hình toàn cục của Oh My Pi, sao chép vào `~/.omp/agent/skills/`.
+Sao chép các thư mục kỹ năng vào `.agents/skills/` (Oh My Pi) hoặc `.claude/skills/` (Claude Code) trong dự án và bổ sung chỉ dẫn từ `AGENTS.md`; với Claude Code, thêm dòng `@AGENTS.md` vào `CLAUDE.md` nếu dự án đã có file này. Đối với cấu hình toàn cục, sao chép vào `~/.omp/agent/skills/` (Oh My Pi) hoặc `~/.claude/skills/` (Claude Code).
 
 ## Câu lệnh mẫu theo nhu cầu
 
