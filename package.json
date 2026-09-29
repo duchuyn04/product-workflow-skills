@@ -1,7 +1,7 @@
 {
   "name": "product-workflow-skills",
-  "version": "1.0.0",
-  "description": "Bộ kỹ năng phát triển sản phẩm (Agent Skills) cho AI Coding Harness",
+  "version": "2.0.0",
+  "description": "Bộ Agent Skills phân tích yêu cầu, lập Product Backlog và chia sprint kèm task cho AI Coding Harness",
   "type": "module",
   "bin": {
     "product-workflow-skills": "./bin/cli.js"
@@ -11,18 +11,11 @@
   },
   "files": [
     "bin",
-    "code-review",
-    "codebase-design",
-    "delivery-inspection",
-    "delivery-planning",
-    "diagnosing-bugs",
     "diagram-design",
+    "product-backlog",
     "product-discovery",
     "product-workflow",
-    "project-guide",
-    "solution-design",
-    "story-and-experience",
-    "task-execution",
+    "sprint-planning",
     "AGENTS.md",
     "README.md"
   ],
@@ -32,12 +25,14 @@
   "keywords": [
     "agent-skills",
     "ai-agents",
-    "product-workflow",
+    "product-backlog",
+    "user-stories",
+    "sprint-planning",
     "oh-my-pi",
     "claude-code",
-    "cursor",
     "agile",
-    "scrum"
+    "scrum",
+    "jira"
   ],
   "author": "duchuyn04",
   "license": "MIT",

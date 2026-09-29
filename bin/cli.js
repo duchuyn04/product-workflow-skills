@@ -15,14 +15,21 @@ const packageRoot = process.env.PRODUCT_WORKFLOW_PACKAGE_ROOT
 
 const SKILLS = [
   'product-workflow',
-  'project-guide',
   'product-discovery',
+  'product-backlog',
+  'sprint-planning',
+  'diagram-design',
+];
+
+// Skills của bản 1.x đã bị gỡ hoặc đổi tên. Installer chỉ cảnh báo, không tự xóa,
+// vì thư mục trùng tên (như code-review) có thể là skill riêng của người dùng.
+const OBSOLETE_SKILLS = [
+  'project-guide',
   'story-and-experience',
   'solution-design',
   'delivery-planning',
   'task-execution',
   'delivery-inspection',
-  'diagram-design',
   'diagnosing-bugs',
   'codebase-design',
   'code-review',
@@ -160,13 +167,11 @@ function syncAgentsMd(targetProjectRoot) {
 
   const block = `${MARKER_START}
 ## Product Workflow
-- Trước khi sửa source, cấu hình, dependencies hoặc migrations, đọc ${routerRefs}. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
-- Trước duyệt chỉ đọc và phân tích source; soạn tài liệu theo cổng. Chờ người dùng duyệt đúng nhánh trước mọi thao tác ghi mã nguồn, kể cả qua shell hoặc subagent.
-- Bounded: trong chat, trình bày Đề xuất sửa lỗi (hoặc cải tiến nhỏ cục bộ) gồm phạm vi, nguyên nhân/mục đích, thay đổi theo file/symbol, ngoài phạm vi/rủi ro và cách kiểm thử; sau đó mới gọi ask và chờ duyệt. Thẻ ask chỉ ghi nhận quyết định, không thay thế kế hoạch hiển thị trước đó. Chỉ yêu cầu duyệt G1–G4 với Feature (module mới, luồng nghiệp vụ cốt lõi, DB mới); Spike cần duyệt thử nghiệm.
-- Thay đổi giao diện web người dùng nhìn thấy/tương tác: sau khi thực thi và trước khi báo hoàn thành, gọi ask để người dùng chọn cách kiểm thử bằng Browser Native. Chỉ không hỏi khi người dùng đã chọn rõ cho đúng scope; nếu bỏ qua thì ghi not-run, không claim đã kiểm chứng trực quan. Diagram HTML/SVG dùng quality gate tự động riêng.
-- Tên công cụ trong skills theo Oh My Pi (ask, task, browser, skill://). Harness khác dùng công cụ tương đương trong ${harnessRefs}; Claude Code: ask → AskUserQuestion, task → Agent, browser → MCP browser (Playwright/Chrome DevTools).
-- Duyệt chỉ có hiệu lực với đề xuất và phạm vi vừa chốt; đã đọc skill hoặc yêu cầu ban đầu không phải bằng chứng duyệt.
-- Không đọc được skill: báo thiếu cấu hình và dừng sửa source. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
+- Khi phân tích yêu cầu, xác định Epic/actors, viết User Stories, lập Product Backlog hoặc chia sprint và task, đọc ${routerRefs} trước. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
+- Quy trình có 3 cổng: G1 Nghiệp vụ & Epic → G2 Stories & Backlog → G3 Sprint & Tasks. Mỗi lượt một cổng: lưu tài liệu vào docs/workflow/, tóm tắt trong chat, gọi ask và chờ duyệt. "OK" chỉ duyệt cổng vừa trình bày.
+- Priority, Story Point, Rank và phân sprint do AI đưa ra là đề xuất cho đến khi người dùng duyệt. Không bịa actors, capacity hay tên thành viên.
+- Tên công cụ trong skills theo Oh My Pi (ask, task, browser, skill://). Harness khác dùng công cụ tương đương trong ${harnessRefs}; Claude Code: ask → AskUserQuestion, task → Agent.
+- Không đọc được skill: báo thiếu cấu hình. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
 ${MARKER_END}`;
 
   upsertMarkedBlock(path.join(targetProjectRoot, 'AGENTS.md'), block);
@@ -356,6 +361,12 @@ async function run() {
       copyDirectorySync(path.join(packageRoot, skillName), destSkillPath);
       console.log(`✓ ${existed ? 'Đã cập nhật' : 'Đã cài đặt'}: ${skillName}`);
     }
+
+    const leftovers = OBSOLETE_SKILLS.filter((skillName) => fs.existsSync(path.join(destSkillsDir, skillName)));
+    if (leftovers.length > 0) {
+      console.log(`! Còn thư mục của bản cũ không còn dùng: ${leftovers.join(', ')}.`);
+      console.log(`  Installer không tự xóa; nếu đó không phải skill riêng của bạn, hãy xóa thủ công trong ${destSkillsDir}.`);
+    }
   }
 
   // Với cài đặt dự án, tích hợp an toàn vào file chỉ dẫn (không ghi đè mất quy tắc cũ của người dùng)
@@ -372,9 +383,9 @@ async function run() {
   console.log('\nCách bắt đầu sử dụng:');
   for (const key of selected) {
     const harness = HARNESSES[key];
-    console.log(`- ${harness.label}: mở phiên mới trong dự án, gọi ${harness.command('project-guide')} để định hướng hoặc ${harness.command('product-workflow')} để điều phối công việc.`);
+    console.log(`- ${harness.label}: mở phiên mới trong dự án, gọi ${harness.command('product-workflow')} để bắt đầu.`);
   }
-  console.log('- Hoặc nói tự nhiên: "Tôi mới vào team, dự án đang ở đâu và nên làm gì tiếp?"\n');
+  console.log('- Hoặc nói tự nhiên: "Phân tích yêu cầu sau, lập product backlog và chia sprint giúp tôi."\n');
 }
 
 run().catch((error) => {

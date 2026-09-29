@@ -10,6 +10,23 @@ const cli = fileURLToPath(new URL('../bin/cli.js', import.meta.url));
 const start = '<!-- BEGIN: product-workflow-skills -->';
 const end = '<!-- END: product-workflow-skills -->';
 
+const allSkills = [
+  'product-workflow',
+  'product-discovery',
+  'product-backlog',
+  'sprint-planning',
+  'diagram-design',
+];
+const hiddenSkills = ['product-discovery', 'product-backlog', 'sprint-planning'];
+const obsoleteSkills = [
+  'project-guide', 'story-and-experience', 'solution-design', 'delivery-planning',
+  'task-execution', 'delivery-inspection', 'diagnosing-bugs', 'codebase-design', 'code-review',
+];
+const claudeImport = `${start}
+@AGENTS.md
+${end}`;
+
+
 function project(t, content) {
   const dir = mkdtempSync(path.join(tmpdir(), 'workflow-install-'));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
@@ -55,56 +72,6 @@ test('project install creates instructions pointing to an installed router', t =
   assert.ok(existsSync(path.resolve(p.dir, pointer[1])));
 });
 
-test('installed bounded workflow requires a visible proposal before approval', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  assert.match(
-    p.read(),
-    /trình bày Đề xuất sửa lỗi[\s\S]+sau đó mới gọi ask/,
-    'installed project instructions must put the visible proposal before ask',
-  );
-
-  const router = readFileSync(
-    path.join(p.dir, '.agents', 'skills', 'product-workflow', 'SKILL.md'),
-    'utf8',
-  );
-  const proposal = router.indexOf('phải trình bày **Đề xuất sửa lỗi (Bounded)**');
-  const approval = router.indexOf('Chỉ sau khi đề xuất đã hiển thị đầy đủ mới gọi `ask`');
-  assert.ok(proposal >= 0, 'installed router must require a visible bounded proposal');
-  assert.ok(approval > proposal, 'installed router must present the proposal before asking approval');
-  assert.match(
-    router,
-    /không giấu kế hoạch trong `options\[\]\.description`/,
-    'ask option descriptions must not become the only visible plan',
-  );
-});
-
-test('installed workflow requires a Browser Native decision for web UI changes', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  assert.match(
-    p.read(),
-    /thay đổi giao diện web[\s\S]+gọi ask[\s\S]+Browser Native/i,
-    'installed project instructions must expose the Browser Native checkpoint',
-  );
-
-  const execution = readFileSync(
-    path.join(p.dir, '.agents', 'skills', 'task-execution', 'SKILL.md'),
-    'utf8',
-  );
-  const trigger = execution.indexOf('`ui_changed = true`');
-  const checkpoint = execution.indexOf('phải gọi `ask`');
-  assert.ok(trigger >= 0, 'execution skill must classify user-visible web changes');
-  assert.ok(checkpoint > trigger, 'execution skill must ask after detecting a web UI change');
-  assert.match(
-    execution,
-    /chưa có lựa chọn này thì chưa được báo hoàn thành/i,
-    'completion must wait for the Browser Native decision',
-  );
-});
-
 test('install preserves existing rules and repeated installation is idempotent', t => {
   const original = '# Team rules\r\nKeep TypeScript strict.\r\n';
   const p = project(t, original);
@@ -143,77 +110,34 @@ for (const [name, content] of [
   });
 }
 
-test('project install places all three hidden specialists, support files, and licenses in .agents/skills', t => {
+test('project install places every skill and the router references in .agents/skills', t => {
   const p = project(t);
   installSuccessfully(p);
 
   const skillsDir = path.join(p.dir, '.agents', 'skills');
-  const specialists = ['diagnosing-bugs', 'codebase-design', 'code-review'];
-
-  for (const skillName of specialists) {
-    const skillMdPath = path.join(skillsDir, skillName, 'SKILL.md');
-    assert.ok(existsSync(skillMdPath), `Project install must contain ${skillName}/SKILL.md`);
-    const content = readFileSync(skillMdPath, 'utf8');
-    assert.match(content, /^hide:\s*true/m, `${skillName} must be marked hide: true`);
-    assert.match(content, /^license:\s*MIT/m, `${skillName} must declare MIT license`);
-    assert.ok(
-      existsSync(path.join(skillsDir, skillName, 'LICENSE')),
-      `Project install must contain ${skillName}/LICENSE`,
-    );
+  for (const skillName of allSkills) {
+    assert.ok(existsSync(path.join(skillsDir, skillName, 'SKILL.md')), `Project install must contain ${skillName}/SKILL.md`);
   }
-
-  // diagnosing-bugs support scripts
-  assert.ok(
-    existsSync(path.join(skillsDir, 'diagnosing-bugs', 'scripts', 'hitl-loop.template.sh')),
-    'Project install must contain hitl-loop.template.sh',
-  );
-
-  // codebase-design reference files
-  assert.ok(
-    existsSync(path.join(skillsDir, 'codebase-design', 'DEEPENING.md')),
-    'Project install must contain DEEPENING.md',
-  );
-  assert.ok(
-    existsSync(path.join(skillsDir, 'codebase-design', 'DESIGN-IT-TWICE.md')),
-    'Project install must contain DESIGN-IT-TWICE.md',
-  );
+  for (const reference of ['contract.md', 'records.md', 'harness.md']) {
+    assert.ok(existsSync(path.join(skillsDir, 'product-workflow', 'references', reference)), `missing ${reference}`);
+  }
+  for (const obsolete of obsoleteSkills) {
+    assert.ok(!existsSync(path.join(skillsDir, obsolete)), `fresh install must not create ${obsolete}`);
+  }
 });
 
-test('global install places all three hidden specialists, support files, and licenses in ~/.omp/agent/skills', t => {
+test('global install places every skill in ~/.omp/agent/skills without instruction files', t => {
   const g = globalProject(t);
   const result = g.install();
   assert.equal(result.status, 0, result.error?.message || result.stderr);
 
-  const specialists = ['diagnosing-bugs', 'codebase-design', 'code-review'];
-  for (const skillName of specialists) {
-    const skillMdPath = path.join(g.skillsDir, skillName, 'SKILL.md');
-    assert.ok(existsSync(skillMdPath), `Global install must contain ${skillName}/SKILL.md`);
-    const content = readFileSync(skillMdPath, 'utf8');
-    assert.match(content, /^hide:\s*true/m, `${skillName} must be marked hide: true`);
-    assert.match(content, /^license:\s*MIT/m, `${skillName} must declare MIT license`);
-    assert.ok(
-      existsSync(path.join(g.skillsDir, skillName, 'LICENSE')),
-      `Global install must contain ${skillName}/LICENSE`,
-    );
+  for (const skillName of allSkills) {
+    assert.ok(existsSync(path.join(g.skillsDir, skillName, 'SKILL.md')), `Global install must contain ${skillName}/SKILL.md`);
   }
-
-  assert.ok(
-    existsSync(path.join(g.skillsDir, 'diagnosing-bugs', 'scripts', 'hitl-loop.template.sh')),
-    'Global install must contain hitl-loop.template.sh',
-  );
-  assert.ok(
-    existsSync(path.join(g.skillsDir, 'codebase-design', 'DEEPENING.md')),
-    'Global install must contain DEEPENING.md',
-  );
-  assert.ok(
-    existsSync(path.join(g.skillsDir, 'codebase-design', 'DESIGN-IT-TWICE.md')),
-    'Global install must contain DESIGN-IT-TWICE.md',
-  );
-
   assert.ok(!existsSync(path.join(g.homeDir, 'AGENTS.md')), 'Global install must not create AGENTS.md in home');
 });
 
-test('reinstall preserves user rules in AGENTS.md and keeps specialist artifacts intact', t => {
+test('reinstall preserves user rules in AGENTS.md and keeps every skill intact', t => {
   const original = '# Team Coding Standards\nNever bypass type checks.\n';
   const p = project(t, original);
   installSuccessfully(p);
@@ -224,11 +148,21 @@ test('reinstall preserves user rules in AGENTS.md and keeps specialist artifacts
   installSuccessfully(p);
   assert.equal(p.read(), firstRead, 'Repeated install must preserve identical AGENTS.md content');
 
-  const skillsDir = path.join(p.dir, '.agents', 'skills');
-  for (const skillName of ['diagnosing-bugs', 'codebase-design', 'code-review']) {
-    assert.ok(existsSync(path.join(skillsDir, skillName, 'SKILL.md')));
-    assert.ok(existsSync(path.join(skillsDir, skillName, 'LICENSE')));
+  for (const skillName of allSkills) {
+    assert.ok(existsSync(path.join(p.dir, '.agents', 'skills', skillName, 'SKILL.md')));
   }
+});
+
+test('upgrade from 1.x warns about obsolete skill folders without deleting them', t => {
+  const p = project(t);
+  const leftover = path.join(p.dir, '.agents', 'skills', 'code-review');
+  mkdirSync(leftover, { recursive: true });
+  writeFileSync(path.join(leftover, 'SKILL.md'), '# My own review skill');
+
+  const result = p.install();
+  assert.equal(result.status, 0, result.error?.message || result.stderr);
+  assert.match(result.stdout, /Còn thư mục của bản cũ không còn dùng: code-review/);
+  assert.equal(readFileSync(path.join(leftover, 'SKILL.md'), 'utf8'), '# My own review skill');
 });
 
 test('missing registered source directory exits non-zero without writing destination files', t => {
@@ -249,320 +183,28 @@ test('missing registered source directory exits non-zero without writing destina
   });
 
   assert.notEqual(result.status, 0, 'Installer must exit non-zero when registered skill source is missing');
-  assert.match(
-    result.stderr,
-    /không tìm thấy thư mục nguồn skill/i,
-    'Installer stderr must report missing skill source',
-  );
-  assert.match(
-    result.stderr,
-    /diagnosing-bugs|codebase-design|code-review/,
-    'Installer stderr must name missing skill',
-  );
-  assert.ok(
-    !existsSync(path.join(p.dir, '.agents')),
-    'Installer must not create destination files when preflight fails',
-  );
+  assert.match(result.stderr, /không tìm thấy thư mục nguồn skill/i);
+  assert.match(result.stderr, /product-backlog|sprint-planning/, 'Installer stderr must name missing skill');
+  assert.ok(!existsSync(path.join(p.dir, '.agents')), 'Installer must not create destination files when preflight fails');
 });
 
-test('package payload includes all three specialist directories and excludes research', () => {
+test('package payload ships exactly the registered skills', () => {
   const packageRoot = fileURLToPath(new URL('..', import.meta.url));
   const pkg = JSON.parse(readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
 
-  assert.ok(pkg.files.includes('diagnosing-bugs'), 'package.json.files must include diagnosing-bugs');
-  assert.ok(pkg.files.includes('codebase-design'), 'package.json.files must include codebase-design');
-  assert.ok(pkg.files.includes('code-review'), 'package.json.files must include code-review');
-  assert.ok(!pkg.files.includes('research'), 'package.json.files must not include research');
-
+  const shippedDirs = pkg.files.filter((file) => existsSync(path.join(packageRoot, file, 'SKILL.md')));
+  assert.deepEqual([...shippedDirs].sort(), [...allSkills].sort(), 'package.json.files must list exactly the registered skills');
+  for (const obsolete of obsoleteSkills) {
+    assert.ok(!pkg.files.includes(obsolete), `package.json.files must not include ${obsolete}`);
+  }
   for (const file of pkg.files) {
     assert.ok(existsSync(path.join(packageRoot, file)), `Declared package file/dir must exist: ${file}`);
   }
 
-  const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  const packResult = spawnSync(npmCmd, ['pack', '--dry-run', '--json'], {
-    cwd: packageRoot,
-    encoding: 'utf8',
-    shell: process.platform === 'win32',
-    timeout: 30000,
-  });
-
-  assert.equal(
-    packResult.status,
-    0,
-    `npm pack dry-run failed with status ${packResult.status}: ${packResult.error?.message || packResult.stderr}`,
-  );
-
-  const packInfo = JSON.parse(packResult.stdout);
-  const files = packInfo[0]?.files?.map((f) => f.path) || [];
-  const specialistPaths = [
-    'diagnosing-bugs/SKILL.md',
-    'diagnosing-bugs/LICENSE',
-    'diagnosing-bugs/scripts/hitl-loop.template.sh',
-    'codebase-design/SKILL.md',
-    'codebase-design/LICENSE',
-    'codebase-design/DEEPENING.md',
-    'codebase-design/DESIGN-IT-TWICE.md',
-    'code-review/SKILL.md',
-    'code-review/LICENSE',
-  ];
-  for (const sp of specialistPaths) {
-    assert.ok(
-      files.some((f) => f.replace(/\\/g, '/') === sp),
-      `Packed payload must contain ${sp}`,
-    );
-  }
-  assert.ok(
-    !files.some((f) => f.toLowerCase().includes('research')),
-    'Packed payload must not contain research',
-  );
+  const cliSource = readFileSync(cli, 'utf8');
+  const registered = cliSource.match(/const SKILLS = \[([\s\S]*?)\];/)[1].match(/'([^']+)'/g).map((s) => s.slice(1, -1));
+  assert.deepEqual(registered, allSkills, 'installer SKILLS must match the tested skill list');
 });
-
-test('installed router wires diagnosis, design, and review triggers with matching URIs and specific skips', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  const routerContent = readFileSync(
-    path.join(p.dir, '.agents', 'skills', 'product-workflow', 'SKILL.md'),
-    'utf8',
-  );
-
-  // 1. Diagnosis trigger + URI + known-root-cause skip
-  assert.match(
-    routerContent,
-    /Bug\/regression\/performance chưa có root cause chắc chắn[\s\S]*?skill:\/\/diagnosing-bugs[\s\S]*?Root cause và evidence đã rõ thì bỏ qua specialist/,
-    'Router must pair unknown root cause trigger with diagnosing-bugs and known-root-cause skip',
-  );
-
-  // 2. Architecture trigger + URI + confirmed-local skip
-  assert.match(
-    routerContent,
-    /Thay đổi module\/interface\/seam\/adapter\/dependency direction\/testability[\s\S]*?skill:\/\/codebase-design[\s\S]*?xác nhận thay đổi cục bộ không ảnh hưởng kiến trúc, bắt buộc bỏ qua specialist/,
-    'Router must pair architecture impact trigger with codebase-design and confirmed-local skip',
-  );
-
-  // 3. Review trigger + URI + docs-only/low-risk skip
-  assert.match(
-    routerContent,
-    /Sau implementation của Feature hoặc Risky Bounded[\s\S]*?skill:\/\/code-review[\s\S]*?Docs-only và Bounded rủi ro thấp theo policy hiện hữu không bị ép review hai trục/,
-    'Router must pair Feature/Risky Bounded completion trigger with code-review and low-risk skip',
-  );
-});
-
-test('installed code-review contract defines parallel and sequential modes, separate outputs, blocked missing inputs, and finding closure', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  const reviewContent = readFileSync(
-    path.join(p.dir, '.agents', 'skills', 'code-review', 'SKILL.md'),
-    'utf8',
-  );
-
-  // Parallel mode and sequential fallback
-  assert.match(
-    reviewContent,
-    /dispatch Standards and Spec in parallel with separate context/i,
-    'Code review must define parallel execution when subagents are available',
-  );
-  assert.match(
-    reviewContent,
-    /isolated sequential passes/i,
-    'Code review must define sequential fallback when subagents are unavailable',
-  );
-  assert.match(
-    reviewContent,
-    /execution_mode:\s*parallel\s*\|\s*sequential/,
-    'Code review output must record parallel or sequential execution mode',
-  );
-
-  // Separate Standards and Spec outputs
-  assert.match(
-    reviewContent,
-    /Never merge, rerank, or let one axis mask the other/i,
-    'Code review must prohibit merging or reranking the two axes',
-  );
-  assert.match(
-    reviewContent,
-    /standards:[\s\S]*?verdict:\s*pass\s*\|\s*changes-required\s*\|\s*blocked[\s\S]*?spec:[\s\S]*?verdict:\s*pass\s*\|\s*changes-required\s*\|\s*blocked/,
-    'Code review output schema must report standards and spec verdicts separately',
-  );
-  assert.match(
-    reviewContent,
-    /Preserve both reports separately/i,
-    'Code review must preserve both axis reports independently',
-  );
-
-  // Missing input blocked
-  assert.match(
-    reviewContent,
-    /Missing a required baseline or spec source returns `?blocked`?/i,
-    'Missing baseline or required spec source must result in blocked status',
-  );
-
-  // Finding closure
-  assert.match(
-    reviewContent,
-    /material finding requires a fix followed by review of the affected axis, or an explicitly sourced accepted exception/i,
-    'Material finding must require a fix and re-review or an explicitly sourced accepted exception',
-  );
-});
-
-test('installed codebase-design and solution-design enforce C-SI-04 fields, status semantics, no-new-gate, and no-fake-seam', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  const skillsDir = path.join(p.dir, '.agents', 'skills');
-
-  // codebase-design/SKILL.md contract
-  const designSpecialistContent = readFileSync(
-    path.join(skillsDir, 'codebase-design', 'SKILL.md'),
-    'utf8',
-  );
-
-  // All C-SI-04 schema fields
-  const requiredFields = [
-    'status: not-needed | drafted | approved-input | needs-revalidation',
-    'module:',
-    'interface:',
-    'seam:',
-    'adapters:',
-    'invariants:',
-    'caller_impact:',
-    'test_surface:',
-    'rejected_abstractions:',
-  ];
-  for (const field of requiredFields) {
-    assert.ok(
-      designSpecialistContent.includes(field),
-      `codebase-design must declare C-SI-04 schema field: ${field}`,
-    );
-  }
-
-  // No-new-gate & parent authority
-  assert.match(
-    designSpecialistContent,
-    /supplies a design lens, not a new approval gate/i,
-    'codebase-design must act as a lens and not create a new approval gate',
-  );
-  assert.match(
-    designSpecialistContent,
-    /parent retains authority/i,
-    'Parent workflow must retain approval authority',
-  );
-
-  // No-fake-seam
-  assert.match(
-    designSpecialistContent,
-    /single implementation without real variation does not justify a seam or adapter/i,
-    'codebase-design must prohibit creating fake seams or adapters without real variation',
-  );
-
-  // solution-design/SKILL.md consumption
-  const solutionDesignContent = readFileSync(
-    path.join(skillsDir, 'solution-design', 'SKILL.md'),
-    'utf8',
-  );
-
-  // Consumes full delta fields
-  assert.match(
-    solutionDesignContent,
-    /status, module, interface, seam, adapters, invariants, caller impact, test surface và rejected abstractions/,
-    'solution-design must consume all C-SI-04 fields',
-  );
-
-  // Status semantics: not-needed, drafted, needs-revalidation, approved-input
-  assert.match(
-    solutionDesignContent,
-    /`not-needed` hợp lệ khi trigger kiến trúc đã thỏa/,
-    'solution-design must recognize not-needed status',
-  );
-  assert.match(
-    solutionDesignContent,
-    /Giữ `drafted` và `needs-revalidation` là chưa sẵn sàng, không xử lý như `approved-input`/,
-    'solution-design must respect drafted and needs-revalidation status semantics',
-  );
-
-  // Retains parent authority and forbids fake seams
-  assert.match(
-    solutionDesignContent,
-    /Lens này không tạo gate mới và không tự duyệt G3/,
-    'solution-design must confirm design lens does not create a new gate or self-approve G3',
-  );
-  assert.match(
-    solutionDesignContent,
-    /Không tạo seam\/adapter giả khi chỉ có một implementation và không có variation thật/,
-    'solution-design must prohibit fake seams or adapters',
-  );
-});
-
-test('installed execution and completion gates wire two-axis review and independent browser native evidence', t => {
-  const p = project(t);
-  installSuccessfully(p);
-
-  const skillsDir = path.join(p.dir, '.agents', 'skills');
-
-  // Review input & execution contract (task-execution/SKILL.md)
-  const executionContent = readFileSync(
-    path.join(skillsDir, 'task-execution', 'SKILL.md'),
-    'utf8',
-  );
-  assert.match(
-    executionContent,
-    /code-review/,
-    'Task execution must wire code-review',
-  );
-  assert.match(
-    executionContent,
-    /Review Input Packet/,
-    'Task execution must assemble Review Input Packet',
-  );
-  assert.match(
-    executionContent,
-    /baseline_revision/,
-    'Task execution must capture baseline revision for review input',
-  );
-  assert.match(
-    executionContent,
-    /Risky Bounded/,
-    'Task execution must define Risky Bounded triggers for review',
-  );
-  assert.match(
-    executionContent,
-    /standards[\s\S]+spec|hai trục/i,
-    'Task execution must require both standards and spec review axes',
-  );
-
-  // Completion gate contract (delivery-inspection/SKILL.md)
-  const inspectionContent = readFileSync(
-    path.join(skillsDir, 'delivery-inspection', 'SKILL.md'),
-    'utf8',
-  );
-  assert.match(
-    inspectionContent,
-    /standards[\s\S]+spec|hai trục/i,
-    'Delivery inspection must verify two-axis review evidence',
-  );
-  assert.match(
-    inspectionContent,
-    /(?:missing input|trạng thái `?blocked`?|finding ảnh hưởng chưa được sửa)[\s\S]*?giữ task ở Review\/Blocked/i,
-    'Delivery inspection must keep completion in Review/Blocked when inputs are missing or findings are unresolved',
-  );
-  assert.match(
-    inspectionContent,
-    /Browser Native/i,
-    'Delivery inspection must maintain independent Browser Native verification',
-  );
-});
-
-const allSkills = [
-  'product-workflow', 'project-guide', 'product-discovery', 'story-and-experience',
-  'solution-design', 'delivery-planning', 'task-execution', 'delivery-inspection',
-  'diagram-design', 'diagnosing-bugs', 'codebase-design', 'code-review',
-];
-const hiddenSkills = [
-  'product-discovery', 'story-and-experience', 'solution-design', 'delivery-planning',
-  'task-execution', 'delivery-inspection', 'diagnosing-bugs', 'codebase-design', 'code-review',
-];
-const claudeImport = `${start}\n@AGENTS.md\n${end}`;
 
 function tempDir(t, prefix) {
   const dir = mkdtempSync(path.join(tmpdir(), prefix));
@@ -738,47 +380,122 @@ test('AGENTS.md block points to an existing harness mapping file', t => {
   assert.ok(existsSync(path.join(dir, ref[1])), `${ref[1]} must exist in the project`);
 });
 
-test('installed discovery requires scale-aware requirement coverage R1–R8 and audits it at G1', t => {
-  const dir = tempDir(t, 'workflow-coverage-');
+function installedSkills(t) {
+  const dir = tempDir(t, 'workflow-content-');
   assertOk(runCli(['--project', dir]));
   const skills = path.join(dir, '.agents', 'skills');
-  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
+  return {
+    dir,
+    read: (...parts) => readFileSync(path.join(skills, ...parts), 'utf8'),
+  };
+}
 
-  const section = discovery.indexOf('Danh sách phủ yêu cầu nghiệp vụ');
-  assert.ok(section >= 0, 'discovery must define the requirement coverage checklist');
-  for (const id of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8']) {
-    assert.ok(discovery.indexOf(`**${id}`, section) > section, `checklist must define ${id}`);
-  }
-  assert.match(discovery, /MVP[^\n]*bắt buộc R1, R2, R8/, 'MVP must only require R1, R2 and R8');
-  assert.match(discovery, /\*\*5\. Phủ yêu cầu nghiệp vụ/, 'G1 rubric must score requirement coverage');
-  assert.match(discovery, /Bảng phủ yêu cầu R1–R8/, 'brief template must record coverage');
-
-  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
-  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*R1–R8/, 'G1 gate condition must include coverage');
+test('installed AGENTS.md block describes the three planning gates instead of source-edit rules', t => {
+  const p = project(t);
+  installSuccessfully(p);
+  const agents = p.read();
+  assert.match(agents, /G1 Nghiệp vụ & Epic → G2 Stories & Backlog → G3 Sprint & Tasks/);
+  assert.match(agents, /Mỗi lượt một cổng/);
+  assert.doesNotMatch(agents, /Bounded|Browser Native|Trước khi sửa source/);
 });
 
-test('G1 auditor advises instead of vetoing: decision point after 3 REVISE rounds with recorded accepted risks', t => {
-  const dir = tempDir(t, 'workflow-g1-override-');
-  assertOk(runCli(['--project', dir]));
-  const skills = path.join(dir, '.agents', 'skills');
-  const discovery = readFileSync(path.join(skills, 'product-discovery', 'SKILL.md'), 'utf8');
-
-  assert.match(discovery, /sau \*\*3 vòng kiểm định\*\*/, 'REVISE loop must surface a decision after 3 rounds');
-  assert.match(discovery, /Duyệt G1, chấp nhận rủi ro/, 'user must be able to approve G1 with accepted risks');
-  assert.match(discovery, /Rủi ro đã chấp nhận tại G1/, 'accepted risks must be recorded in the brief');
-  assert.match(discovery, /cấm trình duyệt G1 khi Subagent Reviewer chưa chạy/i, 'audit must still run before G1');
-  assert.doesNotMatch(discovery, /cho đến khi đạt `PASS`/, 'no unbounded REVISE loop');
-
-  for (const file of [
-    path.join(skills, 'product-workflow', 'references', 'contract.md'),
-    path.join(skills, 'product-workflow', 'SKILL.md'),
-    path.join(dir, 'AGENTS.md'),
+test('router routes the three gates to their skills and output files and never to code execution', t => {
+  const s = installedSkills(t);
+  const router = s.read('product-workflow', 'SKILL.md');
+  for (const [gate, skill] of [
+    ['G1 Nghiệp vụ & Epic', 'product-discovery'],
+    ['G2 Stories & Backlog', 'product-backlog'],
+    ['G3 Sprint & Tasks', 'sprint-planning'],
   ]) {
-    const content = readFileSync(file, 'utf8');
-    if (content.includes('Subagent')) {
-      assert.doesNotMatch(content, /chưa có kết luận PASS\.?$/m, `${path.basename(file)} must not keep the absolute PASS veto`);
-    }
+    assert.match(router, new RegExp(`\\| ${gate} \\| \`skill://${skill}\``), `${gate} must route to ${skill}`);
   }
-  const contract = readFileSync(path.join(skills, 'product-workflow', 'references', 'contract.md'), 'utf8');
-  assert.match(contract, /\| G1 Nghiệp vụ \|[^\n]*chấp nhận rủi ro/, 'G1 gate must allow approval with accepted risks');
+  for (const output of [
+    'docs/workflow/specs/<du-an>-brief.md',
+    'docs/workflow/product-backlog.md',
+    'docs/workflow/sprints/roadmap.md',
+    'docs/workflow/sprints/sprint-<X>-<slug>/sprint-plan.md',
+    'docs/workflow/jira-import.csv',
+  ]) {
+    assert.ok(router.includes(output), `router must name ${output}`);
+  }
+  assert.match(router, /Mỗi lượt một cổng/);
+  assert.match(router, /Không viết code/);
+});
+
+test('shipped skills no longer reference removed skills or the old G4/Bounded workflow', () => {
+  const packageRoot = fileURLToPath(new URL('..', import.meta.url));
+  const files = [
+    ...allSkills.filter((name) => name !== 'diagram-design').map((name) => path.join(name, 'SKILL.md')),
+    path.join('product-workflow', 'references', 'contract.md'),
+    path.join('product-workflow', 'references', 'records.md'),
+    'AGENTS.md',
+    path.join('bin', 'cli.js'),
+  ];
+  const stale = new RegExp(`\\b(?:${[...obsoleteSkills, 'G4', 'Bounded', 'Spike'].join('|')})\\b`);
+  for (const file of files) {
+    const content = readFileSync(path.join(packageRoot, file), 'utf8');
+    const body = file.endsWith('cli.js') ? content.replace(/\/\/ Skills của bản 1\.x[\s\S]*?const OBSOLETE_SKILLS = \[[\s\S]*?\];/, '') : content;
+    assert.doesNotMatch(body, stale, `${file} must not reference the removed workflow`);
+  }
+});
+
+test('discovery asks for project scale, scales R1–R8 and has no mandatory subagent audit', t => {
+  const s = installedSkills(t);
+  const discovery = s.read('product-discovery', 'SKILL.md');
+
+  assert.match(discovery, /"id": "project_scale"/, 'discovery must ask for the project scale first');
+  for (const id of ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8']) {
+    assert.ok(discovery.includes(`**${id}.`), `discovery must define ${id}`);
+  }
+  assert.match(discovery, /MVP:\*\* bắt buộc R1, R2, R8/, 'MVP must only require R1, R2 and R8');
+  assert.match(discovery, /EP01/, 'discovery must produce an Epic catalogue');
+  assert.match(discovery, /Quản lý \+/, 'Epic names follow the Quản lý + … convention');
+  assert.doesNotMatch(discovery, /Subagent|REVISE|100 câu/, 'no mandatory auditor or question quota');
+  assert.match(discovery, /Bước tiếp theo duy nhất là `product-backlog` \(G2\)/);
+});
+
+test('product-backlog builds stories, the actor matrix and a ranked, sized backlog', t => {
+  const s = installedSkills(t);
+  const backlog = s.read('product-backlog', 'SKILL.md');
+  const records = s.read('product-workflow', 'references', 'records.md');
+
+  assert.match(backlog, /Là <actor>, tôi muốn <hành động> để <giá trị>/);
+  assert.match(backlog, /Given \/ When \/ Then/);
+  assert.match(backlog, /Ma trận Actor–Story/);
+  assert.match(backlog, /`Highest` \/ `High` \/ `Medium` \/ `Low`/);
+  assert.match(backlog, /`1, 2, 3, 5, 8, 13`/);
+  assert.match(backlog, /Rank khác Priority/);
+  assert.match(backlog, /Bước tiếp theo duy nhất là `sprint-planning` \(G3\)/);
+
+  assert.match(records, /Góc nhìn 1 – Theo Epic/);
+  assert.match(records, /Góc nhìn 2 – Theo Rank/);
+  assert.match(records, /\| Rank \| ID \/ Epic \| User Story \|[^\n]*\| Priority \| Story Point \| Sprint \|/);
+  assert.match(records, /\| Rank \| ID \| Epic \| User Story \| Priority \| Story Point \| Sprint \|/);
+});
+
+test('sprint-planning surveys the team, applies five criteria and writes named sprints with task tables', t => {
+  const s = installedSkills(t);
+  const planning = s.read('sprint-planning', 'SKILL.md');
+  const records = s.read('product-workflow', 'references', 'records.md');
+
+  assert.match(planning, /"id": "team_size"/, 'sprint planning must ask the team size');
+  assert.match(planning, /"id": "velocity"/, 'sprint planning must ask or propose velocity');
+  for (const criterion of ['Priority', 'Story Point', 'Dependency', 'Sprint Goal', 'Capacity']) {
+    assert.match(planning, new RegExp(`\\*\\*${criterion}:\\*\\*`), `five criteria must include ${criterion}`);
+  }
+  assert.match(planning, /Không lấy máy móc N dòng đầu/);
+  assert.match(planning, /`Sprint X – <Mục tiêu ngắn>`/);
+  assert.match(planning, /jira-import\.csv/);
+
+  assert.match(records, /\| Task \| Story \| Nội dung \| Vai trò \| Người phụ trách \| Phụ thuộc \|/);
+  assert.match(records, /Issue Id,Issue Type,Summary,Description,Priority,Story Points,Parent Id,Sprint,Labels/);
+  assert.match(records, /Không đặt tên trơ trọi `Sprint 1` hay folder `sprint-1\/`/);
+});
+
+test('contract defines exactly three gates and keeps AI numbers as proposals', t => {
+  const s = installedSkills(t);
+  const contract = s.read('product-workflow', 'references', 'contract.md');
+  const gates = contract.match(/^\| G\d [^|]+\|/gm);
+  assert.deepEqual(gates, ['| G1 Nghiệp vụ & Epic |', '| G2 Stories & Backlog |', '| G3 Sprint & Tasks |']);
+  assert.match(contract, /`\(đề xuất\)`/);
 });
