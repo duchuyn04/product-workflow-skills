@@ -1,83 +1,67 @@
 # Product Workflow Skills for AI Agents
 
-Bộ kỹ năng (Agent Skills) chuẩn hóa quy trình phát triển phần mềm cho các công cụ lập trình AI như Oh My Pi, Claude Code hoặc Cursor. Bộ công cụ giúp AI làm việc theo từng giai đoạn rõ ràng:
+Bộ kỹ năng (Agent Skills) giúp các công cụ lập trình AI như Oh My Pi hoặc Claude Code đi từ **mô tả yêu cầu** đến **Product Backlog** và **kế hoạch sprint có chia task**:
 
-- Làm rõ yêu cầu và quy tắc nghiệp vụ trước khi thiết kế.
-- Thống nhất user stories, luồng giao diện, kiến trúc dữ liệu và hợp đồng API trước khi viết code.
-- Phân rã tính năng thành các phần việc cụ thể, có kiểm chứng và lưu trữ tài liệu theo phiên bản trong thư mục `docs/workflow/`.
+```text
+Mô tả yêu cầu → Epic → User Story → Ma trận Actor–Story → Product Backlog (Rank / Priority / Story Point)
+             → Sprint Planning → Sprint → Task / Sub-task → (CSV import Jira)
+```
+
+Bộ skills chỉ lập kế hoạch sản phẩm: không viết code, không thiết kế kiến trúc, không review hay nghiệm thu. Mọi kết quả lưu thành Markdown trong `docs/workflow/` của dự án.
 
 ## Cấu trúc các kỹ năng
-
-Hệ thống gồm một kỹ năng điều phối chung, một kỹ năng định hướng hiện trạng dự án, bảy kỹ năng chuyên môn và ba kỹ năng hỗ trợ kích hoạt theo ngữ cảnh:
 
 <p align="center">
   <img src="docs/workflow/diagrams/skills-architecture.svg" alt="Cấu trúc các kỹ năng Product Workflow" width="100%">
 </p>
-<p align="center"><em>Sơ đồ cấu trúc 12 kỹ năng và cơ chế kích hoạt chuyên gia nội bộ.</em></p>
 
-### Kỹ năng điều phối và định hướng
+| Kỹ năng | Vai trò |
+|---|---|
+| `product-workflow` | Đầu vào duy nhất. Xác định đang ở cổng nào, gọi đúng kỹ năng, tiếp tục từ tài liệu có sẵn và xử lý thay đổi yêu cầu. |
+| `product-discovery` | Cổng G1. Phân tích mô tả, phỏng vấn tình huống theo quy mô dự án, chuyển As-Is sang To-Be, xác định actors, quy tắc nghiệp vụ và danh mục Epic. |
+| `product-backlog` | Cổng G2. Tách yêu cầu thành User Stories có tiêu chí nghiệm thu, lập ma trận Actor–Story, đề xuất Priority, Story Point, Rank và xuất Product Backlog. |
+| `sprint-planning` | Cổng G3. Hỏi số người, độ dài sprint và velocity; xét dependency; chọn story vào từng sprint; viết Sprint Goal; chia task; xuất CSV cho Jira. |
+| `diagram-design` | Tùy chọn. Vẽ story map, chuỗi dependency hoặc roadmap dạng HTML/SVG khi người dùng muốn. |
 
-- `product-workflow`: Phân tích yêu cầu ban đầu, phân loại mức độ thay đổi và gọi đúng kỹ năng chuyên môn cần thiết.
-- `project-guide`: Khảo sát hiện trạng codebase và tài liệu sẵn có để hỗ trợ người mới tham gia dự án xác định việc cần làm tiếp theo.
+Ba kỹ năng cổng được ẩn (`hide: true`; trên Claude Code là `disable-model-invocation: true`): model không tự gọi, `product-workflow` đọc chúng khi tới cổng tương ứng.
 
-### Kỹ năng theo vai trò chuyên môn
-
-- `product-discovery`: Làm rõ nghiệp vụ và các quy tắc cốt lõi qua tình huống thực tế, chốt tài liệu tóm tắt nghiệp vụ (brief) trước khi thiết kế.
-- `story-and-experience`: Chuyển nghiệp vụ thành user stories kèm tiêu chí nghiệm thu, luồng thao tác và tùy chọn dựng bản mẫu giao diện (mockup) tương tác để xem trước.
-- `solution-design`: Thiết kế giải pháp kỹ thuật, lựa chọn công nghệ, lập schema cơ sở dữ liệu kèm sơ đồ quan hệ thực thể (ERD) và chốt hợp đồng API.
-- `delivery-planning`: Lập kế hoạch sprint, phân chia công việc theo vai trò, xác định thứ tự phụ thuộc và các phần việc có thể làm song song.
-- `task-execution`: Triển khai mã nguồn theo từng nhiệm vụ cụ thể, viết kiểm thử đơn vị và lưu lại bằng chứng kiểm chứng.
-- `delivery-inspection`: Đối chiếu tiêu chí nghiệm thu, kiểm tra chất lượng mã nguồn và xác nhận hoàn thành trước khi bàn giao.
-- `diagram-design`: Vẽ sơ đồ kiến trúc, luồng xử lý và dữ liệu dưới dạng file HTML/SVG độc lập, kiểm tra hiển thị trực tiếp trên trình duyệt.
-
-### Chuyên gia nội bộ kích hoạt theo ngữ cảnh
-
-Ba kỹ năng này được cấu hình ẩn (`hide: true`; trên Claude Code là `disable-model-invocation: true`): model không tự gọi chúng, mà router hoặc skill cha đọc chúng khi có tình huống kỹ thuật tương ứng. Sáu kỹ năng chuyên môn từ `product-discovery` đến `delivery-inspection` cũng được ẩn theo cách này và do router gọi; chỉ `product-workflow`, `project-guide` và `diagram-design` hiển thị trực tiếp.
-
-- `diagnosing-bugs`: Được router đọc khi gặp lỗi, lỗi tái xuất hiện hoặc suy giảm hiệu năng chưa rõ nguyên nhân để tìm gốc rễ vấn đề trước khi sửa.
-- `codebase-design`: Được router hoặc `solution-design` đọc khi thay đổi chạm vào ranh giới module, cấu trúc interface hoặc khả năng kiểm thử của mã nguồn.
-- `code-review`: Được `task-execution` đọc sau khi hoàn thành tính năng để rà soát chất lượng code theo tiêu chuẩn dự án và độ khớp với yêu cầu.
-
-## Các cổng kiểm soát chất lượng
-
-Quy trình áp dụng bốn cổng kiểm soát (Gates) theo từng tính năng hoặc phân hệ, cho phép triển khai cuốn chiếu mà không cần chờ đặc tả toàn bộ sản phẩm:
+## Ba cổng duyệt
 
 <p align="center">
-  <img src="docs/workflow/diagrams/quality-gates.svg" alt="Quy trình 4 Cổng kiểm soát chất lượng tuần tự" width="100%">
+  <img src="docs/workflow/diagrams/quality-gates.svg" alt="Ba cổng duyệt từ yêu cầu đến sprint" width="100%">
 </p>
-<p align="center"><em>Bốn cổng kiểm soát chất lượng tuần tự từ ý tưởng ban đầu đến nghiệm thu.</em></p>
 
-- Gate G1 (Nghiệp vụ): Xác nhận mục tiêu bài toán, phạm vi tính năng và các quy tắc nghiệp vụ cốt lõi.
-- Gate G2 (Stories và UX): Thống nhất tiêu chí nghiệm thu và luồng thao tác người dùng cho phần việc tiếp theo.
-- Gate G3 (Kiến trúc): Phê duyệt phương án công nghệ, schema dữ liệu và hợp đồng API cần cho việc triển khai.
-- Gate G4 (Sẵn sàng thực thi): Phân rã tính năng thành các nhiệm vụ cụ thể, đủ điều kiện tiên quyết và không còn vướng mắc kỹ thuật.
+| Cổng | Kết quả | File |
+|---|---|---|
+| G1 Nghiệp vụ & Epic | Vấn đề As-Is/To-Be, actors, danh mục Epic `EP01…`, quy tắc nghiệp vụ, bảng phủ yêu cầu R1–R8 | `docs/workflow/specs/<du-an>-brief.md` |
+| G2 Stories & Backlog | User Stories `US01…` với tiêu chí Given/When/Then, ma trận Actor–Story, Product Backlog theo Epic và theo Rank | `docs/workflow/specs/<du-an>-stories.md`, `docs/workflow/product-backlog.md` |
+| G3 Sprint & Tasks | Lộ trình các sprint, mỗi sprint có Goal, danh sách story trong capacity và bảng task `T01…` | `docs/workflow/sprints/roadmap.md`, `docs/workflow/sprints/sprint-<X>-<slug>/sprint-plan.md`, tùy chọn `docs/workflow/jira-import.csv` |
 
-## Quản lý tiến độ với Product Backlog
+Ở mỗi cổng, AI lưu file, tóm tắt trong chat rồi dừng lại chờ duyệt. Priority, Story Point, Rank và phân sprint do AI đưa ra luôn là đề xuất cho đến khi người dùng chốt.
 
-Trong dự án sử dụng bộ skills, AI cập nhật danh mục công việc chính tại `docs/workflow/product-backlog.md` hoặc tài liệu backlog sẵn có của dự án. Mỗi hàng đại diện cho một tính năng; kế hoạch thực hiện (roadmap) liên kết đến các mã tính năng được chọn và kế hoạch sprint tương ứng.
+Quy ước đặt tên:
+- Epic: `Quản lý + …`, ví dụ `EP02 – Quản lý bán hàng`.
+- Sprint: `Sprint X – <Mục tiêu>`, ví dụ `Sprint 1 – Bán hàng cơ bản`, lưu trong `docs/workflow/sprints/sprint-1-ban-hang-co-ban/`.
 
-Cấu trúc bảng gồm thứ tự ưu tiên, mã định danh, phân hệ, tên tính năng, liên kết actor/story, điểm ước lượng (Story Points), số tiêu chí nghiệm thu đạt được, trạng thái và đường dẫn bằng chứng.
+## Ví dụ kết quả
 
-- Điểm ước lượng do đội ngũ dự án phê duyệt; khi chưa ước lượng thì để trống (`—`).
-- Tỷ lệ nghiệm thu phản ánh số tiêu chí (Acceptance Criteria) đã qua kiểm chứng thực tế, không tính theo số lượng file hay số lượng dòng code.
-- Tính năng chỉ đánh dấu hoàn tất khi đáp ứng đầy đủ tiêu chí nghiệm thu, vượt qua khâu review và có kết quả kiểm thử tích hợp.
-- Khi sử dụng hệ thống quản lý bên ngoài như Jira, tài liệu Markdown phản ánh trạng thái đồng bộ từ nguồn chính đó.
+Với đề bài "Quản lý bán hàng điện thoại", Product Backlog theo Rank có dạng:
 
-### Hồ sơ tài liệu theo quy mô công việc
+| Rank | ID | Epic | User Story | Priority | Story Point | Sprint |
+|---|---|---|---|---|---|---|
+| 1 | US20 | Tài khoản | Đăng nhập | Highest | 3 | Sprint 1 |
+| 2 | US05 | Bán hàng | Tạo đơn hàng | Highest | 5 | Sprint 1 |
+| 3 | US06 | Bán hàng | Thêm sản phẩm vào đơn | Highest | 5 | Sprint 2 |
 
-- Việc sửa lỗi nhỏ hoặc thử nghiệm (Bounded / Spike): Trao đổi trực tiếp phương án trong phiên làm việc, thực hiện và kiểm chứng sau khi xác nhận, không cần sinh bộ tài liệu G1–G4.
-- Tính năng mới (Feature): Áp dụng đủ các cổng G1–G4, cập nhật trực tiếp vào tài liệu phân hệ hiện có thay vì tạo file mới rời rạc.
-- Nhiệm vụ nhỏ tuần tự: Ghi nhận dạng danh sách kiểm tra (checklist) kèm bằng chứng ngay trong roadmap. Nhiệm vụ lớn hoặc cần bàn giao độc lập thì lưu thành từng thẻ nhiệm vụ riêng trong thư mục `tasks/`.
-- Tái sử dụng nền tảng công nghệ, hợp đồng API và sơ đồ sẵn có nếu còn phù hợp với yêu cầu mới.
+Và lộ trình sprint:
 
-## Tối ưu hóa cho Oh My Pi (OMP)
+| Sprint | Sprint Goal | SP |
+|---|---|---|
+| Sprint 1 – Bán hàng cơ bản | Nhân viên đăng nhập, tìm điện thoại, kiểm tra tồn kho và tạo đơn | 20 |
+| Sprint 2 – Hoàn thiện thanh toán | Thêm sản phẩm vào đơn, tính tiền, thanh toán và trừ kho | 18 |
+| Sprint 3 – Khách hàng và báo cáo | Khách hàng, hóa đơn, báo cáo doanh thu | 19 |
 
-Khi chạy trong Oh My Pi, hệ thống tận dụng các tính năng có sẵn của môi trường:
-
-- Phê duyệt cổng tương tác: Sử dụng công cụ `ask` để hiển thị menu lựa chọn trực quan tại mỗi cổng G1–G4.
-- Lập kế hoạch chi tiết: Bẻ nhỏ tính năng thành các nhiệm vụ độc lập kèm đường dẫn file và tiêu chí kiểm chứng trước khi viết code.
-- Lựa chọn mô hình thực thi: Sau Cổng G4, người dùng có thể chọn giao việc cho subagent độc lập (Task Worker và Task Reviewer) hoặc để main agent thực hiện tuần tự.
-- Kiểm tra trực quan qua trình duyệt: Tự động mở sơ đồ HTML/SVG hoặc giao diện web trên Chromium để kiểm tra độ ổn định của font chữ, bố cục và kết nối trước khi bàn giao.
+Mỗi sprint có bảng task cho từng story, ví dụ `US20 – Đăng nhập`: T01 màn hình Login, T02 API Login, T03 kiểm tra username/password, T04 testing.
 
 ## Cài đặt
 
@@ -97,7 +81,7 @@ Chọn các kỹ năng cần dùng hoặc chọn toàn bộ, sau đó nhấn Ent
 npx github:duchuyn04/product-workflow-skills --project
 ```
 
-Lệnh trên cài đặt đầy đủ 12 kỹ năng vào thư mục `.agents/skills/` và bổ sung khối chỉ dẫn tương ứng vào `AGENTS.md`.
+Lệnh trên cài đặt đầy đủ 5 kỹ năng vào thư mục `.agents/skills/` và bổ sung khối chỉ dẫn tương ứng vào `AGENTS.md`.
 
 Các tùy chọn cài đặt dòng lệnh:
 
@@ -153,12 +137,16 @@ npx github:duchuyn04/product-workflow-skills --claude --global
 npx github:duchuyn04/product-workflow-skills --all --project
 ```
 
+### Nâng cấp từ bản 1.x
+
+Bản 2.0 gỡ các kỹ năng liên quan tới code (`solution-design`, `task-execution`, `delivery-inspection`, `code-review`, `codebase-design`, `diagnosing-bugs`), gỡ `project-guide`, và đổi tên `story-and-experience` → `product-backlog`, `delivery-planning` → `sprint-planning`. Trình cài đặt không tự xóa thư mục cũ trong thư mục skills (có thể trùng tên với skill riêng của bạn); nó in cảnh báo để bạn tự xóa.
+
 ### Dùng với Claude Code
 
-- Skills được cài vào `.claude/skills/`. Gọi `/project-guide` để định hướng hoặc `/product-workflow` để điều phối công việc; mở phiên Claude Code mới sau khi cài.
+- Skills được cài vào `.claude/skills/`. Gọi `/product-workflow` để bắt đầu; mở phiên Claude Code mới sau khi cài.
 - Claude Code bỏ qua `AGENTS.md` khi dự án đã có `CLAUDE.md`, nên installer thêm khối có marker chứa `@AGENTS.md` vào `CLAUDE.md` (tạo file nếu chưa có, giữ nguyên nội dung sẵn có, bỏ qua nếu `CLAUDE.md` đã import `AGENTS.md`).
 - Skills viết theo tên công cụ Oh My Pi; bảng ánh xạ `product-workflow/references/harness.md` quy đổi sang công cụ của Claude Code: `ask` thành `AskUserQuestion`, `task`/subagent thành `Agent`, `skill://` thành đọc file trong `.claude/skills/`.
-- Claude Code không có browser tích hợp. Các bước kiểm thử Browser Native (sơ đồ, prototype, giao diện web) cần một MCP browser như Playwright MCP hoặc Chrome DevTools MCP; nếu chưa cấu hình, kết quả được ghi `not-run` thay vì coi là đạt.
+- Chỉ `diagram-design` cần browser để kiểm tra sơ đồ. Trên Claude Code, dùng MCP browser như Playwright MCP hoặc Chrome DevTools MCP; nếu chưa cấu hình, sơ đồ được ghi `not-run`.
 
 ### Đóng gói và chạy bản cục bộ
 
@@ -171,21 +159,21 @@ npm pack
 Chạy gói vừa tạo mà không cần tải từ registry:
 
 ```bash
-npx --yes --package ./product-workflow-skills-1.0.0.tgz product-workflow-skills
+npx --yes --package ./product-workflow-skills-2.0.0.tgz product-workflow-skills
 ```
 
 ### Sao chép thủ công
 
 Sao chép các thư mục kỹ năng vào `.agents/skills/` (Oh My Pi) hoặc `.claude/skills/` (Claude Code) trong dự án và bổ sung chỉ dẫn từ `AGENTS.md`; với Claude Code, thêm dòng `@AGENTS.md` vào `CLAUDE.md` nếu dự án đã có file này. Đối với cấu hình toàn cục, sao chép vào `~/.omp/agent/skills/` (Oh My Pi) hoặc `~/.claude/skills/` (Claude Code).
 
-## Câu lệnh mẫu theo nhu cầu
+## Câu lệnh mẫu
 
 | Nhu cầu | Câu lệnh mẫu |
 |---|---|
-| Định hướng dự án | "Tôi mới vào dự án, hiện tại dự án đang ở đâu và tôi nên làm gì tiếp?" |
-| Phân tích nghiệp vụ | "Làm rõ nghiệp vụ xử lý trùng lặp dữ liệu và các quy tắc liên quan." |
-| Viết User Stories | "Viết User Stories và đặc tả trạng thái giao diện cho màn hình tạo mới." |
-| Thiết kế kiến trúc và API | "Thiết kế database schema và REST API contracts cho module này." |
-| Lập kế hoạch sprint | "Chia nhỏ tính năng thành các task cụ thể để chuẩn bị triển khai." |
-| Triển khai code | "Thực hiện task API đăng nhập và chạy unit test." |
-| Kiểm tra tiến độ và nghiệm thu | "Xem ma trận tiến độ và kiểm tra tiêu chí hoàn thành của sprint này." |
+| Bắt đầu từ mô tả | "Phân tích yêu cầu sau và lập product backlog: <dán mô tả hệ thống>" |
+| Có sẵn đề bài dạng file | "Đọc file de-bai.pdf, xác định Epic và actors." |
+| Viết stories | "Tách các Epic đã duyệt thành user stories và ma trận actor." |
+| Chia sprint | "Nhóm 4 người, sprint 2 tuần, chia sprint và task cho backlog này." |
+| Xuất Jira | "Xuất backlog và sprint ra file CSV để import Jira." |
+| Thay đổi yêu cầu | "Thêm chức năng đổi trả hàng vào backlog và lập lại các sprint chưa bắt đầu." |
+| Tiếp tục | "Tiếp tục từ chỗ đang làm." |
