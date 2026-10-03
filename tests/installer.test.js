@@ -489,7 +489,7 @@ test('sprint-planning surveys the team, applies five criteria and writes named s
 
   assert.match(records, /\| Task \| Story \| Nội dung \| Vai trò \| Người phụ trách \| Phụ thuộc \|/);
   assert.match(records, /Issue Id,Issue Type,Summary,Description,Priority,Story Points,Parent Id,Sprint,Labels/);
-  assert.match(records, /Không đặt tên trơ trọi `Sprint 1` hay folder `sprint-1\/`/);
+  assert.match(records, /Không đặt tên chỉ gồm số thứ tự như `Sprint 1` hay folder `sprint-1\/`/);
 });
 
 test('contract defines exactly three gates and keeps AI numbers as proposals', t => {

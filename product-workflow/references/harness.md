@@ -35,7 +35,7 @@ Thư mục chứa các skill đã cài, cũng là thư mục cha của skill đa
 - Mỗi lần gọi 1–4 câu hỏi; mỗi câu 2–4 lựa chọn; `header` tối đa 12 ký tự.
 - Lựa chọn "Other" có sẵn: bỏ các option kiểu "Khác (tự nhập)" trong mẫu để còn tối đa 4 option.
 - Option `recommended` đặt đầu danh sách và thêm "(Recommended)" vào label; bỏ trường `id` và `recommended`.
-- Kết quả trả về ngay trong lượt. Đó là quyết định của người dùng cho đúng câu hỏi vừa hỏi; nếu người dùng bỏ qua hoặc từ chối trả lời thì dừng lượt, không tự chọn thay.
+- Kết quả trả về ngay trong lượt và là quyết định cho đúng câu hỏi vừa đặt ra. Câu hỏi bị bỏ qua hoặc từ chối trả lời thì dừng lượt, không tự chọn thay.
 - Tóm tắt kết quả cổng phải hiển thị trong chat trước khi gọi; thẻ hỏi chỉ ghi nhận quyết định.
 
 ## Browser trên Claude Code

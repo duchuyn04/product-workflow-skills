@@ -169,9 +169,9 @@ function syncAgentsMd(targetProjectRoot) {
 ## Product Workflow
 - Khi phân tích yêu cầu, xác định Epic/actors, viết User Stories, lập Product Backlog hoặc chia sprint và task, đọc ${routerRefs} trước. Glob/liệt kê đường dẫn không thay cho đọc nội dung.
 - Quy trình có 3 cổng: G1 Nghiệp vụ & Epic → G2 Stories & Backlog → G3 Sprint & Tasks. Mỗi lượt một cổng: lưu tài liệu vào docs/workflow/, tóm tắt trong chat, gọi ask và chờ duyệt. "OK" chỉ duyệt cổng vừa trình bày.
-- Priority, Story Point, Rank và phân sprint do AI đưa ra là đề xuất cho đến khi người dùng duyệt. Không bịa actors, capacity hay tên thành viên.
+- Priority, Story Point, Rank và phân sprint do AI đưa ra là đề xuất cho đến khi được duyệt. Không bịa actors, capacity hay tên thành viên.
 - Tên công cụ trong skills theo Oh My Pi (ask, task, browser, skill://). Harness khác dùng công cụ tương đương trong ${harnessRefs}; Claude Code: ask → AskUserQuestion, task → Agent.
-- Không đọc được skill: báo thiếu cấu hình. Giữ rules riêng của dự án; báo xung đột để người dùng quyết định.
+- Không đọc được skill: báo thiếu cấu hình. Giữ rules riêng của dự án; nêu rõ xung đột và chờ quyết định.
 ${MARKER_END}`;
 
   upsertMarkedBlock(path.join(targetProjectRoot, 'AGENTS.md'), block);

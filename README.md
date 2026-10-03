@@ -1,13 +1,13 @@
 # Product Workflow Skills for AI Agents
 
-Bộ kỹ năng (Agent Skills) giúp các công cụ lập trình AI như Oh My Pi hoặc Claude Code đi từ **mô tả yêu cầu** đến **Product Backlog** và **kế hoạch sprint có chia task**:
+Bộ kỹ năng (Agent Skills) cho các AI coding agent như Oh My Pi và Claude Code, chuyển **mô tả yêu cầu** thành **Product Backlog** và **kế hoạch sprint có chia task**:
 
 ```text
 Mô tả yêu cầu → Epic → User Story → Ma trận Actor–Story → Product Backlog (Rank / Priority / Story Point)
              → Sprint Planning → Sprint → Task / Sub-task → (CSV import Jira)
 ```
 
-Bộ skills chỉ lập kế hoạch sản phẩm: không viết code, không thiết kế kiến trúc, không review hay nghiệm thu. Mọi kết quả lưu thành Markdown trong `docs/workflow/` của dự án.
+Phạm vi của bộ skills là lập kế hoạch sản phẩm: không bao gồm viết code, thiết kế kiến trúc, review hay nghiệm thu. Toàn bộ kết quả được lưu dưới dạng Markdown trong `docs/workflow/` của dự án.
 
 ## Cấu trúc các kỹ năng
 
@@ -17,13 +17,13 @@ Bộ skills chỉ lập kế hoạch sản phẩm: không viết code, không th
 
 | Kỹ năng | Vai trò |
 |---|---|
-| `product-workflow` | Đầu vào duy nhất. Xác định đang ở cổng nào, gọi đúng kỹ năng, tiếp tục từ tài liệu có sẵn và xử lý thay đổi yêu cầu. |
+| `product-workflow` | Điểm vào duy nhất. Xác định cổng hiện tại, định tuyến tới kỹ năng tương ứng, tiếp tục từ tài liệu có sẵn và xử lý thay đổi yêu cầu. |
 | `product-discovery` | Cổng G1. Phân tích mô tả, phỏng vấn tình huống theo quy mô dự án, chuyển As-Is sang To-Be, xác định actors, quy tắc nghiệp vụ và danh mục Epic. |
 | `product-backlog` | Cổng G2. Tách yêu cầu thành User Stories có tiêu chí nghiệm thu, lập ma trận Actor–Story, đề xuất Priority, Story Point, Rank và xuất Product Backlog. |
-| `sprint-planning` | Cổng G3. Hỏi số người, độ dài sprint và velocity; xét dependency; chọn story vào từng sprint; viết Sprint Goal; chia task; xuất CSV cho Jira. |
-| `diagram-design` | Tùy chọn. Vẽ story map, chuỗi dependency hoặc roadmap dạng HTML/SVG khi người dùng muốn. |
+| `sprint-planning` | Cổng G3. Khảo sát quy mô nhóm, độ dài sprint và velocity; phân tích dependency; xếp story vào từng sprint; xác định Sprint Goal; chia task; xuất CSV cho Jira. |
+| `diagram-design` | Tùy chọn. Vẽ story map, chuỗi dependency hoặc roadmap dạng HTML/SVG khi có yêu cầu. |
 
-Ba kỹ năng cổng được ẩn (`hide: true`; trên Claude Code là `disable-model-invocation: true`): model không tự gọi, `product-workflow` đọc chúng khi tới cổng tương ứng.
+Ba kỹ năng cổng được ẩn (`hide: true`; trên Claude Code là `disable-model-invocation: true`): model không tự gọi, `product-workflow` đọc chúng khi đến cổng tương ứng.
 
 ## Ba cổng duyệt
 
@@ -37,7 +37,7 @@ Ba kỹ năng cổng được ẩn (`hide: true`; trên Claude Code là `disable
 | G2 Stories & Backlog | User Stories `US01…` với tiêu chí Given/When/Then, ma trận Actor–Story, Product Backlog theo Epic và theo Rank | `docs/workflow/specs/<du-an>-stories.md`, `docs/workflow/product-backlog.md` |
 | G3 Sprint & Tasks | Lộ trình các sprint, mỗi sprint có Goal, danh sách story trong capacity và bảng task `T01…` | `docs/workflow/sprints/roadmap.md`, `docs/workflow/sprints/sprint-<X>-<slug>/sprint-plan.md`, tùy chọn `docs/workflow/jira-import.csv` |
 
-Ở mỗi cổng, AI lưu file, tóm tắt trong chat rồi dừng lại chờ duyệt. Priority, Story Point, Rank và phân sprint do AI đưa ra luôn là đề xuất cho đến khi người dùng chốt.
+Tại mỗi cổng, agent lưu tài liệu, tóm tắt kết quả trong chat và dừng để chờ phê duyệt. Priority, Story Point, Rank và phân bổ sprint do AI đưa ra giữ trạng thái đề xuất cho đến khi được phê duyệt.
 
 Quy ước đặt tên:
 - Epic: `Quản lý + …`, ví dụ `EP02 – Quản lý bán hàng`.
@@ -67,15 +67,15 @@ Mỗi sprint có bảng task cho từng story, ví dụ `US20 – Đăng nhập`
 
 ### Cách 1: Cài đặt nhanh qua `npx skills`
 
-Chạy lệnh sau trong terminal để mở giao diện chọn skills:
+Lệnh sau mở giao diện chọn skills trong terminal:
 
 ```bash
 npx skills@latest add duchuyn04/product-workflow-skills
 ```
 
-Chọn các kỹ năng cần dùng hoặc chọn toàn bộ, sau đó nhấn Enter để hoàn tất.
+Chọn các kỹ năng cần cài (hoặc toàn bộ) và xác nhận bằng Enter.
 
-Để áp dụng đầy đủ quy tắc ở cấp dự án, chạy thêm lệnh cài đặt tích hợp vào `AGENTS.md`:
+Để áp dụng đầy đủ quy tắc ở cấp dự án, cần chạy thêm lệnh tích hợp vào `AGENTS.md`:
 
 ```bash
 npx github:duchuyn04/product-workflow-skills --project
@@ -106,9 +106,9 @@ Chạy trực tiếp trình cài đặt:
 npx github:duchuyn04/product-workflow-skills
 ```
 
-Menu hỏi lần lượt:
+Trình cài đặt yêu cầu chọn lần lượt:
 1. Harness: `Oh My Pi`, `Claude Code` hoặc cả hai.
-2. Phạm vi: `Project` (cài vào dự án hiện tại và đồng bộ file chỉ dẫn) hoặc `Global` (cài vào thư mục toàn cục của người dùng).
+2. Phạm vi: `Project` (cài vào dự án hiện tại và đồng bộ file chỉ dẫn) hoặc `Global` (cài vào thư mục toàn cục của tài khoản hệ điều hành).
 
 | Harness | Project | Global | File chỉ dẫn (Project) |
 |---|---|---|---|
@@ -139,11 +139,11 @@ npx github:duchuyn04/product-workflow-skills --all --project
 
 ### Nâng cấp từ bản 1.x
 
-Bản 2.0 gỡ các kỹ năng liên quan tới code (`solution-design`, `task-execution`, `delivery-inspection`, `code-review`, `codebase-design`, `diagnosing-bugs`), gỡ `project-guide`, và đổi tên `story-and-experience` → `product-backlog`, `delivery-planning` → `sprint-planning`. Trình cài đặt không tự xóa thư mục cũ trong thư mục skills (có thể trùng tên với skill riêng của bạn); nó in cảnh báo để bạn tự xóa.
+Bản 2.0 gỡ các kỹ năng liên quan tới code (`solution-design`, `task-execution`, `delivery-inspection`, `code-review`, `codebase-design`, `diagnosing-bugs`), gỡ `project-guide`, và đổi tên `story-and-experience` → `product-backlog`, `delivery-planning` → `sprint-planning`. Trình cài đặt không tự xóa thư mục cũ trong thư mục skills, vì thư mục trùng tên có thể là skill riêng của dự án; thay vào đó, trình cài đặt in cảnh báo để xóa thủ công.
 
 ### Dùng với Claude Code
 
-- Skills được cài vào `.claude/skills/`. Gọi `/product-workflow` để bắt đầu; mở phiên Claude Code mới sau khi cài.
+- Skills được cài vào `.claude/skills/`. Gọi `/product-workflow` để bắt đầu; cần mở phiên Claude Code mới sau khi cài.
 - Claude Code bỏ qua `AGENTS.md` khi dự án đã có `CLAUDE.md`, nên installer thêm khối có marker chứa `@AGENTS.md` vào `CLAUDE.md` (tạo file nếu chưa có, giữ nguyên nội dung sẵn có, bỏ qua nếu `CLAUDE.md` đã import `AGENTS.md`).
 - Skills viết theo tên công cụ Oh My Pi; bảng ánh xạ `product-workflow/references/harness.md` quy đổi sang công cụ của Claude Code: `ask` thành `AskUserQuestion`, `task`/subagent thành `Agent`, `skill://` thành đọc file trong `.claude/skills/`.
 - Chỉ `diagram-design` cần browser để kiểm tra sơ đồ. Trên Claude Code, dùng MCP browser như Playwright MCP hoặc Chrome DevTools MCP; nếu chưa cấu hình, sơ đồ được ghi `not-run`.
@@ -156,7 +156,7 @@ Tạo gói cài đặt từ thư mục mã nguồn:
 npm pack
 ```
 
-Chạy gói vừa tạo mà không cần tải từ registry:
+Chạy gói vừa tạo, không cần tải từ registry:
 
 ```bash
 npx --yes --package ./product-workflow-skills-2.0.0.tgz product-workflow-skills
@@ -168,7 +168,7 @@ Sao chép các thư mục kỹ năng vào `.agents/skills/` (Oh My Pi) hoặc `.
 
 ## Câu lệnh mẫu
 
-| Nhu cầu | Câu lệnh mẫu |
+| Mục đích | Câu lệnh mẫu |
 |---|---|
 | Bắt đầu từ mô tả | "Phân tích yêu cầu sau và lập product backlog: <dán mô tả hệ thống>" |
 | Có sẵn đề bài dạng file | "Đọc file de-bai.pdf, xác định Epic và actors." |

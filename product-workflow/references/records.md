@@ -1,13 +1,13 @@
 # Mẫu tài liệu dùng chung
 
-Mẫu để agent điền khi làm các cổng. Không tạo sẵn file dự án chỉ vì đọc file này. Bảng dưới là khung, không phải dữ liệu thật. Mọi ví dụ dùng chung một bộ số liệu minh họa từ đề bài bán điện thoại: `EP01 Quản lý sản phẩm` (US01 Thêm, US04 Tìm kiếm sản phẩm), `EP02 Quản lý bán hàng` (US05 Tạo đơn hàng, US06 Thêm sản phẩm vào đơn, US09 Thanh toán), `EP03 Quản lý kho` (US11 Trừ tồn kho khi bán, US12 Kiểm tra tồn kho), `EP06 Quản lý tài khoản` (US20 Đăng nhập).
+Mẫu để agent điền khi thực hiện các cổng. Không tạo sẵn file dự án chỉ vì đọc file này. Bảng dưới là khung, không phải dữ liệu thật. Mọi ví dụ dùng chung một bộ số liệu minh họa từ đề bài bán điện thoại: `EP01 Quản lý sản phẩm` (US01 Thêm, US04 Tìm kiếm sản phẩm), `EP02 Quản lý bán hàng` (US05 Tạo đơn hàng, US06 Thêm sản phẩm vào đơn, US09 Thanh toán), `EP03 Quản lý kho` (US11 Trừ tồn kho khi bán, US12 Kiểm tra tồn kho), `EP06 Quản lý tài khoản` (US20 Đăng nhập).
 
 ## Quy ước đặt tên và ID
 
 - **Epic:** ID `EP01`, `EP02`… Tên hiển thị bắt đầu bằng `Quản lý + [thực thể/nghiệp vụ]`, ví dụ `Quản lý sản phẩm`, `Quản lý bán hàng`. Nhóm như báo cáo, hóa đơn vẫn viết `Quản lý báo cáo`, `Quản lý hóa đơn`. Bảng hẹp có thể dùng tên ngắn bỏ chữ `Quản lý` (ví dụ `Bán hàng`), nhưng tên đầy đủ trong brief và CSV Jira luôn theo dạng `Quản lý + …`.
 - **User Story:** ID `US01`, `US02`… đánh số liên tục trên toàn dự án, theo thứ tự Epic. Tên ngắn là một hành động: `Thêm sản phẩm`, `Tạo đơn hàng`.
 - **Task:** ID `T01`, `T02`… đánh số liên tục trên toàn dự án (không đánh lại từ đầu mỗi sprint), để task không trùng ID khi xuất Jira.
-- **Sprint:** tên hiển thị `Sprint X – <Mục tiêu ngắn>`, ví dụ `Sprint 1 – Bán hàng cơ bản`. Folder `docs/workflow/sprints/sprint-<X>-<slug>/`, slug là mục tiêu viết kebab-case không dấu, ví dụ `sprint-1-ban-hang-co-ban/`. Không đặt tên trơ trọi `Sprint 1` hay folder `sprint-1/`.
+- **Sprint:** tên hiển thị `Sprint X – <Mục tiêu ngắn>`, ví dụ `Sprint 1 – Bán hàng cơ bản`. Folder `docs/workflow/sprints/sprint-<X>-<slug>/`, slug là mục tiêu viết kebab-case không dấu, ví dụ `sprint-1-ban-hang-co-ban/`. Không đặt tên chỉ gồm số thứ tự như `Sprint 1` hay folder `sprint-1/`.
 - ID giữ ổn định khi đổi tên, đổi Rank hoặc chuyển sprint. Story bị bỏ thì ghi `Đã hủy`, không tái dùng ID.
 
 ## Đầu file
@@ -48,7 +48,7 @@ Các mục theo thứ tự:
 
 | ID | Quy tắc | Ví dụ | Nguồn xác nhận |
 |---|---|---|---|
-| BR01 | … | … | người dùng xác nhận / tài liệu <tên> / AI suy luận – cần xác nhận |
+| BR01 | … | … | bên yêu cầu xác nhận / tài liệu <tên> / AI suy luận – cần xác nhận |
 
 7. **Bảng phủ R1–R8:**
 
@@ -151,7 +151,7 @@ Hai góc nhìn là cùng dữ liệu. Khi sửa Priority/SP/Rank/Sprint thì s�
 - Trạng thái cổng: draft | awaiting-approval | approved | needs-revalidation
 - Cập nhật: <YYYY-MM-DD>
 - Người duyệt: <tên/vai trò hoặc Chưa duyệt>
-- Thời gian: 2 tuần (ngày bắt đầu/kết thúc nếu người dùng cho)
+- Thời gian: 2 tuần (ngày bắt đầu/kết thúc nếu đã xác định)
 - Sprint Goal: Xây dựng quy trình cơ bản để nhân viên đăng nhập, tìm kiếm điện thoại, kiểm tra tồn kho và tạo đơn hàng.
 - Capacity: 20 SP · Đã chọn: 17 SP
 ```
@@ -173,7 +173,7 @@ Hai góc nhìn là cùng dữ liệu. Khi sửa Priority/SP/Rank/Sprint thì s�
 | T03 | US20 | Kiểm tra username/password | Backend | — | T02 |
 | T04 | US20 | Testing Login | QA | — | T01, T03 |
 
-Có thể trình bày thêm dạng cây cho từng story khi người dùng thích:
+Có thể bổ sung dạng cây cho từng story khi cần:
 
 ```text
 US20 – Đăng nhập (3 SP)
@@ -183,7 +183,7 @@ US20 – Đăng nhập (3 SP)
 └── T04 – Testing Login
 ```
 
-`Người phụ trách` chỉ ghi tên người dùng nêu; chưa có thì `—`.
+`Người phụ trách` chỉ ghi tên đã được cung cấp; chưa có thì ghi `—`.
 
 ## G3 — CSV import Jira (`jira-import.csv`)
 
@@ -198,6 +198,6 @@ T01,Sub-task,Thiết kế màn hình Login,,,,US20,Sprint 1 – Bán hàng cơ b
 
 - Thứ tự dòng: Epic → Story → Sub-task, để cha có trước con.
 - `Issue Id` và `Parent Id` dùng ID của backlog. Lúc import, map `Issue Id` → *Issue Id* và `Parent Id` → *Parent* để Jira nối cha–con.
-- Tên trường Story Points khác nhau theo loại project (`Story Points` hoặc `Story point estimate`); người dùng chọn đúng trường khi map. Tên loại issue (`Sub-task`/`Subtask`) cũng phải khớp cấu hình project.
+- Tên trường Story Points khác nhau theo loại project (`Story Points` hoặc `Story point estimate`); cần chọn đúng trường khi map cột. Tên loại issue (`Sub-task`/`Subtask`) cũng phải khớp cấu hình project.
 - Story chưa xếp sprint để trống cột `Sprint`.
 - Ghi hướng dẫn import vào mục `Xuất Jira` của `sprints/roadmap.md` và tóm tắt trong chat, gồm các bước: tạo project, vào trang import CSV của Jira, chọn file, map từng cột, kiểm tra kết quả trên Backlog.
